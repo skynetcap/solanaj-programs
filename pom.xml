@@ -10,6 +10,8 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>mango</module>
+        <module>serum</module>
+        <module>spl</module>
     </modules>
 
     <properties>
