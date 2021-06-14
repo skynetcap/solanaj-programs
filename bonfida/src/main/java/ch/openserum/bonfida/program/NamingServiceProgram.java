@@ -1,4 +1,4 @@
-package ch.openserum.bonfida;
+package ch.openserum.bonfida.program;
 
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
