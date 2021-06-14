@@ -12,6 +12,7 @@
         <module>mango</module>
         <module>serum</module>
         <module>spl</module>
+        <module>bonfida</module>
     </modules>
 
     <properties>
