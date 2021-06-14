@@ -1,0 +1,10 @@
+.vscode
+target
+build
+.project
+.classpath
+.settings
+.idea
+*.iml
+*.dat
+*.properties
