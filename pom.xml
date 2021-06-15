@@ -44,4 +44,12 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/skynetcapital/solanaj-programs</url>
+        </repository>
+    </distributionManagement>
+
 </project>
