@@ -3,7 +3,9 @@
 SolanaJ implementations of popular Solana programs, including the Project Serum DEX.
 
 # Installation
-To install all modules:
+solanaj-programs is not yet on Maven Central. You'll need to install it using `mvn clean install`.
+
+After running `mvn clean install`:
 ```xml
 <dependency>
         <groupId>ch.openserum</groupId>
