@@ -1238,6 +1238,7 @@ public class OrderTest {
     }
 
     @Test
+    @Ignore
     public void lqidUsdcTest() {
         byte[] data = new byte[0];
 
