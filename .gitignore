@@ -7,4 +7,5 @@ build
 .idea
 *.iml
 *.dat
+*.bin
 *.properties
