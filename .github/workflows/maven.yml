@@ -21,5 +21,18 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Build with Maven
+    - run: mkdir solanaj
+      name: Create SolanaJ directory
+    - run: cd solanaj
+      name: Navigate to SolanaJ directory
+    - uses: actions/checkout@v2
+      with:
+        name: skynetcapital/solanaj
+        ref: refs/heads/main
+    - name: Build SolanaJ with Maven
+      run: mvn clean install
+    - run: cd ../
+      name: Navigate to root maven directory
+    - name: Package SolanaJ-Programs with Maven
       run: mvn -B package --file pom.xml
+
