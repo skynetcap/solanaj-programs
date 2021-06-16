@@ -18,16 +18,21 @@ import static ch.openserum.mango.model.MangoUtils.*;
 public class MangoGroup {
     // Constants
     private static final int NUM_TOKENS = 5;
+    private static final int NUM_MARKETS = NUM_TOKENS - 1;
 
     // Offsets
     private static final int TOKENS_OFFSET = ACCOUNT_FLAGS_SIZE_BYTES;
     private static final int VAULTS_OFFSET = TOKENS_OFFSET + (32 * NUM_TOKENS);
     private static final int INDEXES_OFFSET = VAULTS_OFFSET + (32 * NUM_TOKENS);
+    private static final int SPOT_MARKETS_OFFSET = INDEXES_OFFSET + (40 * NUM_TOKENS);
+    private static final int ORACLES_OFFSET = SPOT_MARKETS_OFFSET + (32 * NUM_MARKETS);
 
     private MangoGroupAccountFlags accountFlags;
     private List<PublicKey> tokens;
     private List<PublicKey> vaults;
     private List<MangoIndex> indexes;
+    private List<PublicKey> spotMarkets;
+    private List<PublicKey> oracles;
 
     public static MangoGroup readMangoGroup(byte[] data) {
         // Mango groups only store 4 booleans currently, 1 byte is enough
@@ -84,6 +89,20 @@ public class MangoGroup {
                     .build();
 
             mangoGroup.getIndexes().add(mangoIndex);
+        }
+
+        // Spot Markets
+        mangoGroup.setSpotMarkets(new ArrayList<>());
+        for (int i = 0; i < NUM_MARKETS; i++) {
+            final PublicKey spotMarketPubkey = PublicKey.readPubkey(data, SPOT_MARKETS_OFFSET + (i  * 32));
+            mangoGroup.getSpotMarkets().add(spotMarketPubkey);
+        }
+
+        // Oracles
+        mangoGroup.setOracles(new ArrayList<>());
+        for (int i = 0; i < NUM_MARKETS; i++) {
+            final PublicKey oraclePubkey = PublicKey.readPubkey(data, ORACLES_OFFSET + (i  * 32));
+            mangoGroup.getOracles().add(oraclePubkey);
         }
 
         return mangoGroup;

@@ -1,5 +1,4 @@
 import ch.openserum.mango.model.MangoGroup;
-import ch.openserum.mango.model.MangoGroupAccountFlags;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -10,7 +9,6 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.logging.Logger;
 
