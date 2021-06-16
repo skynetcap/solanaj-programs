@@ -17,6 +17,8 @@ public class MangoGroup {
 
     // Offsets
     private static final int TOKENS_OFFSET = 8;
+    private static final int VAULTS_OFFSET = TOKENS_OFFSET + (32 * NUM_TOKENS);
+    private static final int INDEXES_OFFSET = VAULTS_OFFSET + (32 * NUM_TOKENS);
 
     private MangoGroupAccountFlags accountFlags;
     private List<PublicKey> tokens;
@@ -43,6 +45,13 @@ public class MangoGroup {
         for (int i = 0; i < NUM_TOKENS; i++) {
             PublicKey tokenPubkey = PublicKey.readPubkey(data, TOKENS_OFFSET + (i  * 32));
             mangoGroup.getTokens().add(tokenPubkey);
+        }
+
+        // Listed vaults
+        mangoGroup.setVaults(new ArrayList<>());
+        for (int i = 0; i < NUM_TOKENS; i++) {
+            PublicKey vaultPubkey = PublicKey.readPubkey(data, VAULTS_OFFSET + (i  * 32));
+            mangoGroup.getVaults().add(vaultPubkey);
         }
 
         return mangoGroup;
