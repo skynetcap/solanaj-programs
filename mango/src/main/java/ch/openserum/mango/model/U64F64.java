@@ -10,8 +10,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.logging.Logger;
 
 @Getter
 @Setter
@@ -35,10 +33,5 @@ public class U64F64 {
         BigDecimal divided = new BigDecimal(result).divide(new BigDecimal(divisor));
 
         return divided.floatValue();
-    }
-
-    private BigDecimal bytesToBigDecimal(byte[] buffer) {
-        String string = new String(buffer);
-        return new BigDecimal(string);
     }
 }

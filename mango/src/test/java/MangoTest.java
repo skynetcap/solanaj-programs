@@ -7,21 +7,9 @@ import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
-import org.p2p.solanaj.utils.ByteUtils;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class MangoTest {
 
@@ -71,39 +59,10 @@ public class MangoTest {
                     )
             );
 
-            byte[] deposit = mangoIndex.getDeposit();
-            byte[] borrow = mangoIndex.getBorrow();
+            U64F64 deposit = new U64F64(mangoIndex.getDeposit());
+            U64F64 borrow = new U64F64(mangoIndex.getBorrow());
 
-            U64F64 depositFloat = new U64F64(deposit);
-
-            float decoded = depositFloat.decode();
-
-            LOGGER.info(String.format("Decoded deposits = %.10f", decoded));
-
-        }
-
-
-        try {
-            Files.write(Path.of("mangoGroup.bin"), mangoGroupData);
-        } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.info(String.format("Deposit = %.16f, Borrow = %.16f", deposit.decode(), borrow.decode()));
         }
     }
-
-    private static void reverse(byte[] array) {
-        if (array == null) {
-            return;
-        }
-        int i = 0;
-        int j = array.length - 1;
-        byte tmp;
-        while (j > i) {
-            tmp = array[j];
-            array[j] = array[i];
-            array[i] = tmp;
-            j--;
-            i++;
-        }
-    }
-
 }
