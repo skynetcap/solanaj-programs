@@ -76,7 +76,9 @@ public class MangoTest {
 
             U64F64 depositFloat = new U64F64(deposit);
 
-            depositFloat.decode();
+            float decoded = depositFloat.decode();
+
+            LOGGER.info(String.format("Decoded deposits = %.10f", decoded));
 
         }
 

@@ -21,7 +21,6 @@ public class U64F64 {
     private byte[] data;
 
     public float decode() {
-        //Logger.getAnonymousLogger().info("Data = " + Arrays.toString(data));
         ByteBuffer buffer = ByteBuffer.allocate(16);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -29,23 +28,13 @@ public class U64F64 {
             buffer.put(data[16 - i - 1]);
         }
 
-        //Logger.getAnonymousLogger().info("Buffer = " + Arrays.toString(buffer.array()));
-
         // divisor
         double divisor = Math.pow(2, 64);
-
         String newString = ByteUtils.bytesToHex(buffer.array());
-
-        //Logger.getAnonymousLogger().info("newString = " + newString);
-
         BigInteger result = new BigInteger(newString, 16);
-        //System.out.println("bigInt Result = "  + result);
-
         BigDecimal divided = new BigDecimal(result).divide(new BigDecimal(divisor));
 
-        Logger.getAnonymousLogger().info("deposit = "  + divided);
-
-        return 0.0f;
+        return divided.floatValue();
     }
 
     private BigDecimal bytesToBigDecimal(byte[] buffer) {
