@@ -1,16 +1,27 @@
 import ch.openserum.mango.model.MangoGroup;
+import ch.openserum.mango.model.MangoIndex;
+import ch.openserum.mango.model.U64F64;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
+import org.p2p.solanaj.utils.ByteUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class MangoTest {
 
@@ -48,10 +59,48 @@ public class MangoTest {
                 )
         );
 
+        // Deposits and Borrow indexes test
+        for (int i = 0; i < 5; i++) {
+            MangoIndex mangoIndex = mangoGroup.getIndexes().get(i);
+            LOGGER.info(
+                    String.format(
+                            "Token Index %d (%s): %s",
+                            i,
+                            mangoGroup.getTokens().get(i).toBase58(),
+                            mangoIndex.toString()
+                    )
+            );
+
+            byte[] deposit = mangoIndex.getDeposit();
+            byte[] borrow = mangoIndex.getBorrow();
+
+            U64F64 depositFloat = new U64F64(deposit);
+
+            depositFloat.decode();
+
+        }
+
+
         try {
             Files.write(Path.of("mangoGroup.bin"), mangoGroupData);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void reverse(byte[] array) {
+        if (array == null) {
+            return;
+        }
+        int i = 0;
+        int j = array.length - 1;
+        byte tmp;
+        while (j > i) {
+            tmp = array[j];
+            array[j] = array[i];
+            array[i] = tmp;
+            j--;
+            i++;
         }
     }
 
