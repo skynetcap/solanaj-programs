@@ -26,6 +26,8 @@ public class MangoGroup {
     private static final int INDEXES_OFFSET = VAULTS_OFFSET + (32 * NUM_TOKENS);
     private static final int SPOT_MARKETS_OFFSET = INDEXES_OFFSET + (40 * NUM_TOKENS);
     private static final int ORACLES_OFFSET = SPOT_MARKETS_OFFSET + (32 * NUM_MARKETS);
+    private static final int SIGNER_NONCE_OFFSET = ORACLES_OFFSET + (32 * NUM_MARKETS);
+    private static final int SIGNER_KEY_OFFSET = SIGNER_NONCE_OFFSET + 8;
 
     private MangoGroupAccountFlags accountFlags;
     private List<PublicKey> tokens;
@@ -33,6 +35,8 @@ public class MangoGroup {
     private List<MangoIndex> indexes;
     private List<PublicKey> spotMarkets;
     private List<PublicKey> oracles;
+    private long signerNonce;
+    private PublicKey signerKey;
 
     public static MangoGroup readMangoGroup(byte[] data) {
         // Mango groups only store 4 booleans currently, 1 byte is enough
@@ -84,8 +88,8 @@ public class MangoGroup {
 
             final MangoIndex mangoIndex = MangoIndex.builder()
                     .lastUpdate(lastUpdate)
-                    .borrow(borrow)
-                    .deposit(deposit)
+                    .borrow(new U64F64(borrow))
+                    .deposit(new U64F64(deposit))
                     .build();
 
             mangoGroup.getIndexes().add(mangoIndex);
@@ -104,6 +108,9 @@ public class MangoGroup {
             final PublicKey oraclePubkey = PublicKey.readPubkey(data, ORACLES_OFFSET + (i  * 32));
             mangoGroup.getOracles().add(oraclePubkey);
         }
+
+        mangoGroup.setSignerNonce(Utils.readInt64(data, SIGNER_NONCE_OFFSET));
+        mangoGroup.setSignerKey(PublicKey.readPubkey(data, SIGNER_KEY_OFFSET));
 
         return mangoGroup;
     }

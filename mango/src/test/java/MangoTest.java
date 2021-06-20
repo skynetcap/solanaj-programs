@@ -1,6 +1,5 @@
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MangoIndex;
-import ch.openserum.mango.model.U64F64;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -59,10 +58,21 @@ public class MangoTest {
                     )
             );
 
-            U64F64 deposit = new U64F64(mangoIndex.getDeposit());
-            U64F64 borrow = new U64F64(mangoIndex.getBorrow());
-
-            LOGGER.info(String.format("Deposit = %.16f, Borrow = %.16f", deposit.decode(), borrow.decode()));
+            LOGGER.info(
+                    String.format(
+                            "Deposit = %.16f, Borrow = %.16f",
+                            mangoIndex.getDeposit().decode(),
+                            mangoIndex.getBorrow().decode()
+                    )
+            );
         }
+
+        LOGGER.info(
+                String.format(
+                        "signerNonce = %d, signerKey = %s",
+                        mangoGroup.getSignerNonce(),
+                        mangoGroup.getSignerKey()
+                )
+        );
     }
 }

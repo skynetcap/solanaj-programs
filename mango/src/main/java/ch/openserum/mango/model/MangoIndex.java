@@ -10,7 +10,7 @@ import lombok.Setter;
 public class MangoIndex {
 
     private long lastUpdate;
-    private byte[] borrow;
-    private byte[] deposit;
+    private U64F64 borrow;
+    private U64F64 deposit;
 
 }
