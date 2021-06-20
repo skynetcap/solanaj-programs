@@ -8,7 +8,7 @@ import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
-import org.p2p.solanaj.rpc.types.ConfigObjects;
+import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.utils.ByteUtils;
 
@@ -172,11 +172,11 @@ public class NamingManager {
             programAccounts = client.getApi().getProgramAccounts(
                     NAME_PROGRAM_ID,
                     List.of(
-                            new ConfigObjects.Memcmp(
+                            new Memcmp(
                                     TWITTER_PUBLIC_KEY_OFFSET,
                                     publicKey.toBase58()
                             ),
-                            new ConfigObjects.Memcmp(
+                            new Memcmp(
                                     TWITTER_VERIFICATION_AUTHORITY_OFFSET,
                                     TWITTER_VERIFICATION_AUTHORITY.toBase58()
                             )

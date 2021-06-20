@@ -9,7 +9,7 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
-import org.p2p.solanaj.rpc.types.ConfigObjects;
+import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.io.IOException;
@@ -1119,10 +1119,10 @@ public class OrderTest {
 
             List<ProgramAccount> programAccounts = null;
 
-            ConfigObjects.Memcmp marketFilter = new ConfigObjects.Memcmp(SerumUtils.OWN_ADDRESS_OFFSET, market.toBase58());
-            ConfigObjects.Memcmp ownerFilter = new ConfigObjects.Memcmp(45, skynetMainnetTestAccount.toBase58());
+            Memcmp marketFilter = new Memcmp(SerumUtils.OWN_ADDRESS_OFFSET, market.toBase58());
+            Memcmp ownerFilter = new Memcmp(45, skynetMainnetTestAccount.toBase58());
 
-            List<ConfigObjects.Memcmp> memcmpList = List.of(marketFilter, ownerFilter);
+            List<Memcmp> memcmpList = List.of(marketFilter, ownerFilter);
 
             try {
                 programAccounts = client.getApi().getProgramAccounts(SerumUtils.SERUM_PROGRAM_ID_V3, memcmpList, dataSize);

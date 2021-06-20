@@ -4,7 +4,7 @@ import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
-import org.p2p.solanaj.rpc.types.ConfigObjects;
+import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.nio.ByteBuffer;
@@ -279,10 +279,10 @@ public class SerumUtils {
 
         List<ProgramAccount> programAccounts = null;
 
-        ConfigObjects.Memcmp marketFilter = new ConfigObjects.Memcmp(OWN_ADDRESS_OFFSET, marketAddress.toBase58());
-        ConfigObjects.Memcmp ownerFilter = new ConfigObjects.Memcmp(45, ownerAddress.toBase58()); // TODO remove magic number
+        Memcmp marketFilter = new Memcmp(OWN_ADDRESS_OFFSET, marketAddress.toBase58());
+        Memcmp ownerFilter = new Memcmp(45, ownerAddress.toBase58()); // TODO remove magic number
 
-        List<ConfigObjects.Memcmp> memcmpList = List.of(marketFilter, ownerFilter);
+        List<Memcmp> memcmpList = List.of(marketFilter, ownerFilter);
 
         try {
             programAccounts = client.getApi().getProgramAccounts(SERUM_PROGRAM_ID_V3, memcmpList, dataSize);
