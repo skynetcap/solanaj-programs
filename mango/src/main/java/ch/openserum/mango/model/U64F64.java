@@ -16,6 +16,8 @@ import java.nio.ByteOrder;
 @Builder
 @AllArgsConstructor
 public class U64F64 {
+    public static final int U64F64_LENGTH = 16;
+
     private byte[] data;
 
     public float decode() {

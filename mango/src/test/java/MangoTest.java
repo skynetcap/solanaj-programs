@@ -7,6 +7,7 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -74,5 +75,30 @@ public class MangoTest {
                         mangoGroup.getSignerKey()
                 )
         );
+
+        LOGGER.info(
+                String.format(
+                        "DEX Program ID = %s",
+                        mangoGroup.getDexProgramId().toBase58()
+                )
+        );
+
+        mangoGroup.getTotalDeposits().forEach(totalDeposit -> {
+            LOGGER.info(
+                    String.format(
+                            "Total Deposit = %.2f",
+                            totalDeposit.decode()
+                    )
+            );
+        });
+
+        mangoGroup.getTotalBorrows().forEach(totalBorrow -> {
+            LOGGER.info(
+                    String.format(
+                            "Total Borrow = %.2f",
+                            totalBorrow.decode()
+                    )
+            );
+        });
     }
 }

@@ -28,6 +28,9 @@ public class MangoGroup {
     private static final int ORACLES_OFFSET = SPOT_MARKETS_OFFSET + (32 * NUM_MARKETS);
     private static final int SIGNER_NONCE_OFFSET = ORACLES_OFFSET + (32 * NUM_MARKETS);
     private static final int SIGNER_KEY_OFFSET = SIGNER_NONCE_OFFSET + 8;
+    private static final int DEX_PROGRAM_ID_OFFSET = SIGNER_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int TOTAL_DEPOSITS_OFFSET = DEX_PROGRAM_ID_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int TOTAL_BORROWS_OFFSET = TOTAL_DEPOSITS_OFFSET + (U64F64.U64F64_LENGTH * NUM_TOKENS);
 
     private MangoGroupAccountFlags accountFlags;
     private List<PublicKey> tokens;
@@ -37,6 +40,9 @@ public class MangoGroup {
     private List<PublicKey> oracles;
     private long signerNonce;
     private PublicKey signerKey;
+    private PublicKey dexProgramId;
+    private List<U64F64> totalDeposits;
+    private List<U64F64> totalBorrows;
 
     public static MangoGroup readMangoGroup(byte[] data) {
         // Mango groups only store 4 booleans currently, 1 byte is enough
@@ -71,19 +77,19 @@ public class MangoGroup {
         // Indexes
         mangoGroup.setIndexes(new ArrayList<>());
         for (int i = 0; i < NUM_TOKENS; i++) {
-            int counter = (i * (U64_SIZE_BYTES + (2 * U64F64_SIZE_BYTES))); // (i * 40)
+            int counter = (i * (U64_SIZE_BYTES + (2 * U64F64.U64F64_LENGTH))); // (i * 40)
             long lastUpdate = Utils.readInt64(data, INDEXES_OFFSET);
 
             byte[] borrow = Arrays.copyOfRange(
                     data,
                     INDEXES_OFFSET + U64_SIZE_BYTES + counter,
-                    INDEXES_OFFSET + U64_SIZE_BYTES + U64F64_SIZE_BYTES + counter
+                    INDEXES_OFFSET + U64_SIZE_BYTES + U64F64.U64F64_LENGTH + counter
             );
 
             byte[] deposit = Arrays.copyOfRange(
                     data,
-                    INDEXES_OFFSET + U64_SIZE_BYTES + U64F64_SIZE_BYTES + counter,
-                    INDEXES_OFFSET + U64_SIZE_BYTES + U64F64_SIZE_BYTES + U64F64_SIZE_BYTES + counter
+                    INDEXES_OFFSET + U64_SIZE_BYTES + U64F64.U64F64_LENGTH + counter,
+                    INDEXES_OFFSET + U64_SIZE_BYTES + U64F64.U64F64_LENGTH + U64F64.U64F64_LENGTH + counter
             );
 
             final MangoIndex mangoIndex = MangoIndex.builder()
@@ -111,6 +117,30 @@ public class MangoGroup {
 
         mangoGroup.setSignerNonce(Utils.readInt64(data, SIGNER_NONCE_OFFSET));
         mangoGroup.setSignerKey(PublicKey.readPubkey(data, SIGNER_KEY_OFFSET));
+        mangoGroup.setDexProgramId(PublicKey.readPubkey(data, DEX_PROGRAM_ID_OFFSET));
+
+        // Total Deposits and Borrows
+        mangoGroup.setTotalDeposits(new ArrayList<>());
+        for (int i = 0; i < NUM_TOKENS; i++) {
+            final U64F64 totalDeposit = new U64F64(
+                    Arrays.copyOfRange(
+                            data,
+                            TOTAL_DEPOSITS_OFFSET + (i * U64F64.U64F64_LENGTH),
+                            TOTAL_DEPOSITS_OFFSET + (i * U64F64.U64F64_LENGTH) + U64F64.U64F64_LENGTH)
+            );
+            mangoGroup.getTotalDeposits().add(totalDeposit);
+        }
+
+        mangoGroup.setTotalBorrows(new ArrayList<>());
+        for (int i = 0; i < NUM_TOKENS; i++) {
+            final U64F64 totalBorrow = new U64F64(
+                    Arrays.copyOfRange(
+                            data,
+                            TOTAL_BORROWS_OFFSET + (i * U64F64.U64F64_LENGTH),
+                            TOTAL_BORROWS_OFFSET + (i * U64F64.U64F64_LENGTH) + U64F64.U64F64_LENGTH)
+            );
+            mangoGroup.getTotalBorrows().add(totalBorrow);
+        }
 
         return mangoGroup;
     }
