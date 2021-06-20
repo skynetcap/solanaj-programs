@@ -117,5 +117,15 @@ public class MangoTest {
                         mangoGroup.getAdmin()
                 )
         );
+
+        // Borrow Limits
+        mangoGroup.getBorrowLimits().forEach(borrowLimit -> {
+            LOGGER.info(
+                    String.format(
+                            "Borrow limit = %d",
+                            borrowLimit
+                    )
+            );
+        });
     }
 }

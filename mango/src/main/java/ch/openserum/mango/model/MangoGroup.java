@@ -12,6 +12,9 @@ import java.util.List;
 
 import static ch.openserum.mango.model.MangoUtils.*;
 
+/**
+ * Represents a deserialized v2 Mango Group
+ */
 @Builder
 @Getter
 @Setter
@@ -22,12 +25,12 @@ public class MangoGroup {
 
     // Offsets
     private static final int TOKENS_OFFSET = ACCOUNT_FLAGS_SIZE_BYTES;
-    private static final int VAULTS_OFFSET = TOKENS_OFFSET + (32 * NUM_TOKENS);
-    private static final int INDEXES_OFFSET = VAULTS_OFFSET + (32 * NUM_TOKENS);
-    private static final int SPOT_MARKETS_OFFSET = INDEXES_OFFSET + (40 * NUM_TOKENS);
-    private static final int ORACLES_OFFSET = SPOT_MARKETS_OFFSET + (32 * NUM_MARKETS);
-    private static final int SIGNER_NONCE_OFFSET = ORACLES_OFFSET + (32 * NUM_MARKETS);
-    private static final int SIGNER_KEY_OFFSET = SIGNER_NONCE_OFFSET + 8;
+    private static final int VAULTS_OFFSET = TOKENS_OFFSET + (PublicKey.PUBLIC_KEY_LENGTH * NUM_TOKENS);
+    private static final int INDEXES_OFFSET = VAULTS_OFFSET + (PublicKey.PUBLIC_KEY_LENGTH * NUM_TOKENS);
+    private static final int SPOT_MARKETS_OFFSET = INDEXES_OFFSET + (((U64F64.U64F64_LENGTH * 2) + U64_SIZE_BYTES) * NUM_TOKENS);
+    private static final int ORACLES_OFFSET = SPOT_MARKETS_OFFSET + (PublicKey.PUBLIC_KEY_LENGTH * NUM_MARKETS);
+    private static final int SIGNER_NONCE_OFFSET = ORACLES_OFFSET + (PublicKey.PUBLIC_KEY_LENGTH * NUM_MARKETS);
+    private static final int SIGNER_KEY_OFFSET = SIGNER_NONCE_OFFSET + U64_SIZE_BYTES;
     private static final int DEX_PROGRAM_ID_OFFSET = SIGNER_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
     private static final int TOTAL_DEPOSITS_OFFSET = DEX_PROGRAM_ID_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
     private static final int TOTAL_BORROWS_OFFSET = TOTAL_DEPOSITS_OFFSET + (U64F64.U64F64_LENGTH * NUM_TOKENS);
@@ -35,6 +38,9 @@ public class MangoGroup {
     private static final int INIT_COLL_RATIO_OFFSET = MAINT_COLL_RATIO_OFFSET + U64F64.U64F64_LENGTH;
     private static final int SRM_VAULT_OFFSET = INIT_COLL_RATIO_OFFSET + U64F64.U64F64_LENGTH;
     private static final int ADMIN_OFFSET = SRM_VAULT_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int BORROW_LIMITS_OFFSET = ADMIN_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int MINT_DECIMALS_OFFSET = BORROW_LIMITS_OFFSET + (U64_SIZE_BYTES * NUM_TOKENS);
+    private static final int ORACLE_DECIMALS_OFFSET = MINT_DECIMALS_OFFSET + NUM_TOKENS;
 
     private MangoGroupAccountFlags accountFlags;
     private List<PublicKey> tokens;
@@ -52,9 +58,11 @@ public class MangoGroup {
     private PublicKey srmVault;
     private PublicKey admin;
     private List<Long> borrowLimits;
+    private List<Byte> mintDecimals;
+    private List<Byte> oracleDecimals;
 
     public static MangoGroup readMangoGroup(byte[] data) {
-        // Mango groups only store 4 booleans currently, 1 byte is enough
+        // Mango Groups only store 4 booleans currently, 1 byte is enough
         byte mangoGroupAccountFlags = data[0];
 
         // Mango Group account flags
@@ -72,14 +80,20 @@ public class MangoGroup {
         // Listed tokens
         mangoGroup.setTokens(new ArrayList<>());
         for (int i = 0; i < NUM_TOKENS; i++) {
-            final PublicKey tokenPubkey = PublicKey.readPubkey(data, TOKENS_OFFSET + (i  * 32));
+            final PublicKey tokenPubkey = PublicKey.readPubkey(
+                    data,
+                    TOKENS_OFFSET + (i  * PublicKey.PUBLIC_KEY_LENGTH)
+            );
             mangoGroup.getTokens().add(tokenPubkey);
         }
 
         // Listed vaults
         mangoGroup.setVaults(new ArrayList<>());
         for (int i = 0; i < NUM_TOKENS; i++) {
-            final PublicKey vaultPubkey = PublicKey.readPubkey(data, VAULTS_OFFSET + (i  * 32));
+            final PublicKey vaultPubkey = PublicKey.readPubkey(
+                    data,
+                    VAULTS_OFFSET + (i  * PublicKey.PUBLIC_KEY_LENGTH)
+            );
             mangoGroup.getVaults().add(vaultPubkey);
         }
 
@@ -113,14 +127,20 @@ public class MangoGroup {
         // Spot Markets
         mangoGroup.setSpotMarkets(new ArrayList<>());
         for (int i = 0; i < NUM_MARKETS; i++) {
-            final PublicKey spotMarketPubkey = PublicKey.readPubkey(data, SPOT_MARKETS_OFFSET + (i  * 32));
+            final PublicKey spotMarketPubkey = PublicKey.readPubkey(
+                    data,
+                    SPOT_MARKETS_OFFSET + (i  * PublicKey.PUBLIC_KEY_LENGTH)
+            );
             mangoGroup.getSpotMarkets().add(spotMarketPubkey);
         }
 
         // Oracles
         mangoGroup.setOracles(new ArrayList<>());
         for (int i = 0; i < NUM_MARKETS; i++) {
-            final PublicKey oraclePubkey = PublicKey.readPubkey(data, ORACLES_OFFSET + (i  * 32));
+            final PublicKey oraclePubkey = PublicKey.readPubkey(
+                    data,
+                    ORACLES_OFFSET + (i  * PublicKey.PUBLIC_KEY_LENGTH)
+            );
             mangoGroup.getOracles().add(oraclePubkey);
         }
 
@@ -173,6 +193,27 @@ public class MangoGroup {
 
         mangoGroup.setSrmVault(PublicKey.readPubkey(data, SRM_VAULT_OFFSET));
         mangoGroup.setAdmin(PublicKey.readPubkey(data, ADMIN_OFFSET));
+
+        // Borrow Limits
+        mangoGroup.setBorrowLimits(new ArrayList<>());
+        for (int i = 0; i < NUM_TOKENS; i++) {
+            long borrowLimit = Utils.readInt64(data, BORROW_LIMITS_OFFSET + (i * U64_SIZE_BYTES));
+            mangoGroup.getBorrowLimits().add(borrowLimit);
+        }
+
+        // Mint Decimals
+        mangoGroup.setMintDecimals(new ArrayList<>());
+        for (int i = 0; i < NUM_TOKENS; i++) {
+            byte mintDecimal = data[MINT_DECIMALS_OFFSET + i];
+            mangoGroup.getMintDecimals().add(mintDecimal);
+        }
+
+        // Oracle Decimals
+        mangoGroup.setOracleDecimals(new ArrayList<>());
+        for (int i = 0; i < NUM_MARKETS; i++) {
+            byte mintDecimal = data[ORACLE_DECIMALS_OFFSET + i];
+            mangoGroup.getOracleDecimals().add(mintDecimal);
+        }
 
         return mangoGroup;
     }
