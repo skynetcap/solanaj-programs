@@ -31,6 +31,10 @@ public class MangoGroup {
     private static final int DEX_PROGRAM_ID_OFFSET = SIGNER_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
     private static final int TOTAL_DEPOSITS_OFFSET = DEX_PROGRAM_ID_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
     private static final int TOTAL_BORROWS_OFFSET = TOTAL_DEPOSITS_OFFSET + (U64F64.U64F64_LENGTH * NUM_TOKENS);
+    private static final int MAINT_COLL_RATIO_OFFSET = TOTAL_BORROWS_OFFSET + (U64F64.U64F64_LENGTH * NUM_TOKENS);
+    private static final int INIT_COLL_RATIO_OFFSET = MAINT_COLL_RATIO_OFFSET + U64F64.U64F64_LENGTH;
+    private static final int SRM_VAULT_OFFSET = INIT_COLL_RATIO_OFFSET + U64F64.U64F64_LENGTH;
+    private static final int ADMIN_OFFSET = SRM_VAULT_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
 
     private MangoGroupAccountFlags accountFlags;
     private List<PublicKey> tokens;
@@ -43,6 +47,11 @@ public class MangoGroup {
     private PublicKey dexProgramId;
     private List<U64F64> totalDeposits;
     private List<U64F64> totalBorrows;
+    private U64F64 maintCollRatio;
+    private U64F64 initCollRatio;
+    private PublicKey srmVault;
+    private PublicKey admin;
+    private List<Long> borrowLimits;
 
     public static MangoGroup readMangoGroup(byte[] data) {
         // Mango groups only store 4 booleans currently, 1 byte is enough
@@ -141,6 +150,29 @@ public class MangoGroup {
             );
             mangoGroup.getTotalBorrows().add(totalBorrow);
         }
+
+        mangoGroup.setMaintCollRatio(
+                new U64F64(
+                        Arrays.copyOfRange(
+                                data,
+                                MAINT_COLL_RATIO_OFFSET,
+                                INIT_COLL_RATIO_OFFSET
+                        )
+                )
+        );
+
+        mangoGroup.setInitCollRatio(
+                new U64F64(
+                        Arrays.copyOfRange(
+                                data,
+                                INIT_COLL_RATIO_OFFSET,
+                                SRM_VAULT_OFFSET
+                        )
+                )
+        );
+
+        mangoGroup.setSrmVault(PublicKey.readPubkey(data, SRM_VAULT_OFFSET));
+        mangoGroup.setAdmin(PublicKey.readPubkey(data, ADMIN_OFFSET));
 
         return mangoGroup;
     }

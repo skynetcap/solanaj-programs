@@ -7,7 +7,6 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -15,8 +14,6 @@ public class MangoTest {
 
     private final RpcClient client = new RpcClient(Cluster.MAINNET);
     private static final Logger LOGGER = Logger.getLogger(MangoTest.class.getName());
-    private static final PublicKey SKYNET =
-            new PublicKey("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq");
     private static final PublicKey BTC_ETH_SOL_SRM_USDC_MANGO_GROUP =
             new PublicKey("2oogpTYm1sp6LPZAWD3bp2wsFpnV2kXL1s52yyFhW5vp");
 
@@ -30,10 +27,12 @@ public class MangoTest {
                 )
         );
 
+        // Retrieve MangoGroup from Solana
         final AccountInfo mangoGroupAccountInfo = client.getApi().getAccountInfo(
                 BTC_ETH_SOL_SRM_USDC_MANGO_GROUP
         );
 
+        // Deserialize MangoGroup
         byte[] mangoGroupData = Base64.getDecoder().decode(mangoGroupAccountInfo.getValue().getData().get(0));
         final MangoGroup mangoGroup = MangoGroup.readMangoGroup(mangoGroupData);
 
@@ -83,6 +82,7 @@ public class MangoTest {
                 )
         );
 
+        // Total Deposits
         mangoGroup.getTotalDeposits().forEach(totalDeposit -> {
             LOGGER.info(
                     String.format(
@@ -92,6 +92,7 @@ public class MangoTest {
             );
         });
 
+        // Total Borrows
         mangoGroup.getTotalBorrows().forEach(totalBorrow -> {
             LOGGER.info(
                     String.format(
@@ -100,5 +101,21 @@ public class MangoTest {
                     )
             );
         });
+
+        LOGGER.info(
+                String.format(
+                        "maintCollRatio = %.2f, initCollRatio = %.2f",
+                        mangoGroup.getMaintCollRatio().decode(),
+                        mangoGroup.getInitCollRatio().decode()
+                )
+        );
+
+        LOGGER.info(
+                String.format(
+                        "srmVault = %s, admin = %s",
+                        mangoGroup.getSrmVault(),
+                        mangoGroup.getAdmin()
+                )
+        );
     }
 }
