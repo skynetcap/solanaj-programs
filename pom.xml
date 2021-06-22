@@ -12,6 +12,7 @@
         <module>mango</module>
         <module>serum</module>
         <module>bonfida</module>
+        <module>pyth</module>
     </modules>
 
     <properties>
