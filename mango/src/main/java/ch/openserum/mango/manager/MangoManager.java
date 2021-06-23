@@ -19,20 +19,7 @@ public class MangoManager {
             new PublicKey("2oogpTYm1sp6LPZAWD3bp2wsFpnV2kXL1s52yyFhW5vp");
 
     public MangoGroup getDefaultMangoGroup() {
-        AccountInfo accountInfo = null;
-
-        try {
-            accountInfo = client.getApi().getAccountInfo(BTC_ETH_SOL_SRM_USDC_MANGO_GROUP);
-        } catch (RpcException e) {
-            LOGGER.warning(e.getMessage());
-        }
-
-        if (accountInfo == null) {
-            return null;
-        }
-
-        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
-        return MangoGroup.readMangoGroup(data);
+        return getMangoGroup(BTC_ETH_SOL_SRM_USDC_MANGO_GROUP);
     }
 
     public MangoGroup getMangoGroup(final PublicKey publicKey) {
