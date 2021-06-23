@@ -1,6 +1,7 @@
 import ch.openserum.mango.manager.MangoManager;
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MangoIndex;
+import ch.openserum.mango.model.MarginAccount;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -140,6 +141,16 @@ public class MangoTest {
                         "defaultMangoGroup = %s",
                         defaultMangoGroup.toString()
                 )
+        );
+    }
+
+    @Test
+    public void getMangoGroupAndMarginAccountTest() {
+        final PublicKey marginAccountPk = PublicKey.valueOf("CUozJfE2kMataLexX6fco63AYTvwcNXyPPtj3NBbxHK6");
+        final MangoGroup defaultMangoGroup = mangoManager.getDefaultMangoGroup();
+        final MarginAccount marginAccount = mangoManager.getMarginAccount(
+                marginAccountPk,
+                defaultMangoGroup.getDexProgramId()
         );
     }
 }

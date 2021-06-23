@@ -44,7 +44,7 @@ public class MangoGroup {
     private static final int MINT_DECIMALS_OFFSET = BORROW_LIMITS_OFFSET + (U64_SIZE_BYTES * NUM_TOKENS);
     private static final int ORACLE_DECIMALS_OFFSET = MINT_DECIMALS_OFFSET + NUM_TOKENS;
 
-    private MangoGroupAccountFlags accountFlags;
+    private MangoAccountFlags accountFlags;
     private List<PublicKey> tokens;
     private List<PublicKey> vaults;
     private List<MangoIndex> indexes;
@@ -64,13 +64,17 @@ public class MangoGroup {
     private List<Byte> oracleDecimals;
 
     public static MangoGroup readMangoGroup(byte[] data) {
+        if (data == null) {
+            return null;
+        }
+
         // Mango Groups only store 4 booleans currently, 1 byte is enough
         byte mangoGroupAccountFlags = data[0];
 
         // Mango Group account flags
         final MangoGroup mangoGroup = MangoGroup.builder()
                 .accountFlags(
-                        MangoGroupAccountFlags.builder()
+                        MangoAccountFlags.builder()
                                 .initialized((mangoGroupAccountFlags & 1) == 1)
                                 .mangoGroup((mangoGroupAccountFlags & 2) == 2)
                                 .marginAccount((mangoGroupAccountFlags & 4) == 4)

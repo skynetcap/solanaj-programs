@@ -1,6 +1,7 @@
 package ch.openserum.mango.manager;
 
 import ch.openserum.mango.model.MangoGroup;
+import ch.openserum.mango.model.MarginAccount;
 import lombok.RequiredArgsConstructor;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -23,6 +24,22 @@ public class MangoManager {
     }
 
     public MangoGroup getMangoGroup(final PublicKey publicKey) {
+        byte[] mangoGroupData = getAccountData(publicKey);
+        return MangoGroup.readMangoGroup(mangoGroupData);
+    }
+
+    public MarginAccount getMarginAccount(final PublicKey publicKey, final PublicKey dexProgramId) {
+        // Decode Margin Account
+        byte[] marginAccountData = getAccountData(publicKey);
+        final MarginAccount marginAccount = MarginAccount.readMarginAccount(marginAccountData);
+
+        // Populate marginAccount with Open Orders
+        marginAccount.loadOpenOrders(dexProgramId);
+
+        return marginAccount;
+    }
+
+    private byte[] getAccountData(final PublicKey publicKey) {
         AccountInfo accountInfo = null;
 
         try {
@@ -35,8 +52,7 @@ public class MangoManager {
             return null;
         }
 
-        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
-        return MangoGroup.readMangoGroup(data);
+        return Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
     }
 
 }

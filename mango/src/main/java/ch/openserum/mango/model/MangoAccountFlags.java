@@ -7,7 +7,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class MangoGroupAccountFlags {
+public class MangoAccountFlags {
     boolean initialized;
     boolean mangoGroup;
     boolean marginAccount;
