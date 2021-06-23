@@ -1,3 +1,4 @@
+import ch.openserum.mango.manager.MangoManager;
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MangoIndex;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import java.util.logging.Logger;
 public class MangoTest {
 
     private final RpcClient client = new RpcClient(Cluster.MAINNET);
+    private final MangoManager mangoManager = new MangoManager(client);
     private static final Logger LOGGER = Logger.getLogger(MangoTest.class.getName());
     private static final PublicKey BTC_ETH_SOL_SRM_USDC_MANGO_GROUP =
             new PublicKey("2oogpTYm1sp6LPZAWD3bp2wsFpnV2kXL1s52yyFhW5vp");
@@ -127,5 +129,17 @@ public class MangoTest {
                     )
             );
         });
+    }
+
+    @Test
+    public void getDefaultMangoGroupTest() {
+        final MangoGroup defaultMangoGroup = mangoManager.getDefaultMangoGroup();
+
+        LOGGER.info(
+                String.format(
+                        "defaultMangoGroup = %s",
+                        defaultMangoGroup.toString()
+                )
+        );
     }
 }

@@ -3,6 +3,7 @@ package ch.openserum.mango.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 
@@ -18,6 +19,7 @@ import static ch.openserum.mango.model.MangoUtils.*;
 @Builder
 @Getter
 @Setter
+@ToString
 public class MangoGroup {
     // Constants
     private static final int NUM_TOKENS = 5;
