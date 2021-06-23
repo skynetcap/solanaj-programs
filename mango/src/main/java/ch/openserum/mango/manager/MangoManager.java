@@ -35,4 +35,21 @@ public class MangoManager {
         return MangoGroup.readMangoGroup(data);
     }
 
+    public MangoGroup getMangoGroup(final PublicKey publicKey) {
+        AccountInfo accountInfo = null;
+
+        try {
+            accountInfo = client.getApi().getAccountInfo(publicKey);
+        } catch (RpcException e) {
+            LOGGER.warning(e.getMessage());
+        }
+
+        if (accountInfo == null) {
+            return null;
+        }
+
+        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+        return MangoGroup.readMangoGroup(data);
+    }
+
 }
