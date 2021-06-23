@@ -12,6 +12,8 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import java.util.Base64;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.assertTrue;
+
 public class MangoTest {
 
     private final RpcClient client = new RpcClient(Cluster.MAINNET);
@@ -152,5 +154,14 @@ public class MangoTest {
                 marginAccountPk,
                 defaultMangoGroup.getDexProgramId()
         );
+
+        LOGGER.info(
+                String.format(
+                        "Margin Account = %s",
+                        marginAccount.toString()
+                )
+        );
+
+        assertTrue(marginAccount.getAccountFlags().isMarginAccount());
     }
 }

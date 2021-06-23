@@ -65,7 +65,7 @@ public class MangoGroup {
 
     public static MangoGroup readMangoGroup(byte[] data) {
         if (data == null) {
-            return null;
+            return MangoGroup.builder().build();
         }
 
         // Mango Groups only store 4 booleans currently, 1 byte is enough

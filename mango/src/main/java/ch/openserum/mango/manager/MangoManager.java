@@ -31,7 +31,7 @@ public class MangoManager {
     public MarginAccount getMarginAccount(final PublicKey publicKey, final PublicKey dexProgramId) {
         // Decode Margin Account
         byte[] marginAccountData = getAccountData(publicKey);
-        final MarginAccount marginAccount = MarginAccount.readMarginAccount(marginAccountData);
+        final MarginAccount marginAccount = MarginAccount.readMarginAccount(publicKey, marginAccountData);
 
         // Populate marginAccount with Open Orders
         marginAccount.loadOpenOrders(dexProgramId);
