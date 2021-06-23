@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 @Getter
 @Setter
@@ -19,6 +20,10 @@ public class U64F64 {
     public static final int U64F64_LENGTH = 16;
 
     private byte[] data;
+
+    public static U64F64 readU64F64(byte[] data, int offset) {
+        return new U64F64(Arrays.copyOfRange(data, offset, offset + U64F64_LENGTH));
+    }
 
     public float decode() {
         ByteBuffer buffer = ByteBuffer.allocate(16);
