@@ -8,6 +8,7 @@ import org.p2p.solanaj.utils.ByteUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -37,7 +38,9 @@ public class U64F64 {
         double divisor = Math.pow(2, 64);
         String newString = ByteUtils.bytesToHex(buffer.array());
         BigInteger result = new BigInteger(newString, 16);
-        BigDecimal divided = new BigDecimal(result).divide(new BigDecimal(divisor));
+        BigDecimal divided = new BigDecimal(result)
+                .divide(new BigDecimal(divisor), RoundingMode.HALF_EVEN);
+
 
         return divided.floatValue();
     }

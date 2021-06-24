@@ -148,7 +148,7 @@ public class MangoTest {
 
     @Test
     public void getMangoGroupAndMarginAccountTest() {
-        final PublicKey marginAccountPk = PublicKey.valueOf("CUozJfE2kMataLexX6fco63AYTvwcNXyPPtj3NBbxHK6");
+        final PublicKey marginAccountPk = PublicKey.valueOf("E95EaroWhpRnEtCpjH8HsFnzrQdcwxsXtVPwS8BbsXE");
         final MangoGroup defaultMangoGroup = mangoManager.getDefaultMangoGroup();
         final MarginAccount marginAccount = mangoManager.getMarginAccount(
                 marginAccountPk,
@@ -157,10 +157,27 @@ public class MangoTest {
 
         LOGGER.info(
                 String.format(
+                        "Mango Group = %s",
+                        defaultMangoGroup
+                )
+        );
+
+        LOGGER.info(
+                String.format(
                         "Margin Account = %s",
                         marginAccount.toString()
                 )
         );
+
+
+        for (int i = 0; i < 5; i++) {
+            LOGGER.info(
+                    String.format(
+                            "Deposit = %.5f",
+                            marginAccount.getDeposits().get(i).decode() / Math.pow(10, defaultMangoGroup.getMintDecimals().get(i))
+                    )
+            );
+        }
 
         assertTrue(marginAccount.getAccountFlags().isMarginAccount());
     }
