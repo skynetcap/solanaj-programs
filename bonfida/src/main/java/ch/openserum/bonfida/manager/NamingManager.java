@@ -36,6 +36,7 @@ public class NamingManager {
     private static final int TWITTER_HANDLE_START_OFFSET = 96;
     private static final PublicKey TWITTER_VERIFICATION_AUTHORITY = new PublicKey("867BLob5b52i81SNaV9Awm5ejkZV6VGSv9SxLcwukDDJ");
     private static final PublicKey TWITTER_ROOT_PARENT_REGISTRY_KEY = new PublicKey("AFrGkxNmVLBn3mKhvfJJABvm8RJkTtRhHDoaF97pQZaA");
+    private static final PublicKey SOL_TLD_AUTHORITY = new PublicKey("58PwtjSDuFHuUkYjH9BYnnQKHfwo9reZhC2zMJv9JPkx");
 
     public NamingManager(final RpcClient client) {
         this.client = client;
@@ -225,6 +226,26 @@ public class NamingManager {
         AccountInfo accountInfo = getAccountInfo(twitterHandleRegistryKey);
         byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
 
+        PublicKey owner = PublicKey.readPubkey(data, 32);
+
+        return owner;
+    }
+
+    /**
+     * Looks up a Pubkey associated with a .sol domain using Bonfida's naming service
+     * @param solDomain sol domain to lookup
+     * @return pubkey associated with the sol domain
+     */
+    public PublicKey getPublicKeyBySolDomain(String solDomain) {
+        byte[] hashedInputName = getHashedName(solDomain);
+        PublicKey inputDomainKey = getNameAccountKey(
+                hashedInputName,
+                null,
+                SOL_TLD_AUTHORITY
+        );
+
+        AccountInfo accountInfo = getAccountInfo(inputDomainKey);
+        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
         PublicKey owner = PublicKey.readPubkey(data, 32);
 
         return owner;
