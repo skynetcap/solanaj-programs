@@ -64,7 +64,6 @@ public class BonfidaTest {
     @Test
     public void getPublicKeyBySolDomainTest() {
         PublicKey publicKey = namingManager.getPublicKeyBySolDomain("skynet");
-
         LOGGER.info(
                 String.format(
                         "skynet.sol = %s",
@@ -73,5 +72,15 @@ public class BonfidaTest {
         );
 
         assertTrue(publicKey.toBase58().equalsIgnoreCase("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq"));
+
+        PublicKey sbfPublicKey = namingManager.getPublicKeyBySolDomain("sbf");
+        LOGGER.info(
+                String.format(
+                        "sbf.sol = %s",
+                        sbfPublicKey.toBase58()
+                )
+        );
+
+        assertTrue(sbfPublicKey.toBase58().equalsIgnoreCase("2NoEcR9cC7Rn6bP9rBpky6B1eP9syyPf8FXRaf1myChv"));
     }
 }
