@@ -201,5 +201,31 @@ public class MangoTest {
         );
 
         assertTrue(mangoPerpGroup.getMetadata().isInitialized());
+
+        byte[] rawData = {
+                (byte)0x64, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x0A, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                (byte)0x00, (byte)0x00
+        };
+
+        PublicKey pubkey = PublicKey.readPubkey(rawData, 0);
+        LOGGER.info("Pubkey = " + pubkey.toBase58());
+
+        byte[] rawData2 = {
+                (byte)0x51, (byte)0xA1, (byte)0x3F, (byte)0x14, (byte)0x0D, (byte)0x58,
+                (byte)0x32, (byte)0x04, (byte)0x51, (byte)0x11, (byte)0x4A, (byte)0x84,
+                (byte)0x91, (byte)0xF2, (byte)0x96, (byte)0x0B, (byte)0x62, (byte)0x0A,
+                (byte)0x92, (byte)0x60, (byte)0xEA, (byte)0x50, (byte)0x21, (byte)0x4B,
+                (byte)0x21, (byte)0x75, (byte)0x7E, (byte)0x29, (byte)0xEA, (byte)0x7C,
+                (byte)0xD9, (byte)0xDB
+        };
+
+        PublicKey pubkey2 = PublicKey.readPubkey(rawData2, 0);
+        LOGGER.info("Pubkey2 = " + pubkey2.toBase58());
+
+
     }
 }

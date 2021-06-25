@@ -25,16 +25,21 @@ public class MangoPerpGroup {
 
     // Constants
     private static final int MAX_TOKENS = 32;
+    private static final int MAX_PAIRS = MAX_TOKENS - 1;
 
     // Offsets
     private static final int METADATA_OFFSET = 0;
     private static final int NUM_ORACLES_OFFSET = METADATA_OFFSET + MangoAccountMetadata.METADATA_LAYOUT_SIZE;
-    private static final int TOKEN_INFO_LAYOUT_OFFSET = NUM_ORACLES_OFFSET + U64_SIZE_BYTES;
+    private static final int TOKENS_OFFSET = NUM_ORACLES_OFFSET + U64_SIZE_BYTES;
+    private static final int SPOT_MARKETS_OFFSET = TOKENS_OFFSET
+            + (MAX_TOKENS * MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE);
 
+    // Member variables
     private PublicKey publicKey;
     private MangoAccountMetadata metadata;
     private long numOracles;
     private List<MangoTokenInfo> tokens;
+    private List<MangoSpotMarketInfo> spotMarketInfos;
 
     public static MangoPerpGroup readMangoPerpGroup(final PublicKey publicKey, byte[] data) {
         final MangoPerpGroup mangoPerpGroup = MangoPerpGroup.builder()
@@ -56,14 +61,35 @@ public class MangoPerpGroup {
             final MangoTokenInfo mangoTokenInfo = MangoTokenInfo.readMangoTokenInfo(
                     Arrays.copyOfRange(
                             data,
-                            TOKEN_INFO_LAYOUT_OFFSET + (i * MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE),
-                            TOKEN_INFO_LAYOUT_OFFSET + (i * MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE)
+                            TOKENS_OFFSET + (i * MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE),
+                            TOKENS_OFFSET + (i * MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE)
                                     + MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE
                     )
             );
 
             if (mangoTokenInfo.getDecimals() != 0) {
                 mangoPerpGroup.getTokens().add(mangoTokenInfo);
+            }
+        }
+
+        mangoPerpGroup.setSpotMarketInfos(new ArrayList<>());
+        for (int i = 0; i < MAX_PAIRS; i++) {
+            int start = SPOT_MARKETS_OFFSET + (i * MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE);
+            int end = SPOT_MARKETS_OFFSET + (i * MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE)
+                    + MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE;
+
+            final MangoSpotMarketInfo mangoSpotMarketInfo = MangoSpotMarketInfo.readMangoSpotMarketInfo(
+                    Arrays.copyOfRange(
+                            data,
+                            start,
+                            end
+                    )
+            );
+
+            String spotMarketString = mangoSpotMarketInfo.getSpotMarket().toBase58();
+
+            if (!spotMarketString.equalsIgnoreCase("11111111111111111111111111111111")) {
+                mangoPerpGroup.getSpotMarketInfos().add(mangoSpotMarketInfo);
             }
         }
 
