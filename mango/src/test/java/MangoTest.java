@@ -199,5 +199,7 @@ public class MangoTest {
                         mangoPerpGroup
                 )
         );
+
+        assertTrue(mangoPerpGroup.getMetadata().isInitialized());
     }
 }
