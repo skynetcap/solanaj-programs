@@ -216,19 +216,7 @@ public class NamingManager {
      * @return pubkey associated with the twitter handle
      */
     public PublicKey getPublicKey(String twitterHandle) {
-        byte[] hashedTwitterHandle = getHashedName(twitterHandle);
-        PublicKey twitterHandleRegistryKey = getNameAccountKey(
-                hashedTwitterHandle,
-                null,
-                TWITTER_ROOT_PARENT_REGISTRY_KEY
-        );
-
-        AccountInfo accountInfo = getAccountInfo(twitterHandleRegistryKey);
-        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
-
-        PublicKey owner = PublicKey.readPubkey(data, 32);
-
-        return owner;
+        return getNameOwnerByAuthority(twitterHandle, TWITTER_ROOT_PARENT_REGISTRY_KEY);
     }
 
     /**
@@ -237,11 +225,15 @@ public class NamingManager {
      * @return pubkey associated with the sol domain
      */
     public PublicKey getPublicKeyBySolDomain(String solDomain) {
-        byte[] hashedInputName = getHashedName(solDomain);
+        return getNameOwnerByAuthority(solDomain, SOL_TLD_AUTHORITY);
+    }
+
+    private PublicKey getNameOwnerByAuthority(final String input, final PublicKey authority) {
+        byte[] hashedInputName = getHashedName(input);
         PublicKey inputDomainKey = getNameAccountKey(
                 hashedInputName,
                 null,
-                SOL_TLD_AUTHORITY
+                authority
         );
 
         AccountInfo accountInfo = getAccountInfo(inputDomainKey);
