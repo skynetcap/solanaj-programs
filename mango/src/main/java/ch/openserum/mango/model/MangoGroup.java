@@ -44,7 +44,7 @@ public class MangoGroup {
     private static final int MINT_DECIMALS_OFFSET = BORROW_LIMITS_OFFSET + (U64_SIZE_BYTES * NUM_TOKENS);
     private static final int ORACLE_DECIMALS_OFFSET = MINT_DECIMALS_OFFSET + NUM_TOKENS;
 
-    private MangoAccountFlags accountFlags;
+    private MangoFlags accountFlags;
     private List<PublicKey> tokens;
     private List<PublicKey> vaults;
     private List<MangoIndex> indexes;
@@ -74,7 +74,7 @@ public class MangoGroup {
         // Mango Group account flags
         final MangoGroup mangoGroup = MangoGroup.builder()
                 .accountFlags(
-                        MangoAccountFlags.builder()
+                        MangoFlags.builder()
                                 .initialized((mangoGroupAccountFlags & 1) == 1)
                                 .mangoGroup((mangoGroupAccountFlags & 2) == 2)
                                 .marginAccount((mangoGroupAccountFlags & 4) == 4)

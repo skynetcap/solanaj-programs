@@ -1,5 +1,7 @@
 package ch.openserum.mango.manager;
 
+import ch.openserum.mango.model.MangoAccount;
+import ch.openserum.mango.model.MangoAccountMetadata;
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MarginAccount;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +10,9 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -53,6 +58,18 @@ public class MangoManager {
         }
 
         return Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+    }
+
+    public MangoAccount getMangoAccount(final PublicKey publicKey) {
+        byte[] mangoAccountData = getAccountData(publicKey);
+
+        try {
+            Files.write(Path.of("mangoAccount.bin"), mangoAccountData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return MangoAccount.readMangoAccount(publicKey, mangoAccountData);
     }
 
 }

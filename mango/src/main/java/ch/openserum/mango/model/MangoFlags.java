@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MangoAccountFlags {
+public class MangoFlags {
     boolean initialized;
     boolean mangoGroup;
     boolean marginAccount;

@@ -28,7 +28,7 @@ public class MarginAccount {
     private static final int BORROWS_OFFSET = DEPOSITS_OFFSET + (U64F64.U64F64_LENGTH * NUM_TOKENS);
 
     private PublicKey publicKey;
-    private MangoAccountFlags accountFlags;
+    private MangoFlags accountFlags;
     private PublicKey mangoGroup;
     private PublicKey owner;
     private List<U64F64> deposits;
@@ -46,7 +46,7 @@ public class MarginAccount {
         byte marginAccountFlags = data[0];
 
         marginAccount.setAccountFlags(
-                MangoAccountFlags.builder()
+                MangoFlags.builder()
                         .initialized((marginAccountFlags & 1) == 1)
                         .mangoGroup((marginAccountFlags & 2) == 2)
                         .marginAccount((marginAccountFlags & 4) == 4)

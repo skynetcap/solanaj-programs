@@ -1,4 +1,5 @@
 import ch.openserum.mango.manager.MangoManager;
+import ch.openserum.mango.model.MangoAccount;
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MangoIndex;
 import ch.openserum.mango.model.MarginAccount;
@@ -17,7 +18,9 @@ import static org.junit.Assert.assertTrue;
 public class MangoTest {
 
     private final RpcClient client = new RpcClient(Cluster.MAINNET);
+    private final RpcClient devnetClient = new RpcClient("https://api.devnet.solana.com");
     private final MangoManager mangoManager = new MangoManager(client);
+    private final MangoManager devnetMangoManager = new MangoManager(devnetClient);
     private static final Logger LOGGER = Logger.getLogger(MangoTest.class.getName());
     private static final PublicKey BTC_ETH_SOL_SRM_USDC_MANGO_GROUP =
             new PublicKey("2oogpTYm1sp6LPZAWD3bp2wsFpnV2kXL1s52yyFhW5vp");
@@ -182,5 +185,19 @@ public class MangoTest {
         }
 
         assertTrue(marginAccount.getAccountFlags().isMarginAccount());
+    }
+
+    @Test
+    public void mangoV3Test() {
+        final MangoAccount mangoAccount = devnetMangoManager.getMangoAccount(
+                PublicKey.valueOf("ECAikQUnS8HGLnzGrqEYA6Daz8nRRu9GsbfLbwMfK23P")
+        );
+
+        LOGGER.info(
+                String.format(
+                        "Mango Account = %s",
+                        mangoAccount
+                )
+        );
     }
 }
