@@ -9,8 +9,10 @@ import org.p2p.solanaj.utils.ByteUtils;
 
 import java.util.Arrays;
 
+import static ch.openserum.mango.model.MangoUtils.U64_SIZE_BYTES;
+
 /**
- * Represents a v3 Mango perp account
+ * Represents a v3 Mango Perp group
  */
 
 @Builder
@@ -19,8 +21,13 @@ import java.util.Arrays;
 @ToString
 public class MangoPerpGroup {
 
+    // Constants
+    private static final int MAX_TOKENS = 32;
+
+    // Offsets
     private static final int METADATA_OFFSET = 0;
     private static final int NUM_ORACLES_OFFSET = METADATA_OFFSET + MangoAccountMetadata.METADATA_LAYOUT_SIZE;
+    private static final int TOKEN_INFO_LAYOUT_OFFSET = NUM_ORACLES_OFFSET + U64_SIZE_BYTES;
 
     private PublicKey publicKey;
     private MangoAccountMetadata metadata;
