@@ -1,5 +1,5 @@
 import ch.openserum.mango.manager.MangoManager;
-import ch.openserum.mango.model.MangoAccount;
+import ch.openserum.mango.model.MangoPerpGroup;
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MangoIndex;
 import ch.openserum.mango.model.MarginAccount;
@@ -189,14 +189,14 @@ public class MangoTest {
 
     @Test
     public void mangoV3Test() {
-        final MangoAccount mangoAccount = devnetMangoManager.getMangoAccount(
+        final MangoPerpGroup mangoPerpGroup = devnetMangoManager.getMangoAccount(
                 PublicKey.valueOf("ECAikQUnS8HGLnzGrqEYA6Daz8nRRu9GsbfLbwMfK23P")
         );
 
         LOGGER.info(
                 String.format(
                         "Mango Account = %s",
-                        mangoAccount
+                        mangoPerpGroup
                 )
         );
     }

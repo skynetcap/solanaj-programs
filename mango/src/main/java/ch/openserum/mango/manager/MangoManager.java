@@ -1,7 +1,6 @@
 package ch.openserum.mango.manager;
 
-import ch.openserum.mango.model.MangoAccount;
-import ch.openserum.mango.model.MangoAccountMetadata;
+import ch.openserum.mango.model.MangoPerpGroup;
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MarginAccount;
 import lombok.RequiredArgsConstructor;
@@ -60,16 +59,16 @@ public class MangoManager {
         return Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
     }
 
-    public MangoAccount getMangoAccount(final PublicKey publicKey) {
-        byte[] mangoAccountData = getAccountData(publicKey);
+    public MangoPerpGroup getMangoAccount(final PublicKey publicKey) {
+        byte[] mangoPerpGroupData = getAccountData(publicKey);
 
         try {
-            Files.write(Path.of("mangoAccount.bin"), mangoAccountData);
+            Files.write(Path.of("mangoPerpGroup.bin"), mangoPerpGroupData);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return MangoAccount.readMangoAccount(publicKey, mangoAccountData);
+        return MangoPerpGroup.readMangoPerpGroup(publicKey, mangoPerpGroupData);
     }
 
 }
