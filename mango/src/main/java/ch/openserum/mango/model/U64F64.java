@@ -26,7 +26,11 @@ public class U64F64 {
         return new U64F64(Arrays.copyOfRange(data, offset, offset + U64F64_LENGTH));
     }
 
-    public float decode() {
+    public float decodeFloat() {
+        return decodeBigDecimal().floatValue();
+    }
+
+    public BigDecimal decodeBigDecimal() {
         ByteBuffer buffer = ByteBuffer.allocate(16);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -41,7 +45,6 @@ public class U64F64 {
         BigDecimal divided = new BigDecimal(result)
                 .divide(new BigDecimal(divisor), RoundingMode.HALF_EVEN);
 
-
-        return divided.floatValue();
+        return divided;
     }
 }

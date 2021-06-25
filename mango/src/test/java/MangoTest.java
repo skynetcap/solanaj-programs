@@ -66,8 +66,8 @@ public class MangoTest {
             LOGGER.info(
                     String.format(
                             "Deposit = %.16f, Borrow = %.16f",
-                            mangoIndex.getDeposit().decode(),
-                            mangoIndex.getBorrow().decode()
+                            mangoIndex.getDeposit().decodeFloat(),
+                            mangoIndex.getBorrow().decodeFloat()
                     )
             );
         }
@@ -92,7 +92,7 @@ public class MangoTest {
             LOGGER.info(
                     String.format(
                             "Total Deposit = %.2f",
-                            totalDeposit.decode()
+                            totalDeposit.decodeFloat()
                     )
             );
         });
@@ -102,7 +102,7 @@ public class MangoTest {
             LOGGER.info(
                     String.format(
                             "Total Borrow = %.2f",
-                            totalBorrow.decode()
+                            totalBorrow.decodeFloat()
                     )
             );
         });
@@ -110,8 +110,8 @@ public class MangoTest {
         LOGGER.info(
                 String.format(
                         "maintCollRatio = %.2f, initCollRatio = %.2f",
-                        mangoGroup.getMaintCollRatio().decode(),
-                        mangoGroup.getInitCollRatio().decode()
+                        mangoGroup.getMaintCollRatio().decodeFloat(),
+                        mangoGroup.getInitCollRatio().decodeFloat()
                 )
         );
 
@@ -173,8 +173,10 @@ public class MangoTest {
         for (int i = 0; i < 5; i++) {
             LOGGER.info(
                     String.format(
-                            "Deposit = %.5f",
-                            marginAccount.getDeposits().get(i).decode() / Math.pow(10, defaultMangoGroup.getMintDecimals().get(i))
+                            "Deposit = %.8f, BigDecimal = %s",
+                            marginAccount.getDeposits().get(i).decodeFloat() /
+                                    Math.pow(10, defaultMangoGroup.getMintDecimals().get(i)),
+                            marginAccount.getDeposits().get(i).decodeBigDecimal()
                     )
             );
         }
