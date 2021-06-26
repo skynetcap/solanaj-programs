@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.utils.ByteUtils;
 
@@ -16,7 +17,6 @@ import static ch.openserum.mango.model.MangoUtils.U64_SIZE_BYTES;
 /**
  * Represents a v3 Mango Perp group
  */
-
 @Builder
 @Getter
 @Setter
@@ -37,8 +37,14 @@ public class MangoPerpGroup {
             + (MAX_PAIRS * MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE);
     private static final int ORACLES_OFFSET = PERP_MARKETS_OFFSET
             + (MAX_PAIRS * MangoPerpMarketInfo.MANGO_PERP_MARKET_INFO_LAYOUT_SIZE);
+    private static final int SIGNER_NONCE_OFFSET = ORACLES_OFFSET + (MAX_PAIRS * PublicKey.PUBLIC_KEY_LENGTH);
+    private static final int SIGNER_KEY_OFFSET = SIGNER_NONCE_OFFSET + U64_SIZE_BYTES;
+    private static final int ADMIN_OFFSET = SIGNER_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int DEX_PROGRAM_ID_OFFSET = ADMIN_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int MANGO_CACHE_OFFSET = DEX_PROGRAM_ID_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int VALID_INTERVAL_OFFSET = MANGO_CACHE_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
 
-    // Member variables
+    // Member Variables
     private PublicKey publicKey;
     private MangoAccountMetadata metadata;
     private long numOracles;
@@ -46,6 +52,12 @@ public class MangoPerpGroup {
     private List<MangoSpotMarketInfo> spotMarkets;
     private List<MangoPerpMarketInfo> perpMarkets;
     private List<PublicKey> oracles;
+    private long signerNonce;
+    private PublicKey signerKey;
+    private PublicKey admin;
+    private PublicKey dexProgramId;
+    private PublicKey mangoCache;
+    private long validInterval;
 
     public static MangoPerpGroup readMangoPerpGroup(final PublicKey publicKey, byte[] data) {
         final MangoPerpGroup mangoPerpGroup = MangoPerpGroup.builder()
@@ -131,6 +143,13 @@ public class MangoPerpGroup {
                 mangoPerpGroup.getOracles().add(oracle);
             }
         }
+
+        mangoPerpGroup.setSignerNonce(Utils.readInt64(data, SIGNER_NONCE_OFFSET));
+        mangoPerpGroup.setSignerKey(PublicKey.readPubkey(data, SIGNER_KEY_OFFSET));
+        mangoPerpGroup.setAdmin(PublicKey.readPubkey(data, ADMIN_OFFSET));
+        mangoPerpGroup.setDexProgramId(PublicKey.readPubkey(data, DEX_PROGRAM_ID_OFFSET));
+        mangoPerpGroup.setMangoCache(PublicKey.readPubkey(data, MANGO_CACHE_OFFSET));
+        mangoPerpGroup.setValidInterval(Utils.readInt64(data, VALID_INTERVAL_OFFSET));
 
         return mangoPerpGroup;
     }
