@@ -209,40 +209,35 @@ public class MangoTest {
 
         LOGGER.info(
                 String.format(
-                        "maintAssetWeight = %.48f, bigDecimal = %s",
-                        maintAssetWeight.decodeFloat(),
+                        "maintAssetWeight = %s",
                         maintAssetWeight.decodeBigDecimal()
                 )
         );
 
         LOGGER.info(
                 String.format(
-                        "initAssetWeight = %.48f, bigDecimal = %s",
-                        initAssetWeight.decodeFloat(),
+                        "initAssetWeight = %s",
                         initAssetWeight.decodeBigDecimal()
                 )
         );
 
         LOGGER.info(
                 String.format(
-                        "maintLiabWeight = %.48f, bigDecimal = %s",
-                        maintLiabWeight.decodeFloat(),
+                        "maintLiabWeight = %s",
                         maintLiabWeight.decodeBigDecimal()
                 )
         );
 
         LOGGER.info(
                 String.format(
-                        "initLiabWeight = %.48f, bigDecimal = %s",
-                        initLiabWeight.decodeFloat(),
+                        "initLiabWeight = %s",
                         initLiabWeight.decodeBigDecimal()
                 )
         );
 
         LOGGER.info(
                 String.format(
-                        "liquidationFee = %.48f, bigDecimal = %s",
-                        liquidationFee.decodeFloat(),
+                        "liquidationFee = %s",
                         liquidationFee.decodeBigDecimal()
                 )
         );
