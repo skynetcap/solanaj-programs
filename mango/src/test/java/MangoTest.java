@@ -10,8 +10,7 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import java.util.Base64;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MangoTest {
 
@@ -230,6 +229,8 @@ public class MangoTest {
                 )
         );
 
+        assertEquals(100, perpMarketInfo.getBaseLotSize());
+        assertEquals(10, perpMarketInfo.getQuoteLotSize());
         assertArrayEquals(
                 spotMarketInfo.getMaintAssetWeight().getData(),
                 new byte[]{102, 102, 102, 102, 102, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
