@@ -201,49 +201,37 @@ public class MangoTest {
         assertTrue(mangoPerpGroup.getMetadata().isInitialized());
 
         final MangoSpotMarketInfo spotMarketInfo = mangoPerpGroup.getSpotMarkets().get(0);
-        final I80F48 maintAssetWeight = spotMarketInfo.getMaintAssetWeight();
-        final I80F48 initAssetWeight = spotMarketInfo.getInitAssetWeight();
-        final I80F48 maintLiabWeight = spotMarketInfo.getMaintLiabWeight();
-        final I80F48 initLiabWeight = spotMarketInfo.getInitLiabWeight();
-        final I80F48 liquidationFee = spotMarketInfo.getLiquidationFee();
 
         LOGGER.info(
                 String.format(
-                        "maintAssetWeight = %s",
-                        maintAssetWeight.decodeBigDecimal()
+                        "Spot market 0: maintAssetWeight = %s, initAssetWeight = %s, maintLiabWeight = %s, " +
+                                "initLiabWeight = %s, liquidationFee = %s",
+                        spotMarketInfo.getMaintAssetWeight().decodeBigDecimal(),
+                        spotMarketInfo.getInitAssetWeight().decodeBigDecimal(),
+                        spotMarketInfo.getMaintLiabWeight().decodeBigDecimal(),
+                        spotMarketInfo.getInitLiabWeight().decodeBigDecimal(),
+                        spotMarketInfo.getLiquidationFee().decodeBigDecimal()
                 )
         );
 
-        LOGGER.info(
-                String.format(
-                        "initAssetWeight = %s",
-                        initAssetWeight.decodeBigDecimal()
-                )
-        );
+        final MangoPerpMarketInfo perpMarketInfo = mangoPerpGroup.getPerpMarkets().get(0);
 
         LOGGER.info(
                 String.format(
-                        "maintLiabWeight = %s",
-                        maintLiabWeight.decodeBigDecimal()
-                )
-        );
-
-        LOGGER.info(
-                String.format(
-                        "initLiabWeight = %s",
-                        initLiabWeight.decodeBigDecimal()
-                )
-        );
-
-        LOGGER.info(
-                String.format(
-                        "liquidationFee = %s",
-                        liquidationFee.decodeBigDecimal()
+                        "Perp market 0: maintAssetWeight = %s, initAssetWeight = %s, maintLiabWeight = %s, " +
+                                "initLiabWeight = %s, liquidationFee = %s, baseLotSize = %d, quoteLotSize = %d",
+                        perpMarketInfo.getMaintAssetWeight().decodeBigDecimal(),
+                        perpMarketInfo.getInitAssetWeight().decodeBigDecimal(),
+                        perpMarketInfo.getMaintLiabWeight().decodeBigDecimal(),
+                        perpMarketInfo.getInitLiabWeight().decodeBigDecimal(),
+                        perpMarketInfo.getLiquidationFee().decodeBigDecimal(),
+                        perpMarketInfo.getBaseLotSize(),
+                        perpMarketInfo.getQuoteLotSize()
                 )
         );
 
         assertArrayEquals(
-                maintAssetWeight.getData(),
+                spotMarketInfo.getMaintAssetWeight().getData(),
                 new byte[]{102, 102, 102, 102, 102, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         );
     }

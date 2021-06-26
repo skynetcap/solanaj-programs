@@ -47,7 +47,7 @@ public class MangoPerpMarketInfo {
         mangoPerpMarketInfo.setInitLiabWeight(I80F48.readI80F48(data, INIT_LIAB_WEIGHT_OFFSET));
         mangoPerpMarketInfo.setLiquidationFee(I80F48.readI80F48(data, LIQUIDATION_FEE_OFFSET));
         mangoPerpMarketInfo.setBaseLotSize(Utils.readInt64(data, BASE_LOT_SIZE_OFFSET));
-        mangoPerpMarketInfo.setBaseLotSize(Utils.readInt64(data, QUOTE_LOT_SIZE_OFFSET));
+        mangoPerpMarketInfo.setQuoteLotSize(Utils.readInt64(data, QUOTE_LOT_SIZE_OFFSET));
 
         return mangoPerpMarketInfo;
     }
