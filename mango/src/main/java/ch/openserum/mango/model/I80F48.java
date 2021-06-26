@@ -18,6 +18,7 @@ import java.util.Arrays;
 public class I80F48 {
 
     public static final int I80F48_LENGTH = 16;
+    private static final int FRACTIONS = 48;
     private byte[] data;
 
     public static I80F48 readI80F48(byte[] data, int offset) {
@@ -29,17 +30,17 @@ public class I80F48 {
     }
 
     public BigDecimal decodeBigDecimal() {
-        ByteBuffer buffer = ByteBuffer.allocate(16);
+        ByteBuffer buffer = ByteBuffer.allocate(I80F48_LENGTH);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-        for (int i = 0; i < 16; i++) {
-            buffer.put(data[16 - i - 1]);
+        for (int i = 0; i < I80F48_LENGTH; i++) {
+            buffer.put(data[I80F48_LENGTH - i - 1]);
         }
 
         String newString = ByteUtils.bytesToHex(buffer.array());
-        BigInteger result = new BigInteger(newString, 16);
+        BigInteger result = new BigInteger(newString, I80F48_LENGTH);
 
-        return new BigDecimal(result, 48)
-                .divide(BigDecimal.valueOf((long) Math.pow(2, 48), 48), RoundingMode.HALF_UP);
+        return new BigDecimal(result, FRACTIONS)
+                .divide(BigDecimal.valueOf((long) Math.pow(2, FRACTIONS), FRACTIONS), RoundingMode.HALF_UP);
     }
 }
