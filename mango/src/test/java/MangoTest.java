@@ -10,6 +10,8 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Base64;
 import java.util.logging.Logger;
 
