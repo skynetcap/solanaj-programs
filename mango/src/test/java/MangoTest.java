@@ -200,7 +200,7 @@ public class MangoTest {
 
         assertTrue(mangoPerpGroup.getMetadata().isInitialized());
 
-        final MangoSpotMarketInfo spotMarketInfo = mangoPerpGroup.getSpotMarketInfos().get(0);
+        final MangoSpotMarketInfo spotMarketInfo = mangoPerpGroup.getSpotMarkets().get(0);
         final I80F48 maintAssetWeight = spotMarketInfo.getMaintAssetWeight();
         final I80F48 initAssetWeight = spotMarketInfo.getInitAssetWeight();
         final I80F48 maintLiabWeight = spotMarketInfo.getMaintLiabWeight();

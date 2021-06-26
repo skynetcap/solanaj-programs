@@ -33,13 +33,16 @@ public class MangoPerpGroup {
     private static final int TOKENS_OFFSET = NUM_ORACLES_OFFSET + U64_SIZE_BYTES;
     private static final int SPOT_MARKETS_OFFSET = TOKENS_OFFSET
             + (MAX_TOKENS * MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE);
+    private static final int PERP_MARKETS_OFFSET = SPOT_MARKETS_OFFSET
+            + (MAX_PAIRS * MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE);
 
     // Member variables
     private PublicKey publicKey;
     private MangoAccountMetadata metadata;
     private long numOracles;
     private List<MangoTokenInfo> tokens;
-    private List<MangoSpotMarketInfo> spotMarketInfos;
+    private List<MangoSpotMarketInfo> spotMarkets;
+    private List<MangoPerpMarketInfo> perpMarkets;
 
     public static MangoPerpGroup readMangoPerpGroup(final PublicKey publicKey, byte[] data) {
         final MangoPerpGroup mangoPerpGroup = MangoPerpGroup.builder()
@@ -72,7 +75,7 @@ public class MangoPerpGroup {
             }
         }
 
-        mangoPerpGroup.setSpotMarketInfos(new ArrayList<>());
+        mangoPerpGroup.setSpotMarkets(new ArrayList<>());
         for (int i = 0; i < MAX_PAIRS; i++) {
             int start = SPOT_MARKETS_OFFSET + (i * MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE);
             int end = SPOT_MARKETS_OFFSET + (i * MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE)
@@ -89,7 +92,28 @@ public class MangoPerpGroup {
             String spotMarketString = mangoSpotMarketInfo.getSpotMarket().toBase58();
 
             if (!spotMarketString.equalsIgnoreCase("11111111111111111111111111111111")) {
-                mangoPerpGroup.getSpotMarketInfos().add(mangoSpotMarketInfo);
+                mangoPerpGroup.getSpotMarkets().add(mangoSpotMarketInfo);
+            }
+        }
+
+        mangoPerpGroup.setPerpMarkets(new ArrayList<>());
+        for (int i = 0; i < MAX_PAIRS; i++) {
+            int start = PERP_MARKETS_OFFSET + (i * MangoPerpMarketInfo.MANGO_PERP_MARKET_INFO_LAYOUT_SIZE);
+            int end = PERP_MARKETS_OFFSET + (i * MangoPerpMarketInfo.MANGO_PERP_MARKET_INFO_LAYOUT_SIZE)
+                    + MangoPerpMarketInfo.MANGO_PERP_MARKET_INFO_LAYOUT_SIZE;
+
+            final MangoPerpMarketInfo mangoPerpMarketInfo = MangoPerpMarketInfo.readMangoPerpMarketInfo(
+                    Arrays.copyOfRange(
+                            data,
+                            start,
+                            end
+                    )
+            );
+
+            String perpMarketString = mangoPerpMarketInfo.getPerpMarket().toBase58();
+
+            if (!perpMarketString.equalsIgnoreCase("11111111111111111111111111111111")) {
+                mangoPerpGroup.getPerpMarkets().add(mangoPerpMarketInfo);
             }
         }
 
