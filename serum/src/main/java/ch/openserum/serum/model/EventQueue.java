@@ -1,5 +1,7 @@
 package ch.openserum.serum.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.utils.ByteUtils;
@@ -48,9 +50,9 @@ const EVENT = struct([
 /**
  * Represents a Serum Event Queue
  */
+@Getter
+@Setter
 public class EventQueue {
-
-    private static final Logger LOGGER = Logger.getLogger(EventQueue.class.getName());
 
     // sizes
     private static final int HEADER_LAYOUT_SPAN = 37;
@@ -66,7 +68,6 @@ public class EventQueue {
     private int count;
     private int seqNum;
     private List<TradeEvent> events;
-    private List<PublicKey> openOrdersAccounts = new ArrayList<>();
 
     private long baseLotSize;
     private long quoteLotSize;
@@ -173,98 +174,6 @@ public class EventQueue {
             }
         }
 
-        // Calculate top traders by # of fills
-        List<String> publicKeys = events.stream()
-                .map(tradeEvent -> tradeEvent.getOpenOrders().toBase58())
-                .sorted()
-                .collect(Collectors.toList());
-
-        eventQueue.getOpenOrdersAccounts().clear();
-
-        for (String publicKey : publicKeys) {
-            eventQueue.getOpenOrdersAccounts().add(PublicKey.valueOf(publicKey));
-        }
-
         return eventQueue;
-    }
-
-    public AccountFlags getAccountFlags() {
-        return accountFlags;
-    }
-
-    public void setAccountFlags(AccountFlags accountFlags) {
-        this.accountFlags = accountFlags;
-    }
-
-    public int getHead() {
-        return head;
-    }
-
-    public void setHead(int head) {
-        this.head = head;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public int getSeqNum() {
-        return seqNum;
-    }
-
-    public void setSeqNum(int seqNum) {
-        this.seqNum = seqNum;
-    }
-
-    public List<TradeEvent> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<TradeEvent> events) {
-        this.events = events;
-    }
-
-    public List<PublicKey> getOpenOrdersAccounts() {
-        return openOrdersAccounts;
-    }
-
-    public void setOpenOrdersAccounts(List<PublicKey> openOrdersAccounts) {
-        this.openOrdersAccounts = openOrdersAccounts;
-    }
-
-    public long getBaseLotSize() {
-        return baseLotSize;
-    }
-
-    public void setBaseLotSize(long baseLotSize) {
-        this.baseLotSize = baseLotSize;
-    }
-
-    public long getQuoteLotSize() {
-        return quoteLotSize;
-    }
-
-    public void setQuoteLotSize(long quoteLotSize) {
-        this.quoteLotSize = quoteLotSize;
-    }
-
-    public byte getBaseDecimals() {
-        return baseDecimals;
-    }
-
-    public void setBaseDecimals(byte baseDecimals) {
-        this.baseDecimals = baseDecimals;
-    }
-
-    public byte getQuoteDecimals() {
-        return quoteDecimals;
-    }
-
-    public void setQuoteDecimals(byte quoteDecimals) {
-        this.quoteDecimals = quoteDecimals;
     }
 }

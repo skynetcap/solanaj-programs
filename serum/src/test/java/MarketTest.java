@@ -152,7 +152,6 @@ public class MarketTest {
 
         LOGGER.info("Market = " + solUsdcMarket.toString());
         LOGGER.info("Event Queue = " + solUsdcMarket.getEventQueue());
-        LOGGER.info("# of Open Orders accounts = " + solUsdcMarket.getEventQueue().getOpenOrdersAccounts().size());
 
         List<TradeEvent> tradeEvents = solUsdcMarket.getEventQueue().getEvents();
 
