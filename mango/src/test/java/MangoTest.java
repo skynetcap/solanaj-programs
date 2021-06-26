@@ -189,7 +189,7 @@ public class MangoTest {
 
     @Test
     public void mangoV3Test() {
-        final MangoPerpGroup mangoPerpGroup = devnetMangoManager.getMangoAccount(
+        final MangoPerpGroup mangoPerpGroup = devnetMangoManager.getMangoPerpGroup(
                 PublicKey.valueOf("ECAikQUnS8HGLnzGrqEYA6Daz8nRRu9GsbfLbwMfK23P")
         );
 
@@ -202,6 +202,17 @@ public class MangoTest {
 
         assertTrue(mangoPerpGroup.getMetadata().isInitialized());
 
+        LOGGER.info(
+                String.format(
+                        "maintAssetWeight = %.48f, bigDecimal = %s",
+                        mangoPerpGroup.getSpotMarketInfos().get(0).getMaintAssetWeight().decodeFloat(),
+                        mangoPerpGroup.getSpotMarketInfos().get(0).getMaintAssetWeight().decodeBigDecimal()
+                )
+        );
+    }
+
+    @Test
+    public void pubkeyReadTest() {
         byte[] rawData = {
                 (byte)0x64, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                 (byte)0x00, (byte)0x00, (byte)0x0A, (byte)0x00, (byte)0x00, (byte)0x00,
@@ -225,7 +236,5 @@ public class MangoTest {
 
         PublicKey pubkey2 = PublicKey.readPubkey(rawData2, 0);
         LOGGER.info("Pubkey2 = " + pubkey2.toBase58());
-
-
     }
 }

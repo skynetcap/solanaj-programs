@@ -59,7 +59,7 @@ public class MangoManager {
         return Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
     }
 
-    public MangoPerpGroup getMangoAccount(final PublicKey publicKey) {
+    public MangoPerpGroup getMangoPerpGroup(final PublicKey publicKey) {
         byte[] mangoPerpGroupData = getAccountData(publicKey);
 
         try {
