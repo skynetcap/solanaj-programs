@@ -35,6 +35,8 @@ public class MangoPerpGroup {
             + (MAX_TOKENS * MangoTokenInfo.MANGO_TOKEN_INFO_LAYOUT_SIZE);
     private static final int PERP_MARKETS_OFFSET = SPOT_MARKETS_OFFSET
             + (MAX_PAIRS * MangoSpotMarketInfo.MANGO_SPOT_MARKET_INFO_LAYOUT_SIZE);
+    private static final int ORACLES_OFFSET = PERP_MARKETS_OFFSET
+            + (MAX_PAIRS * MangoPerpMarketInfo.MANGO_PERP_MARKET_INFO_LAYOUT_SIZE);
 
     // Member variables
     private PublicKey publicKey;
@@ -43,6 +45,7 @@ public class MangoPerpGroup {
     private List<MangoTokenInfo> tokens;
     private List<MangoSpotMarketInfo> spotMarkets;
     private List<MangoPerpMarketInfo> perpMarkets;
+    private List<PublicKey> oracles;
 
     public static MangoPerpGroup readMangoPerpGroup(final PublicKey publicKey, byte[] data) {
         final MangoPerpGroup mangoPerpGroup = MangoPerpGroup.builder()
@@ -114,6 +117,18 @@ public class MangoPerpGroup {
 
             if (!perpMarketString.equalsIgnoreCase("11111111111111111111111111111111")) {
                 mangoPerpGroup.getPerpMarkets().add(mangoPerpMarketInfo);
+            }
+        }
+
+        mangoPerpGroup.setOracles(new ArrayList<>());
+        for (int i = 0; i < MAX_PAIRS; i++) {
+            final PublicKey oracle = PublicKey.readPubkey(
+                    data,
+                    ORACLES_OFFSET + (i * PublicKey.PUBLIC_KEY_LENGTH)
+            );
+
+            if (!oracle.toBase58().equalsIgnoreCase("11111111111111111111111111111111")) {
+                mangoPerpGroup.getOracles().add(oracle);
             }
         }
 
