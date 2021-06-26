@@ -1,8 +1,5 @@
 import ch.openserum.mango.manager.MangoManager;
-import ch.openserum.mango.model.MangoPerpGroup;
-import ch.openserum.mango.model.MangoGroup;
-import ch.openserum.mango.model.MangoIndex;
-import ch.openserum.mango.model.MarginAccount;
+import ch.openserum.mango.model.*;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -10,11 +7,10 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Base64;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MangoTest {
@@ -204,12 +200,56 @@ public class MangoTest {
 
         assertTrue(mangoPerpGroup.getMetadata().isInitialized());
 
+        final MangoSpotMarketInfo spotMarketInfo = mangoPerpGroup.getSpotMarketInfos().get(0);
+        final I80F48 maintAssetWeight = spotMarketInfo.getMaintAssetWeight();
+        final I80F48 initAssetWeight = spotMarketInfo.getInitAssetWeight();
+        final I80F48 maintLiabWeight = spotMarketInfo.getMaintLiabWeight();
+        final I80F48 initLiabWeight = spotMarketInfo.getInitLiabWeight();
+        final I80F48 liquidationFee = spotMarketInfo.getLiquidationFee();
+
         LOGGER.info(
                 String.format(
                         "maintAssetWeight = %.48f, bigDecimal = %s",
-                        mangoPerpGroup.getSpotMarketInfos().get(0).getMaintAssetWeight().decodeFloat(),
-                        mangoPerpGroup.getSpotMarketInfos().get(0).getMaintAssetWeight().decodeBigDecimal()
+                        maintAssetWeight.decodeFloat(),
+                        maintAssetWeight.decodeBigDecimal()
                 )
+        );
+
+        LOGGER.info(
+                String.format(
+                        "initAssetWeight = %.48f, bigDecimal = %s",
+                        initAssetWeight.decodeFloat(),
+                        initAssetWeight.decodeBigDecimal()
+                )
+        );
+
+        LOGGER.info(
+                String.format(
+                        "maintLiabWeight = %.48f, bigDecimal = %s",
+                        maintLiabWeight.decodeFloat(),
+                        maintLiabWeight.decodeBigDecimal()
+                )
+        );
+
+        LOGGER.info(
+                String.format(
+                        "initLiabWeight = %.48f, bigDecimal = %s",
+                        initLiabWeight.decodeFloat(),
+                        initLiabWeight.decodeBigDecimal()
+                )
+        );
+
+        LOGGER.info(
+                String.format(
+                        "liquidationFee = %.48f, bigDecimal = %s",
+                        liquidationFee.decodeFloat(),
+                        liquidationFee.decodeBigDecimal()
+                )
+        );
+
+        assertArrayEquals(
+                maintAssetWeight.getData(),
+                new byte[]{102, 102, 102, 102, 102, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         );
     }
 
