@@ -14,9 +14,9 @@ public class DevnetTest {
     private final PythManager pythManager = new PythManager(client);
     private static final Logger LOGGER = Logger.getLogger(DevnetTest.class.getName());
     private static final int PYTH_MAGIC_NUMBER = (int) Long.parseLong("a1b2c3d4", 16);
-    private static final int EXPECTED_PYTH_VERSION = 1;
+    private static final int EXPECTED_PYTH_VERSION = 2;
     private static final PublicKey TEST_MAPPING_ACCOUNT = PublicKey.valueOf(
-            "ArppEFcsybCLE8CRtQJLQ9tLv2peGmQoKWFuiUWm4KBP"
+            "BmA9Z6FjioHJPpjT39QazZyhDRUdZy2ezwx4GiDdE2u2"
     );
 
     @Test
@@ -48,7 +48,7 @@ public class DevnetTest {
                         version
                 )
         );
-        assertEquals(EXPECTED_PYTH_VERSION, 1);
+        assertEquals(EXPECTED_PYTH_VERSION, version);
 
         // Next mapping account
         final PublicKey nextMappingAccount = mappingAccount.getNextMappingAccount();
