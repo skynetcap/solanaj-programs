@@ -1,5 +1,6 @@
 import ch.openserum.pyth.manager.PythManager;
 import ch.openserum.pyth.model.MappingAccount;
+import ch.openserum.pyth.model.ProductAccount;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -20,7 +21,7 @@ public class DevnetTest {
     );
 
     @Test
-    public void pythTest() {
+    public void mappingAccount() {
         final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
 
         LOGGER.info(
@@ -53,7 +54,24 @@ public class DevnetTest {
         // Next mapping account
         final PublicKey nextMappingAccount = mappingAccount.getNextMappingAccount();
         assertNull(nextMappingAccount);
+    }
 
+    @Test
+    public void productAccountTest() {
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
+        final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(0);
 
+        assertNotNull(productAccountKey);
+
+        final ProductAccount productAccount = pythManager.getProductAccount(productAccountKey);
+        LOGGER.info(
+                String.format(
+                        "Product Account = %s",
+                        productAccount.toString()
+                )
+        );
+
+        int magicNumber = productAccount.getMagicNumber();
+        assertEquals(PYTH_MAGIC_NUMBER, magicNumber);
     }
 }

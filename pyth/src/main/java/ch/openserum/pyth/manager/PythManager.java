@@ -1,6 +1,7 @@
 package ch.openserum.pyth.manager;
 
 import ch.openserum.pyth.model.MappingAccount;
+import ch.openserum.pyth.model.ProductAccount;
 import ch.openserum.pyth.utils.PythUtils;
 import lombok.RequiredArgsConstructor;
 import org.p2p.solanaj.core.PublicKey;
@@ -30,6 +31,18 @@ public class PythManager {
         }
 
         return MappingAccount.readMappingAccount(data);
+    }
+
+    public ProductAccount getProductAccount(final PublicKey publicKey) {
+        byte[] data = getAccountData(publicKey);
+
+        try {
+            Files.write(Path.of("productAccount.bin"), data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ProductAccount.readProductAccount(data);
     }
 
     // TODO Deduplicate this with MangoManager
