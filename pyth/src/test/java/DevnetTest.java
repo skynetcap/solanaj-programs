@@ -6,7 +6,7 @@ import org.p2p.solanaj.rpc.RpcClient;
 
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class DevnetTest {
 
@@ -22,6 +22,13 @@ public class DevnetTest {
     @Test
     public void pythTest() {
         final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
+
+        LOGGER.info(
+                String.format(
+                        "Mapping Account = %s",
+                        mappingAccount.toString()
+                )
+        );
 
         // Magic Number
         int magicInt = mappingAccount.getMagicNumber();
@@ -42,5 +49,11 @@ public class DevnetTest {
                 )
         );
         assertEquals(EXPECTED_PYTH_VERSION, 1);
+
+        // Next mapping account
+        final PublicKey nextMappingAccount = mappingAccount.getNextMappingAccount();
+        assertNull(nextMappingAccount);
+
+
     }
 }
