@@ -98,7 +98,6 @@ public class PriceDataAccount {
         );
         priceDataAccount.setAggregatePriceInfo(aggregatePriceInfo);
 
-
         return priceDataAccount;
     }
 }

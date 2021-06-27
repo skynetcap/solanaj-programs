@@ -5,6 +5,7 @@ import ch.openserum.pyth.model.ProductAccount;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
+import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
 
 import java.util.logging.Logger;
 
@@ -12,7 +13,9 @@ import static org.junit.Assert.*;
 
 public class DevnetTest {
 
-    private final RpcClient client = new RpcClient("https://api.devnet.solana.com");
+    private final String ENDPOINT = "https://api.devnet.solana.com";
+    private final RpcClient client = new RpcClient(ENDPOINT);
+    private final SubscriptionWebSocketClient webSocketClient = SubscriptionWebSocketClient.getInstance(ENDPOINT);
     private final PythManager pythManager = new PythManager(client);
     private static final Logger LOGGER = Logger.getLogger(DevnetTest.class.getName());
     private static final int PYTH_MAGIC_NUMBER = (int) Long.parseLong("a1b2c3d4", 16);
@@ -110,5 +113,30 @@ public class DevnetTest {
         );
 
         assertEquals(EXPECTED_EXPONENT, priceDataAccount.getExponent());
+    }
+
+    @Test
+    public void priceDataAccountWebsocketTest() throws InterruptedException {
+        final PublicKey EUR_USD_PUBKEY = PublicKey.valueOf("E36MyBbavhYKHVLWR79GiReNNnBDiHj6nWA7htbkNZbh");
+        final PriceDataAccount priceDataAccount = pythManager.getPriceDataAccount(EUR_USD_PUBKEY);
+        LOGGER.info(
+                String.format(
+                        "Price Data Account = %s",
+                        priceDataAccount.toString()
+                )
+        );
+
+        webSocketClient.accountSubscribe(EUR_USD_PUBKEY.toBase58(), event -> {
+            if (event != null) {
+                LOGGER.info(
+                        String.format(
+                                "Event = %s",
+                                event
+                        )
+                );
+            }
+        });
+
+        Thread.sleep(30000L);
     }
 }
