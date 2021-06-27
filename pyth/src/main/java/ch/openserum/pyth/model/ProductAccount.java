@@ -7,6 +7,11 @@ import lombok.Setter;
 import lombok.ToString;
 import org.p2p.solanaj.core.PublicKey;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 @Builder
 @Getter
 @Setter
@@ -19,6 +24,7 @@ public class ProductAccount {
     private static final int TYPE_OFFSET = VERSION_OFFSET + PythUtils.INT32_SIZE;
     private static final int SIZE_OFFSET = TYPE_OFFSET + PythUtils.INT32_SIZE;
     private static final int PRICE_ACCOUNT_KEY_OFFSET = SIZE_OFFSET + PythUtils.INT32_SIZE;
+    private static final int PRODUCT_ATTRIBUTES_OFFSET = PRICE_ACCOUNT_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
 
     // Variables
     private int magicNumber;
@@ -26,6 +32,7 @@ public class ProductAccount {
     private int type;
     private int size;
     private PublicKey priceAccountKey;
+    private Map<String, String> productAttributes;
 
     public static ProductAccount readProductAccount(byte[] data) {
         final ProductAccount productAccount = ProductAccount.builder()
@@ -35,6 +42,31 @@ public class ProductAccount {
                 .size(PythUtils.readInt32(data, SIZE_OFFSET))
                 .priceAccountKey(PublicKey.readPubkey(data, PRICE_ACCOUNT_KEY_OFFSET))
                 .build();
+
+        productAccount.setProductAttributes(new HashMap<>());
+        int index = PRODUCT_ATTRIBUTES_OFFSET;
+        while (index < productAccount.getSize()) {
+            int keyLength = data[index];
+            index++;
+            if (keyLength > 0) {
+                String key = new String(
+                        Arrays.copyOfRange(data, index, index + keyLength),
+                        StandardCharsets.UTF_8
+                );
+                index += keyLength;
+
+                int valueLength = data[index];
+                index++;
+
+                String value = new String(
+                        Arrays.copyOfRange(data, index, index + valueLength),
+                        StandardCharsets.UTF_8
+                );
+                index+= valueLength;
+
+                productAccount.getProductAttributes().put(key, value);
+            }
+        }
 
         return productAccount;
     }

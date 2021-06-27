@@ -78,5 +78,7 @@ public class DevnetTest {
         assertTrue(
                 priceAccountKey.toBase58().equalsIgnoreCase("4EQrNZYk5KR1RnjyzbaaRbHsv8VqZWzSUtvx58wLsZbj")
         );
+
+
     }
 }
