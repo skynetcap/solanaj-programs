@@ -45,7 +45,7 @@ public class MappingAccount {
                 .build();
 
         final PublicKey nextMappingAccount = PublicKey.readPubkey(data, NEXT_MAPPING_ACCOUNT_OFFSET);
-        if (!nextMappingAccount.toBase58().equalsIgnoreCase("11111111111111111111111111111111")){
+        if (!nextMappingAccount.toBase58().equalsIgnoreCase(PythUtils.EMPTY_PUBKEY)){
             mappingAccount.setNextMappingAccount(nextMappingAccount);
         }
 

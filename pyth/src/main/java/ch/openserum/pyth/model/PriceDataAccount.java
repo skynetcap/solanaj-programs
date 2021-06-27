@@ -6,12 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.bitcoinj.core.Utils;
+import org.p2p.solanaj.core.PublicKey;
 
 @Builder
 @Getter
 @Setter
 @ToString
 public class PriceDataAccount {
+
+    private static final int NUM_DERIVED_VALUES = 6;
 
     // Offsets
     private static final int MAGIC_NUMBER_OFFSET = 0;
@@ -25,6 +28,9 @@ public class PriceDataAccount {
     private static final int VALID_SLOT_OFFSET = CURRENT_SLOT_OFFSET + PythUtils.INT64_SIZE;
     private static final int TWAP_COMPONENT_OFFSET = VALID_SLOT_OFFSET + PythUtils.INT64_SIZE;
     private static final int AVOL_COMPONENT_OFFSET = TWAP_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
+    private static final int PRODUCT_ACCOUNT_KEY_OFFSET = AVOL_COMPONENT_OFFSET + PythUtils.INT64_SIZE
+            + (NUM_DERIVED_VALUES * PythUtils.INT64_SIZE);
+    private static final int NEXT_PRICE_ACCOUNT_KEY_OFFSET = PRODUCT_ACCOUNT_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
 
     // Variables
     private int magicNumber;
@@ -40,6 +46,8 @@ public class PriceDataAccount {
     private float twap;
     private long avolComponent;
     private float avol;
+    private PublicKey productAccountKey;
+    private PublicKey nextPriceAccountKey;
 
     public static PriceDataAccount readPriceDataAccount(byte[] data) {
         final PriceDataAccount priceDataAccount = PriceDataAccount.builder()
@@ -61,6 +69,15 @@ public class PriceDataAccount {
         priceDataAccount.setAvolComponent(Utils.readInt64(data, AVOL_COMPONENT_OFFSET));
         float avol = ((float) priceDataAccount.getAvolComponent()) * (float) (Math.pow(10, priceDataAccount.getExponent()));
         priceDataAccount.setAvol(avol);
+
+        priceDataAccount.setProductAccountKey(PublicKey.readPubkey(data, PRODUCT_ACCOUNT_KEY_OFFSET));
+
+        final PublicKey nextPriceAccountKey = PublicKey.readPubkey(data, NEXT_PRICE_ACCOUNT_KEY_OFFSET);
+        if (!nextPriceAccountKey.toBase58().equalsIgnoreCase(PythUtils.EMPTY_PUBKEY)){
+            priceDataAccount.setNextPriceAccountKey(nextPriceAccountKey);
+        }
+
+
 
         return priceDataAccount;
     }

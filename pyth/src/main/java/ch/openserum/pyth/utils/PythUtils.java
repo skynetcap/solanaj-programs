@@ -8,6 +8,7 @@ public class PythUtils {
 
     public static final int INT32_SIZE = 4;
     public static final int INT64_SIZE = 8;
+    public static final String EMPTY_PUBKEY = "11111111111111111111111111111111";
 
     // TODO - Deduplicate this from Slab
     public static int readInt32(byte[] data, int offset) {
