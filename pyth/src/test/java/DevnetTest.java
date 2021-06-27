@@ -1,5 +1,6 @@
 import ch.openserum.pyth.manager.PythManager;
 import ch.openserum.pyth.model.MappingAccount;
+import ch.openserum.pyth.model.PriceDataAccount;
 import ch.openserum.pyth.model.ProductAccount;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
@@ -16,6 +17,7 @@ public class DevnetTest {
     private static final Logger LOGGER = Logger.getLogger(DevnetTest.class.getName());
     private static final int PYTH_MAGIC_NUMBER = (int) Long.parseLong("a1b2c3d4", 16);
     private static final int EXPECTED_PYTH_VERSION = 2;
+    private static final int EXPECTED_EXPONENT = -9;
     private static final PublicKey TEST_MAPPING_ACCOUNT = PublicKey.valueOf(
             "BmA9Z6FjioHJPpjT39QazZyhDRUdZy2ezwx4GiDdE2u2"
     );
@@ -79,6 +81,31 @@ public class DevnetTest {
                 priceAccountKey.toBase58().equalsIgnoreCase("4EQrNZYk5KR1RnjyzbaaRbHsv8VqZWzSUtvx58wLsZbj")
         );
 
+        assertTrue(productAccount.getProductAttributes().size() > 0);
+    }
 
+    @Test
+    public void priceDataAccountTest() {
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
+        final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(0);
+
+        assertNotNull(productAccountKey);
+
+        final ProductAccount productAccount = pythManager.getProductAccount(productAccountKey);
+        LOGGER.info(
+                String.format(
+                        "Product Account = %s",
+                        productAccount.toString()
+                )
+        );
+        final PriceDataAccount priceDataAccount = pythManager.getPriceDataAccount(productAccount.getPriceAccountKey());
+        LOGGER.info(
+                String.format(
+                        "Price Data Account = %s",
+                        priceDataAccount.toString()
+                )
+        );
+
+        assertEquals(EXPECTED_EXPONENT, priceDataAccount.getExponent());
     }
 }

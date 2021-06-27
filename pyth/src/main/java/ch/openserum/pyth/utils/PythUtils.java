@@ -7,6 +7,7 @@ import java.util.Arrays;
 public class PythUtils {
 
     public static final int INT32_SIZE = 4;
+    public static final int INT64_SIZE = 8;
 
     // TODO - Deduplicate this from Slab
     public static int readInt32(byte[] data, int offset) {
