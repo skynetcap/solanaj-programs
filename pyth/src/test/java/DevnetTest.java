@@ -1,11 +1,9 @@
-import ch.openserum.pyth.utils.PythUtils;
+import ch.openserum.pyth.manager.PythManager;
+import ch.openserum.pyth.model.MappingAccount;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
-import org.p2p.solanaj.rpc.RpcException;
-import org.p2p.solanaj.rpc.types.AccountInfo;
 
-import java.util.Base64;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -13,22 +11,21 @@ import static org.junit.Assert.assertEquals;
 public class DevnetTest {
 
     private final RpcClient client = new RpcClient("https://api.devnet.solana.com");
+    private final PythManager pythManager = new PythManager(client);
+    private static final Logger LOGGER = Logger.getLogger(DevnetTest.class.getName());
     private static final int PYTH_MAGIC_NUMBER = (int) Long.parseLong("a1b2c3d4", 16);
     private static final int EXPECTED_PYTH_VERSION = 1;
-    private static final int MAGIC_NUMBER_OFFSET = 0;
-    private static final int VERSION_OFFSET = MAGIC_NUMBER_OFFSET + PythUtils.INT32_SIZE;
+    private static final PublicKey TEST_MAPPING_ACCOUNT = PublicKey.valueOf(
+            "ArppEFcsybCLE8CRtQJLQ9tLv2peGmQoKWFuiUWm4KBP"
+    );
 
     @Test
-    public void pythTest() throws RpcException {
-        AccountInfo accountInfo = client.getApi().getAccountInfo(
-                PublicKey.valueOf("ArppEFcsybCLE8CRtQJLQ9tLv2peGmQoKWFuiUWm4KBP")
-        );
-
-        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+    public void pythTest() {
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
 
         // Magic Number
-        int magicInt = PythUtils.readInt32(data, MAGIC_NUMBER_OFFSET);
-        Logger.getAnonymousLogger().info(
+        int magicInt = mappingAccount.getMagicNumber();
+        LOGGER.info(
                 String.format(
                         "Magic number %d",
                         magicInt
@@ -37,8 +34,8 @@ public class DevnetTest {
         assertEquals(PYTH_MAGIC_NUMBER, magicInt);
 
         // Version
-        int version = PythUtils.readInt32(data, VERSION_OFFSET);
-        Logger.getAnonymousLogger().info(
+        int version = mappingAccount.getVersion();
+        LOGGER.info(
                 String.format(
                         "Version %d",
                         version
