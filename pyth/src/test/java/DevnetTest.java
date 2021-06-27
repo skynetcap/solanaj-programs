@@ -8,6 +8,9 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
 
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
@@ -119,8 +122,8 @@ public class DevnetTest {
     @Test
     @Ignore
     public void priceDataAccountWebsocketTest() throws InterruptedException {
-        final PublicKey EUR_USD_PUBKEY = PublicKey.valueOf("E36MyBbavhYKHVLWR79GiReNNnBDiHj6nWA7htbkNZbh");
-        final PriceDataAccount priceDataAccount = pythManager.getPriceDataAccount(EUR_USD_PUBKEY);
+        final PublicKey DOGE_USD_PUBKEY = PublicKey.valueOf("4L6YhY8VvUgmqG5MvJkUJATtzB2rFqdrJwQCmFLv4Jzy");
+        final PriceDataAccount priceDataAccount = pythManager.getPriceDataAccount(DOGE_USD_PUBKEY);
         LOGGER.info(
                 String.format(
                         "Price Data Account = %s",
@@ -128,12 +131,21 @@ public class DevnetTest {
                 )
         );
 
-        webSocketClient.accountSubscribe(EUR_USD_PUBKEY.toBase58(), event -> {
-            if (event != null) {
-                LOGGER.info(
+        webSocketClient.accountSubscribe(DOGE_USD_PUBKEY.toBase58(), data -> {
+            if (data != null) {
+                final Map<String, Object> objectMap = (Map<String, Object>) data;
+                final String base64 = (String)((List) objectMap.get("data")).get(0);
+
+                final PriceDataAccount streamedPriceDataAccount = PriceDataAccount.readPriceDataAccount(
+                        Base64.getDecoder().decode(base64)
+                );
+
+                System.out.println(
                         String.format(
-                                "Event = %s",
-                                event
+                                "DOGE/USD Price = %.6f, Confidence = %.5f",
+                                streamedPriceDataAccount.getAggregatePriceInfo().getPrice(),
+                                streamedPriceDataAccount.getAggregatePriceInfo().getConfidence()
+
                         )
                 );
             }
