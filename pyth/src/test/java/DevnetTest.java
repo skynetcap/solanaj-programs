@@ -21,6 +21,7 @@ public class DevnetTest {
     private static final PublicKey TEST_MAPPING_ACCOUNT = PublicKey.valueOf(
             "BmA9Z6FjioHJPpjT39QazZyhDRUdZy2ezwx4GiDdE2u2"
     );
+    private static final int EUR_USD_PRODUCT_ACCOUNT_KEY_INDEX = 20;
 
     @Test
     public void mappingAccount() {
@@ -87,7 +88,9 @@ public class DevnetTest {
     @Test
     public void priceDataAccountTest() {
         final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
-        final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(0);
+        final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(
+                EUR_USD_PRODUCT_ACCOUNT_KEY_INDEX
+        );
 
         assertNotNull(productAccountKey);
 

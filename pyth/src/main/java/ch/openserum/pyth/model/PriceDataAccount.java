@@ -8,6 +8,8 @@ import lombok.ToString;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 
+import java.util.Arrays;
+
 @Builder
 @Getter
 @Setter
@@ -31,6 +33,10 @@ public class PriceDataAccount {
     private static final int PRODUCT_ACCOUNT_KEY_OFFSET = AVOL_COMPONENT_OFFSET + PythUtils.INT64_SIZE
             + (NUM_DERIVED_VALUES * PythUtils.INT64_SIZE);
     private static final int NEXT_PRICE_ACCOUNT_KEY_OFFSET = PRODUCT_ACCOUNT_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int AGGREGATE_PRICE_UPDATE_ACCOUNT_KEY_OFFSET = NEXT_PRICE_ACCOUNT_KEY_OFFSET
+            + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int AGGREGATE_PRICE_INFO_OFFSET = AGGREGATE_PRICE_UPDATE_ACCOUNT_KEY_OFFSET
+            + PublicKey.PUBLIC_KEY_LENGTH;
 
     // Variables
     private int magicNumber;
@@ -48,6 +54,8 @@ public class PriceDataAccount {
     private float avol;
     private PublicKey productAccountKey;
     private PublicKey nextPriceAccountKey;
+    private PublicKey aggregatePriceUpdaterAccountKey;
+    private PriceInfo aggregatePriceInfo;
 
     public static PriceDataAccount readPriceDataAccount(byte[] data) {
         final PriceDataAccount priceDataAccount = PriceDataAccount.builder()
@@ -71,12 +79,24 @@ public class PriceDataAccount {
         priceDataAccount.setAvol(avol);
 
         priceDataAccount.setProductAccountKey(PublicKey.readPubkey(data, PRODUCT_ACCOUNT_KEY_OFFSET));
-
         final PublicKey nextPriceAccountKey = PublicKey.readPubkey(data, NEXT_PRICE_ACCOUNT_KEY_OFFSET);
         if (!nextPriceAccountKey.toBase58().equalsIgnoreCase(PythUtils.EMPTY_PUBKEY)){
             priceDataAccount.setNextPriceAccountKey(nextPriceAccountKey);
         }
 
+        priceDataAccount.setAggregatePriceUpdaterAccountKey(
+                PublicKey.readPubkey(data, AGGREGATE_PRICE_UPDATE_ACCOUNT_KEY_OFFSET)
+        );
+
+        final PriceInfo aggregatePriceInfo = PriceInfo.readPriceInfo(
+                Arrays.copyOfRange(
+                        data,
+                        AGGREGATE_PRICE_INFO_OFFSET,
+                        AGGREGATE_PRICE_INFO_OFFSET + PythUtils.PRICE_INFO_SIZE
+                ),
+                priceDataAccount.getExponent()
+        );
+        priceDataAccount.setAggregatePriceInfo(aggregatePriceInfo);
 
 
         return priceDataAccount;

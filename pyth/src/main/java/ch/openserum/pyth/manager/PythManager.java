@@ -2,9 +2,8 @@ package ch.openserum.pyth.manager;
 
 import ch.openserum.pyth.model.MappingAccount;
 import ch.openserum.pyth.model.PriceDataAccount;
-import ch.openserum.pyth.model.PriceInfoAccount;
+import ch.openserum.pyth.model.PriceInfo;
 import ch.openserum.pyth.model.ProductAccount;
-import ch.openserum.pyth.utils.PythUtils;
 import lombok.RequiredArgsConstructor;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -45,18 +44,6 @@ public class PythManager {
         }
 
         return ProductAccount.readProductAccount(data);
-    }
-
-    public PriceInfoAccount getPriceInfoAccount(final PublicKey publicKey) {
-        byte[] data = getAccountData(publicKey);
-
-        try {
-            Files.write(Path.of("priceInfoAccount.bin"), data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return PriceInfoAccount.readPriceInfoAccount(data);
     }
 
     public PriceDataAccount getPriceDataAccount(final PublicKey publicKey) {
