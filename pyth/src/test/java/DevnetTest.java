@@ -2,6 +2,7 @@ import ch.openserum.pyth.manager.PythManager;
 import ch.openserum.pyth.model.MappingAccount;
 import ch.openserum.pyth.model.PriceDataAccount;
 import ch.openserum.pyth.model.ProductAccount;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -116,6 +117,7 @@ public class DevnetTest {
     }
 
     @Test
+    @Ignore
     public void priceDataAccountWebsocketTest() throws InterruptedException {
         final PublicKey EUR_USD_PUBKEY = PublicKey.valueOf("E36MyBbavhYKHVLWR79GiReNNnBDiHj6nWA7htbkNZbh");
         final PriceDataAccount priceDataAccount = pythManager.getPriceDataAccount(EUR_USD_PUBKEY);
