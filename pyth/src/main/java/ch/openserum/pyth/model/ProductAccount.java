@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.p2p.solanaj.core.PublicKey;
 
 @Builder
 @Getter
@@ -14,13 +15,25 @@ public class ProductAccount {
 
     // Constants
     private static final int MAGIC_NUMBER_OFFSET = 0;
+    private static final int VERSION_OFFSET = MAGIC_NUMBER_OFFSET + PythUtils.INT32_SIZE;
+    private static final int TYPE_OFFSET = VERSION_OFFSET + PythUtils.INT32_SIZE;
+    private static final int SIZE_OFFSET = TYPE_OFFSET + PythUtils.INT32_SIZE;
+    private static final int PRICE_ACCOUNT_KEY_OFFSET = SIZE_OFFSET + PythUtils.INT32_SIZE;
 
     // Variables
     private int magicNumber;
+    private int version;
+    private int type;
+    private int size;
+    private PublicKey priceAccountKey;
 
     public static ProductAccount readProductAccount(byte[] data) {
         final ProductAccount productAccount = ProductAccount.builder()
                 .magicNumber(PythUtils.readInt32(data, MAGIC_NUMBER_OFFSET))
+                .version(PythUtils.readInt32(data, VERSION_OFFSET))
+                .type(PythUtils.readInt32(data, TYPE_OFFSET))
+                .size(PythUtils.readInt32(data, SIZE_OFFSET))
+                .priceAccountKey(PublicKey.readPubkey(data, PRICE_ACCOUNT_KEY_OFFSET))
                 .build();
 
         return productAccount;

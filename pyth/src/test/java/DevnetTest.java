@@ -73,5 +73,10 @@ public class DevnetTest {
 
         int magicNumber = productAccount.getMagicNumber();
         assertEquals(PYTH_MAGIC_NUMBER, magicNumber);
+
+        final PublicKey priceAccountKey = productAccount.getPriceAccountKey();
+        assertTrue(
+                priceAccountKey.toBase58().equalsIgnoreCase("4EQrNZYk5KR1RnjyzbaaRbHsv8VqZWzSUtvx58wLsZbj")
+        );
     }
 }
