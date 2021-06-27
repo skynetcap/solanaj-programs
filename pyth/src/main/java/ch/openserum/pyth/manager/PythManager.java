@@ -29,8 +29,7 @@ public class PythManager {
             e.printStackTrace();
         }
 
-        final MappingAccount mappingAccount = MappingAccount.readMappingAccount(data);
-        return mappingAccount;
+        return MappingAccount.readMappingAccount(data);
     }
 
     // TODO Deduplicate this with MangoManager

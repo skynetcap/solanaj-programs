@@ -7,10 +7,16 @@ import lombok.Setter;
 import lombok.ToString;
 import org.p2p.solanaj.core.PublicKey;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Builder
 @Getter
 @Setter
 @ToString
+/**
+ * Represents a Pyth mapping account
+ */
 public class MappingAccount {
 
     private static final int MAGIC_NUMBER_OFFSET = 0;
@@ -19,6 +25,7 @@ public class MappingAccount {
     private static final int SIZE_OFFSET = TYPE_OFFSET + PythUtils.INT32_SIZE;
     private static final int NUM_PRODUCTS_OFFSET = SIZE_OFFSET + PythUtils.INT32_SIZE;
     private static final int NEXT_MAPPING_ACCOUNT_OFFSET = NUM_PRODUCTS_OFFSET + (2 * PythUtils.INT32_SIZE);
+    private static final int PRODUCT_ACCOUNT_KEYS_OFFSET = NEXT_MAPPING_ACCOUNT_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
 
     private int magicNumber;
     private int version;
@@ -26,6 +33,7 @@ public class MappingAccount {
     private int size;
     private int numProducts;
     private PublicKey nextMappingAccount;
+    private List<PublicKey> productAccountKeys;
 
     public static MappingAccount readMappingAccount(byte[] data) {
         final MappingAccount mappingAccount = MappingAccount.builder()
@@ -39,6 +47,15 @@ public class MappingAccount {
         final PublicKey nextMappingAccount = PublicKey.readPubkey(data, NEXT_MAPPING_ACCOUNT_OFFSET);
         if (!nextMappingAccount.toBase58().equalsIgnoreCase("11111111111111111111111111111111")){
             mappingAccount.setNextMappingAccount(nextMappingAccount);
+        }
+
+        mappingAccount.setProductAccountKeys(new ArrayList<>());
+        for (int i = 0; i < mappingAccount.getNumProducts(); i++) {
+            final PublicKey productAccountKey = PublicKey.readPubkey(
+                    data,
+                    PRODUCT_ACCOUNT_KEYS_OFFSET + (i * 32)
+            );
+            mappingAccount.getProductAccountKeys().add(productAccountKey);
         }
 
         return mappingAccount;
