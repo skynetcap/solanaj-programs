@@ -66,7 +66,10 @@ public class MangoPerpGroup {
 
         mangoPerpGroup.setMetadata(
                 MangoAccountMetadata.readMangoAccountMetadata(
-                        Arrays.copyOfRange(data, METADATA_OFFSET, MangoAccountMetadata.METADATA_LAYOUT_SIZE)
+                        Arrays.copyOfRange(
+                                data,
+                                METADATA_OFFSET,
+                                METADATA_OFFSET + MangoAccountMetadata.METADATA_LAYOUT_SIZE)
                 )
         );
 

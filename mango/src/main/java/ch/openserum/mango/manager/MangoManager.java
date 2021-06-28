@@ -1,5 +1,6 @@
 package ch.openserum.mango.manager;
 
+import ch.openserum.mango.model.MangoPerpAccount;
 import ch.openserum.mango.model.MangoPerpGroup;
 import ch.openserum.mango.model.MangoGroup;
 import ch.openserum.mango.model.MarginAccount;
@@ -71,4 +72,8 @@ public class MangoManager {
         return MangoPerpGroup.readMangoPerpGroup(publicKey, mangoPerpGroupData);
     }
 
+    public MangoPerpAccount getMangoPerpAccount(final PublicKey publicKey) {
+        byte[] mangoPerpAccountData = getAccountData(publicKey);
+        return MangoPerpAccount.readMangoPerpAccount(publicKey, mangoPerpAccountData);
+    }
 }

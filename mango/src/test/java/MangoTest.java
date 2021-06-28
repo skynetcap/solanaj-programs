@@ -238,6 +238,20 @@ public class MangoTest {
     }
 
     @Test
+    public void mangoV3PerpAccountTest() {
+        final PublicKey TEST_MANGO_PERP_PUBKEY = PublicKey.valueOf("Fbq2VQNuq6WW2fHj9CDrTLSmtjvMwFajS3gXuCMTRMQV");
+        final MangoPerpAccount mangoPerpAccount = devnetMangoManager.getMangoPerpAccount(TEST_MANGO_PERP_PUBKEY);
+
+        LOGGER.info(
+                String.format(
+                        "mangoPerpAccount = %s",
+                        mangoPerpAccount.toString()
+                )
+        );
+
+    }
+
+    @Test
     public void pubkeyReadTest() {
         byte[] rawData = {
                 (byte)0x64, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
