@@ -24,6 +24,8 @@ public class SerumManager {
     // getMinimumBalanceForRentExemption(165) = 2039280
     private static final long MINIMUM_BALANCE_FOR_RENT_EXEMPTION_165 = 2039280L;
     private static final long REQUIRED_ACCOUNT_SPACE = 165L;
+    private static final long OPEN_ORDERS_ACCOUNT_DATA_SIZE = 3228L;
+    private static final long OPEN_ORDERS_MINIMUM_BALANCE_FOR_RENT_EXEMPTION = 23357760L;
 
     public SerumManager(final RpcClient client) {
         this.client = client;
@@ -48,7 +50,6 @@ public class SerumManager {
                 market.getOwnAddress(),
                 account.getPublicKey()
         );
-        validateOpenOrdersAccount(openOrders);
 
         return placeOrderInternal(account, market, order, baseWallet, quoteWallet, openOrders, null);
     }
@@ -72,7 +73,6 @@ public class SerumManager {
                              PublicKey quoteWallet,
                              OpenOrdersAccount openOrdersAccount) {
         validateOrder(order);
-        validateOpenOrdersAccount(openOrdersAccount);
 
         return placeOrderInternal(account, market, order, baseWallet, quoteWallet, openOrdersAccount, null);
     }
@@ -98,7 +98,6 @@ public class SerumManager {
                              OpenOrdersAccount openOrdersAccount,
                              PublicKey srmFeeDiscount) {
         validateOrder(order);
-        validateOpenOrdersAccount(openOrdersAccount);
 
         return placeOrderInternal(account, market, order, baseWallet, quoteWallet, openOrdersAccount, srmFeeDiscount);
     }
@@ -122,33 +121,26 @@ public class SerumManager {
                                       OpenOrdersAccount openOrdersAccount,
                                       PublicKey srmFeeDiscount) {
         final Transaction transaction = new Transaction();
+        final List<Account> signers = new ArrayList<>();
+        signers.add(account);
+
         setOrderPrices(order, market);
 
         boolean shouldWrapSol = (order.isBuy() && market.getQuoteMint().equals(SerumUtils.WRAPPED_SOL_MINT)) ||
                 (!order.isBuy() && market.getBaseMint().equals(SerumUtils.WRAPPED_SOL_MINT));
 
-        long lamports = -1L;
-
+        Account payerAccount = null;
         if (shouldWrapSol) {
-            lamports = SerumUtils.getLamportsNeededForSolWrapping(
+            long lamports = SerumUtils.getLamportsNeededForSolWrapping(
                     order.getFloatPrice(),
                     order.getFloatQuantity(),
                     order.isBuy(),
                     openOrdersAccount
             );
-        }
 
-        // Create payer account (only used if shouldWrapSol)
-        Account payerAccount = null;
-
-        if (shouldWrapSol) {
             payerAccount = new Account();
-        }
+            signers.add(payerAccount);
 
-        final PublicKey payerPublicKey = shouldWrapSol ? payerAccount.getPublicKey()
-                : (order.isBuy() ? quoteWallet : baseWallet);
-
-        if (shouldWrapSol) {
             transaction.addInstruction(
                     SystemProgram.createAccount(
                             account.getPublicKey(),
@@ -168,16 +160,40 @@ public class SerumManager {
             );
         }
 
+        // Create openOrdersAccount if it does not exist
+        PublicKey openOrdersAddress;
+        if (null == openOrdersAccount) {
+            Account openOrders = new Account();
+            signers.add(openOrders);
+            openOrdersAddress = openOrders.getPublicKey();
+
+            transaction.addInstruction(
+                    SystemProgram.createAccount(
+                            account.getPublicKey(),
+                            openOrders.getPublicKey(),
+                            OPEN_ORDERS_MINIMUM_BALANCE_FOR_RENT_EXEMPTION,
+                            OPEN_ORDERS_ACCOUNT_DATA_SIZE,
+                            SerumUtils.SERUM_PROGRAM_ID_V3
+                    )
+            );
+        } else {
+            openOrdersAddress = openOrdersAccount.getOwnPubkey();
+        }
+
+        final PublicKey payerPublicKey = shouldWrapSol ? payerAccount.getPublicKey()
+                : (order.isBuy() ? quoteWallet : baseWallet);
+
         transaction.addInstruction(
                 SerumProgram.placeOrder(
                         account,
                         payerPublicKey,
-                        openOrdersAccount.getOwnPubkey(),
+                        openOrdersAddress,
                         market,
                         order,
                         srmFeeDiscount
                 )
         );
+
 
         if (shouldWrapSol) {
             transaction.addInstruction(
@@ -195,29 +211,15 @@ public class SerumManager {
             transaction.addInstruction(
                     SerumProgram.settleFunds(
                             market,
-                            openOrdersAccount.getOwnPubkey(),
-                            openOrdersAccount.getOwner(),
+                            openOrdersAddress,
+                            account.getPublicKey(),
                             baseWallet,
                             quoteWallet
                     )
             );
         }
 
-        List<Account> signers;
-        if (shouldWrapSol) {
-            signers = List.of(account, payerAccount);
-        } else {
-            signers = List.of(account);
-        }
-
-        String result = null;
-        try {
-            result = client.getApi().sendTransaction(transaction, signers, null);
-        } catch (RpcException e) {
-            e.printStackTrace();
-        }
-
-        return result;
+        return sendTransactionWithSigners(transaction, signers);
     }
 
     /**
