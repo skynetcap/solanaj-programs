@@ -28,11 +28,10 @@ public class PriceDataAccountListener implements NotificationEventListener {
 
             LOGGER.info(
                     String.format(
-                            "Asset %s, Price = %.6f, Confidence = %.5f",
+                            "Asset %s, Price = %.6f, Confidence ± %.5f",
                             publicKey.toBase58(),
                             streamedPriceDataAccount.getAggregatePriceInfo().getPrice(),
                             streamedPriceDataAccount.getAggregatePriceInfo().getConfidence()
-
                     )
             );
         }

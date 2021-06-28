@@ -115,6 +115,27 @@ public class DevnetTest {
         );
 
         assertEquals(EXPECTED_EXPONENT, priceDataAccount.getExponent());
+
+        LOGGER.info(
+                String.format(
+                        "priceComponents = %s",
+                        priceDataAccount.getPriceComponents()
+                )
+        );
+
+        LOGGER.info(
+                String.format(
+                        "drv0 = %.4f, drv1 = %.4f, drv2 = %.4f, drv3 = %.4f, drv4 = %.4f, drv5 = %.4f",
+                        priceDataAccount.getDrv0(),
+                        priceDataAccount.getDrv1(),
+                        priceDataAccount.getDrv2(),
+                        priceDataAccount.getDrv3(),
+                        priceDataAccount.getDrv4(),
+                        priceDataAccount.getDrv5()
+                )
+        );
+
+        assertEquals(0.0f, priceDataAccount.getDrv0(), 0.0);
     }
 
     @Test
