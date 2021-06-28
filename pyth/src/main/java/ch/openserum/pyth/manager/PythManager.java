@@ -2,7 +2,6 @@ package ch.openserum.pyth.manager;
 
 import ch.openserum.pyth.model.MappingAccount;
 import ch.openserum.pyth.model.PriceDataAccount;
-import ch.openserum.pyth.model.PriceInfo;
 import ch.openserum.pyth.model.ProductAccount;
 import lombok.RequiredArgsConstructor;
 import org.p2p.solanaj.core.PublicKey;
@@ -10,9 +9,6 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -24,37 +20,16 @@ public class PythManager {
 
     public MappingAccount getMappingAccount(final PublicKey publicKey) {
         byte[] data = getAccountData(publicKey);
-
-        try {
-            Files.write(Path.of("mappingAccount.bin"), data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         return MappingAccount.readMappingAccount(data);
     }
 
     public ProductAccount getProductAccount(final PublicKey publicKey) {
         byte[] data = getAccountData(publicKey);
-
-        try {
-            Files.write(Path.of("productAccount.bin"), data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         return ProductAccount.readProductAccount(data);
     }
 
     public PriceDataAccount getPriceDataAccount(final PublicKey publicKey) {
         byte[] data = getAccountData(publicKey);
-
-        try {
-            Files.write(Path.of("priceDataAccount.bin"), data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         return PriceDataAccount.readPriceDataAccount(data);
     }
 
