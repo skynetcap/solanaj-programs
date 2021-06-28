@@ -9,6 +9,7 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
@@ -152,5 +153,31 @@ public class DevnetTest {
 
         webSocketClient.accountSubscribe(DOGE_USD_PUBKEY.toBase58(), new PriceDataAccountListener(DOGE_USD_PUBKEY));
         Thread.sleep(30000L);
+    }
+
+    @Test
+    @Ignore
+    public void multiplePriceDataAccountWebsocketTest() throws InterruptedException {
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
+        Thread.sleep(100L);
+        final List<PublicKey> productAccountKeys = mappingAccount.getProductAccountKeys();
+        for (PublicKey productAccountKey : productAccountKeys) {
+            final ProductAccount productAccount = pythManager.getProductAccount(productAccountKey);
+            Thread.sleep(100L);
+            final PublicKey priceDataAccountKey = productAccount.getPriceAccountKey();
+            webSocketClient.accountSubscribe(
+                    priceDataAccountKey.toBase58(),
+                    new PriceDataAccountListener(priceDataAccountKey)
+            );
+            LOGGER.info(
+                    String.format(
+                            "Subscribed to %s",
+                            priceDataAccountKey.toBase58()
+                    )
+            );
+            Thread.sleep(2000L);
+        }
+
+        Thread.sleep(60000L);
     }
 }
