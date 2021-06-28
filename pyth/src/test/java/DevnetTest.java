@@ -1,3 +1,4 @@
+import ch.openserum.pyth.listener.PriceDataAccountListener;
 import ch.openserum.pyth.manager.PythManager;
 import ch.openserum.pyth.model.MappingAccount;
 import ch.openserum.pyth.model.PriceDataAccount;
@@ -8,9 +9,6 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
@@ -131,26 +129,7 @@ public class DevnetTest {
                 )
         );
 
-        webSocketClient.accountSubscribe(DOGE_USD_PUBKEY.toBase58(), data -> {
-            if (data != null) {
-                final Map<String, Object> objectMap = (Map<String, Object>) data;
-                final String base64 = (String)((List) objectMap.get("data")).get(0);
-
-                final PriceDataAccount streamedPriceDataAccount = PriceDataAccount.readPriceDataAccount(
-                        Base64.getDecoder().decode(base64)
-                );
-
-                System.out.println(
-                        String.format(
-                                "DOGE/USD Price = %.6f, Confidence = %.5f",
-                                streamedPriceDataAccount.getAggregatePriceInfo().getPrice(),
-                                streamedPriceDataAccount.getAggregatePriceInfo().getConfidence()
-
-                        )
-                );
-            }
-        });
-
+        webSocketClient.accountSubscribe(DOGE_USD_PUBKEY.toBase58(), new PriceDataAccountListener(DOGE_USD_PUBKEY));
         Thread.sleep(30000L);
     }
 }
