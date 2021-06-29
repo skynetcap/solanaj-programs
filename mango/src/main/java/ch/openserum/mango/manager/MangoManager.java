@@ -10,9 +10,6 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -62,13 +59,6 @@ public class MangoManager {
 
     public MangoPerpGroup getMangoPerpGroup(final PublicKey publicKey) {
         byte[] mangoPerpGroupData = getAccountData(publicKey);
-
-        try {
-            Files.write(Path.of("mangoPerpGroup.bin"), mangoPerpGroupData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         return MangoPerpGroup.readMangoPerpGroup(publicKey, mangoPerpGroupData);
     }
 
