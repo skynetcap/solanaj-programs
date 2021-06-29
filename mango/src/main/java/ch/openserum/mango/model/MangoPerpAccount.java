@@ -69,9 +69,7 @@ public class MangoPerpAccount {
                     DEPOSITS_OFFSET + (i * I80F48.I80F48_LENGTH)
             );
 
-            if (i80F48.decodeFloat() > 0) {
-                mangoPerpAccount.getDeposits().add(i80F48);
-            }
+            mangoPerpAccount.getDeposits().add(i80F48);
         }
 
         mangoPerpAccount.setBorrows(new ArrayList<>());
@@ -82,9 +80,7 @@ public class MangoPerpAccount {
             );
 
             // TODO figure out good way to index by token mint, instead of "i"
-            if (i80F48.decodeFloat() > 0) {
-                mangoPerpAccount.getBorrows().add(i80F48);
-            }
+            mangoPerpAccount.getBorrows().add(i80F48);
         }
 
         return mangoPerpAccount;

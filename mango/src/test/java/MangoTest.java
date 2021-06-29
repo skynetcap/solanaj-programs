@@ -263,15 +263,17 @@ public class MangoTest {
         for (int i = 0; i < mangoPerpAccount.getDeposits().size(); i++) {
             final I80F48 deposit = mangoPerpAccount.getDeposits().get(i);
             final I80F48 borrow = mangoPerpAccount.getBorrows().get(i);
-            final byte decimals = mangoPerpGroup.getTokens().get(i).getDecimals();
+            byte decimals = mangoPerpGroup.getTokens().get(i).getDecimals();
 
-            LOGGER.info(
-                    String.format(
-                            "Deposit = %.6f, Borrow = %.6f",
-                            deposit.decodeFloat() / (float) Math.pow(10, decimals),
-                            borrow.decodeFloat() / (float) Math.pow(10, decimals)
-                    )
-            );
+            if (decimals > 0) {
+                LOGGER.info(
+                        String.format(
+                                "Deposit = %.6f, Borrow = %.6f",
+                                deposit.decodeFloat() / (float) Math.pow(10, decimals),
+                                borrow.decodeFloat() / (float) Math.pow(10, decimals)
+                        )
+                );
+            }
         }
 
         // TODO - figure out a good indexing solution between deposits and borrows

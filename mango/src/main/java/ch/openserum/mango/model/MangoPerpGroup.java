@@ -88,9 +88,7 @@ public class MangoPerpGroup {
                     )
             );
 
-            if (mangoTokenInfo.getDecimals() != 0) {
-                mangoPerpGroup.getTokens().add(mangoTokenInfo);
-            }
+            mangoPerpGroup.getTokens().add(mangoTokenInfo);
         }
 
         mangoPerpGroup.setSpotMarkets(new ArrayList<>());
