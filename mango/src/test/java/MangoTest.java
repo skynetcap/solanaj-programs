@@ -238,6 +238,49 @@ public class MangoTest {
     }
 
     @Test
+    public void mangoV3PerpAccountTest() {
+        final MangoPerpGroup mangoPerpGroup = devnetMangoManager.getMangoPerpGroup(
+                PublicKey.valueOf("ECAikQUnS8HGLnzGrqEYA6Daz8nRRu9GsbfLbwMfK23P")
+        );
+
+        LOGGER.info(
+                String.format(
+                        "mangoPerpGroup = %s",
+                        mangoPerpGroup.toString()
+                )
+        );
+
+        final PublicKey TEST_MANGO_PERP_PUBKEY = PublicKey.valueOf("Fbq2VQNuq6WW2fHj9CDrTLSmtjvMwFajS3gXuCMTRMQV");
+        final MangoPerpAccount mangoPerpAccount = devnetMangoManager.getMangoPerpAccount(TEST_MANGO_PERP_PUBKEY);
+
+        LOGGER.info(
+                String.format(
+                        "mangoPerpAccount = %s",
+                        mangoPerpAccount.toString()
+                )
+        );
+
+        for (int i = 0; i < mangoPerpAccount.getDeposits().size(); i++) {
+            final I80F48 deposit = mangoPerpAccount.getDeposits().get(i);
+            final I80F48 borrow = mangoPerpAccount.getBorrows().get(i);
+            byte decimals = mangoPerpGroup.getTokens().get(i).getDecimals();
+
+            if (decimals > 0) {
+                LOGGER.info(
+                        String.format(
+                                "Deposit = %.6f, Borrow = %.6f",
+                                deposit.decodeFloat() / (float) Math.pow(10, decimals),
+                                borrow.decodeFloat() / (float) Math.pow(10, decimals)
+                        )
+                );
+            }
+        }
+
+        // TODO - figure out a good indexing solution between deposits and borrows
+
+    }
+
+    @Test
     public void pubkeyReadTest() {
         byte[] rawData = {
                 (byte)0x64, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
