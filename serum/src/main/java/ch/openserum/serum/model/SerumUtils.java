@@ -311,10 +311,14 @@ public class SerumUtils {
 
         if (isBuy) {
             lamports = Math.round(price * size * 1.01 * LAMPORTS_PER_SOL);
-            lamports -= openOrdersAccount.getQuoteTokenFree();
+            if (null != openOrdersAccount) {
+                lamports -= openOrdersAccount.getQuoteTokenFree();
+            }
         } else {
             lamports = (long) (size * LAMPORTS_PER_SOL);
-            lamports -= openOrdersAccount.getBaseTokenFree();
+            if (null != openOrdersAccount) {
+                lamports -= openOrdersAccount.getBaseTokenFree();
+            }
         }
 
         return Math.max(lamports, 0) + 10000000;
