@@ -1181,6 +1181,18 @@ public class OrderTest {
         assertTrue(true);
     }
 
+    @Test
+    @Ignore
+    public void singleOpenOrdersAccount() {
+        final OpenOrdersAccount openOrdersAccount = SerumUtils.findOpenOrdersAccountForOwner(
+                client,
+                new PublicKey("G2aPyW7r3gfW8GnRumiXXp1567XzMZsfwvbgxDiaNR4U"),
+                new PublicKey("F459S1MFG2whWbznzULPkYff6TFe2QjoKhgHXpRfDyCj")
+        );
+
+        LOGGER.info(openOrdersAccount.toString());
+    }
+
     // Doesn't work yet
     @Test
     @Ignore
