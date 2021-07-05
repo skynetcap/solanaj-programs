@@ -5,9 +5,6 @@ import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.utils.ByteUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -141,12 +138,6 @@ public class OpenOrdersAccount {
 
     public static OpenOrdersAccount readOpenOrdersAccount(byte[] data) {
         OpenOrdersAccount openOrdersAccount = new OpenOrdersAccount();
-
-        try {
-            Files.write(Path.of("openOrdersAccount.bin"), data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         final AccountFlags accountFlags = AccountFlags.readAccountFlags(data);
         openOrdersAccount.setAccountFlags(accountFlags);
