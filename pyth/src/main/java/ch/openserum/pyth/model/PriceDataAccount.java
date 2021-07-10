@@ -26,22 +26,19 @@ public class PriceDataAccount {
     private static final int PRICE_TYPE_OFFSET = SIZE_OFFSET + PythUtils.INT32_SIZE;
     private static final int EXPONENT_OFFSET = PRICE_TYPE_OFFSET + PythUtils.INT32_SIZE;
     private static final int NUM_COMPONENT_PRICES_OFFSET = EXPONENT_OFFSET + PythUtils.INT32_SIZE;
-    private static final int CURRENT_SLOT_OFFSET = NUM_COMPONENT_PRICES_OFFSET + (2 * PythUtils.INT32_SIZE);
-    private static final int VALID_SLOT_OFFSET = CURRENT_SLOT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int TWAP_COMPONENT_OFFSET = VALID_SLOT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int AVOL_COMPONENT_OFFSET = TWAP_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int DRV_0_COMPONENT_OFFSET = AVOL_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int DRV_1_COMPONENT_OFFSET = DRV_0_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
+    private static final int LAST_SLOT_OFFSET = NUM_COMPONENT_PRICES_OFFSET + (2 * PythUtils.INT32_SIZE);
+    private static final int VALID_SLOT_OFFSET = LAST_SLOT_OFFSET + PythUtils.INT64_SIZE;
+    private static final int TWAP_OFFSET = VALID_SLOT_OFFSET + PythUtils.INT64_SIZE;
+    private static final int TWAC_OFFSET = TWAP_OFFSET + PriceEma.SIZE;
+    private static final int DRV_1_COMPONENT_OFFSET = TWAC_OFFSET + PriceEma.SIZE;
     private static final int DRV_2_COMPONENT_OFFSET = DRV_1_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int DRV_3_COMPONENT_OFFSET = DRV_2_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int DRV_4_COMPONENT_OFFSET = DRV_3_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int DRV_5_COMPONENT_OFFSET = DRV_4_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
-    private static final int PRODUCT_ACCOUNT_KEY_OFFSET = DRV_5_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
+    private static final int PRODUCT_ACCOUNT_KEY_OFFSET = DRV_2_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
     private static final int NEXT_PRICE_ACCOUNT_KEY_OFFSET = PRODUCT_ACCOUNT_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
-    private static final int AGGREGATE_PRICE_UPDATE_ACCOUNT_KEY_OFFSET = NEXT_PRICE_ACCOUNT_KEY_OFFSET
-            + PublicKey.PUBLIC_KEY_LENGTH;
-    private static final int AGGREGATE_PRICE_INFO_OFFSET = AGGREGATE_PRICE_UPDATE_ACCOUNT_KEY_OFFSET
-            + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int PREVIOUS_SLOT_OFFSET = NEXT_PRICE_ACCOUNT_KEY_OFFSET + PublicKey.PUBLIC_KEY_LENGTH;
+    private static final int PREVIOUS_PRICE_COMPONENT_OFFSET = PREVIOUS_SLOT_OFFSET + PythUtils.INT64_SIZE;
+    private static final int PREVIOUS_CONFIDENCE_COMPONENT = PREVIOUS_PRICE_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
+    private static final int DRV_3_COMPONENT_OFFSET = PREVIOUS_CONFIDENCE_COMPONENT + PythUtils.INT64_SIZE;
+    private static final int AGGREGATE_PRICE_INFO_OFFSET = DRV_3_COMPONENT_OFFSET + PythUtils.INT64_SIZE;
     private static final int PRICE_COMPONENTS_OFFSET = AGGREGATE_PRICE_INFO_OFFSET + PythUtils.PRICE_INFO_SIZE;
 
     // Variables
@@ -52,30 +49,28 @@ public class PriceDataAccount {
     private int priceType;
     private int exponent;
     private int numComponentPrices;
-    private long currentSlot;
+    private long lastSlot;
     private long validSlot;
-    private long twapComponent;
-    private float twap;
-    private long avolComponent;
-    private float avol;
 
-    // Space for future derived values
-    private long drv0Component;
-    private float drv0;
+    private PriceEma twap;
+    private PriceEma twac;
+
     private long drv1Component;
     private float drv1;
     private long drv2Component;
     private float drv2;
-    private long drv3Component;
-    private float drv3;
-    private long drv4Component;
-    private float drv4;
-    private long drv5Component;
-    private float drv5;
 
     private PublicKey productAccountKey;
     private PublicKey nextPriceAccountKey;
-    private PublicKey aggregatePriceUpdaterAccountKey;
+    private long previousSlot;
+    private long previousPriceComponent;
+    private float previousPrice;
+    private long previousConfidenceComponent;
+    private float previousConfidence;
+
+    private long drv3Component;
+    private float drv3;
+
     private PriceInfo aggregatePriceInfo;
     private List<PriceComponent> priceComponents; // Up to 32 elements
 
@@ -88,28 +83,28 @@ public class PriceDataAccount {
                 .priceType(PythUtils.readInt32(data, PRICE_TYPE_OFFSET))
                 .exponent(PythUtils.readInt32(data, EXPONENT_OFFSET))
                 .numComponentPrices(PythUtils.readInt32(data, NUM_COMPONENT_PRICES_OFFSET))
-                .currentSlot(Utils.readInt64(data, CURRENT_SLOT_OFFSET))
+                .lastSlot(Utils.readInt64(data, LAST_SLOT_OFFSET))
                 .validSlot(Utils.readInt64(data, VALID_SLOT_OFFSET))
-                .twapComponent(Utils.readInt64(data, TWAP_COMPONENT_OFFSET))
                 .build();
 
-        float twap = ((float) priceDataAccount.getTwapComponent()) * (float) (Math.pow(10, priceDataAccount.getExponent()));
-        priceDataAccount.setTwap(twap);
+        priceDataAccount.setTwap(
+                PriceEma.readPriceEma(
+                        Arrays.copyOfRange(data, TWAP_OFFSET, TWAP_OFFSET + PriceEma.SIZE),
+                        priceDataAccount.getExponent()
+                )
+        );
 
-        priceDataAccount.setAvolComponent(Utils.readInt64(data, AVOL_COMPONENT_OFFSET));
-        float avol = ((float) priceDataAccount.getAvolComponent()) * (float) (Math.pow(10, priceDataAccount.getExponent()));
-        priceDataAccount.setAvol(avol);
-
-        // Derived values
-        long drv0Component = Utils.readInt64(data, DRV_0_COMPONENT_OFFSET);
-        float drv0 = (float) drv0Component * (float) Math.pow(10, priceDataAccount.getExponent());
-        priceDataAccount.setDrv0Component(drv0Component);
-        priceDataAccount.setDrv0(drv0);
+        priceDataAccount.setTwac(
+                PriceEma.readPriceEma(
+                        Arrays.copyOfRange(data, TWAC_OFFSET, TWAC_OFFSET + PriceEma.SIZE),
+                        priceDataAccount.getExponent()
+                )
+        );
 
         long drv1Component = Utils.readInt64(data, DRV_1_COMPONENT_OFFSET);
         float drv1 = (float) drv1Component * (float) Math.pow(10, priceDataAccount.getExponent());
         priceDataAccount.setDrv1Component(drv1Component);
-        priceDataAccount.setDrv0(drv1);
+        priceDataAccount.setDrv1(drv1);
 
         long drv2Component = Utils.readInt64(data, DRV_2_COMPONENT_OFFSET);
         float drv2 = (float) drv2Component * (float) Math.pow(10, priceDataAccount.getExponent());
@@ -121,25 +116,24 @@ public class PriceDataAccount {
         priceDataAccount.setDrv3Component(drv3Component);
         priceDataAccount.setDrv3(drv3);
 
-        long drv4Component = Utils.readInt64(data, DRV_4_COMPONENT_OFFSET);
-        float drv4 = (float) drv4Component * (float) Math.pow(10, priceDataAccount.getExponent());
-        priceDataAccount.setDrv4Component(drv4Component);
-        priceDataAccount.setDrv4(drv4);
-
-        long drv5Component = Utils.readInt64(data, DRV_5_COMPONENT_OFFSET);
-        float drv5 = (float) drv5Component * (float) Math.pow(10, priceDataAccount.getExponent());
-        priceDataAccount.setDrv5Component(drv5Component);
-        priceDataAccount.setDrv5(drv5);
-
         priceDataAccount.setProductAccountKey(PublicKey.readPubkey(data, PRODUCT_ACCOUNT_KEY_OFFSET));
         final PublicKey nextPriceAccountKey = PublicKey.readPubkey(data, NEXT_PRICE_ACCOUNT_KEY_OFFSET);
         if (!nextPriceAccountKey.toBase58().equalsIgnoreCase(PythUtils.EMPTY_PUBKEY)){
             priceDataAccount.setNextPriceAccountKey(nextPriceAccountKey);
         }
 
-        priceDataAccount.setAggregatePriceUpdaterAccountKey(
-                PublicKey.readPubkey(data, AGGREGATE_PRICE_UPDATE_ACCOUNT_KEY_OFFSET)
-        );
+        long previousSlot = Utils.readInt64(data, PREVIOUS_SLOT_OFFSET);
+        priceDataAccount.setPreviousSlot(previousSlot);
+
+        long previousPriceComponent = Utils.readInt64(data, PREVIOUS_PRICE_COMPONENT_OFFSET);
+        float previousPrice = (float) previousPriceComponent * (float) Math.pow(10, priceDataAccount.getExponent());
+        priceDataAccount.setPreviousPriceComponent(previousPriceComponent);
+        priceDataAccount.setPreviousPrice(previousPrice);
+
+        long previousConfidenceComponent = Utils.readInt64(data, PREVIOUS_CONFIDENCE_COMPONENT);
+        float previousConfidence = (float) previousConfidenceComponent * (float) Math.pow(10, priceDataAccount.getExponent());
+        priceDataAccount.setPreviousConfidenceComponent(previousConfidenceComponent);
+        priceDataAccount.setPreviousConfidence(previousConfidence);
 
         final PriceInfo aggregatePriceInfo = PriceInfo.readPriceInfo(
                 Arrays.copyOfRange(
