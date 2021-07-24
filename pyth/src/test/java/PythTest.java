@@ -6,32 +6,31 @@ import ch.openserum.pyth.model.ProductAccount;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
+import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
-public class DevnetTest {
+public class PythTest {
 
-    private final String ENDPOINT = "https://api.devnet.solana.com";
-    private final RpcClient client = new RpcClient(ENDPOINT);
-    private final SubscriptionWebSocketClient webSocketClient = SubscriptionWebSocketClient.getInstance(ENDPOINT);
+    private final RpcClient client = new RpcClient(Cluster.MAINNET);
+    private final SubscriptionWebSocketClient webSocketClient = SubscriptionWebSocketClient.getInstance(Cluster.MAINNET.getEndpoint());
     private final PythManager pythManager = new PythManager(client);
-    private static final Logger LOGGER = Logger.getLogger(DevnetTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PythTest.class.getName());
     private static final int PYTH_MAGIC_NUMBER = (int) Long.parseLong("a1b2c3d4", 16);
     private static final int EXPECTED_PYTH_VERSION = 2;
-    private static final int EXPECTED_EXPONENT = -9;
-    private static final PublicKey TEST_MAPPING_ACCOUNT = PublicKey.valueOf(
-            "BmA9Z6FjioHJPpjT39QazZyhDRUdZy2ezwx4GiDdE2u2"
-    );
-    private static final int EUR_USD_PRODUCT_ACCOUNT_KEY_INDEX = 20;
+    private static final int EXPECTED_EXPONENT = -8;
+    private static final PublicKey MAPPING_ACCOUNT = PublicKey.valueOf("AHtgzX45WTKfkPG53L6WYhGEXwQkN1BVknET3sVsLL8J");
 
     @Test
     public void mappingAccount() {
-        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
 
         LOGGER.info(
                 String.format(
@@ -67,7 +66,7 @@ public class DevnetTest {
 
     @Test
     public void productAccountTest() {
-        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
         final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(0);
 
         assertNotNull(productAccountKey);
@@ -81,22 +80,15 @@ public class DevnetTest {
         );
 
         int magicNumber = productAccount.getMagicNumber();
+
         assertEquals(PYTH_MAGIC_NUMBER, magicNumber);
-
-        final PublicKey priceAccountKey = productAccount.getPriceAccountKey();
-        assertTrue(
-                priceAccountKey.toBase58().equalsIgnoreCase("4EQrNZYk5KR1RnjyzbaaRbHsv8VqZWzSUtvx58wLsZbj")
-        );
-
         assertTrue(productAccount.getProductAttributes().size() > 0);
     }
 
     @Test
     public void priceDataAccountTest() {
-        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
-        final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(
-                EUR_USD_PRODUCT_ACCOUNT_KEY_INDEX
-        );
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
+        final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(0);
 
         assertNotNull(productAccountKey);
 
@@ -138,28 +130,20 @@ public class DevnetTest {
 
     @Test
     @Ignore
-    public void priceDataAccountWebsocketTest() throws InterruptedException {
-        final PublicKey DOGE_USD_PUBKEY = PublicKey.valueOf("4L6YhY8VvUgmqG5MvJkUJATtzB2rFqdrJwQCmFLv4Jzy");
-        final PriceDataAccount priceDataAccount = pythManager.getPriceDataAccount(DOGE_USD_PUBKEY);
-        LOGGER.info(
-                String.format(
-                        "Price Data Account = %s",
-                        priceDataAccount.toString()
-                )
-        );
+    public void mainnetTest() throws InterruptedException {
+        final Map<String, Float> currentPriceMap = new HashMap<>();
 
-        webSocketClient.accountSubscribe(DOGE_USD_PUBKEY.toBase58(), new PriceDataAccountListener(DOGE_USD_PUBKEY));
-        Thread.sleep(30000L);
-    }
-
-    @Test
-    @Ignore
-    public void multiplePriceDataAccountWebsocketTest() throws InterruptedException {
-        final MappingAccount mappingAccount = pythManager.getMappingAccount(TEST_MAPPING_ACCOUNT);
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
         Thread.sleep(100L);
         final List<PublicKey> productAccountKeys = mappingAccount.getProductAccountKeys();
         for (PublicKey productAccountKey : productAccountKeys) {
             final ProductAccount productAccount = pythManager.getProductAccount(productAccountKey);
+            LOGGER.info(
+                    String.format(
+                            "Asset: %s",
+                            productAccount.getProductAttributes().get("description")
+                    )
+            );
             Thread.sleep(100L);
             final PublicKey priceDataAccountKey = productAccount.getPriceAccountKey();
             webSocketClient.accountSubscribe(
@@ -172,7 +156,7 @@ public class DevnetTest {
                             priceDataAccountKey.toBase58()
                     )
             );
-            Thread.sleep(2000L);
+            Thread.sleep(100L);
         }
 
         Thread.sleep(60000L);
