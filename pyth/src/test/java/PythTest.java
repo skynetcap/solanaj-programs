@@ -10,9 +10,9 @@ import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
@@ -131,7 +131,7 @@ public class PythTest {
     @Test
     @Ignore
     public void mainnetTest() throws InterruptedException {
-        final Map<String, Float> currentPriceMap = new HashMap<>();
+        final Map<String, Float> currentPriceMap = new ConcurrentHashMap<>();
 
         final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
         Thread.sleep(100L);
@@ -148,15 +148,19 @@ public class PythTest {
             final PublicKey priceDataAccountKey = productAccount.getPriceAccountKey();
             webSocketClient.accountSubscribe(
                     priceDataAccountKey.toBase58(),
-                    new PriceDataAccountListener(priceDataAccountKey)
+                    new PriceDataAccountListener(
+                            currentPriceMap,
+                            productAccount.getProductAttributes().get("symbol")
+                    )
             );
+
             LOGGER.info(
                     String.format(
                             "Subscribed to %s",
                             priceDataAccountKey.toBase58()
                     )
             );
-            Thread.sleep(100L);
+            Thread.sleep(300L);
         }
 
         Thread.sleep(60000L);

@@ -13,8 +13,9 @@ import java.util.logging.Logger;
 @AllArgsConstructor
 public class PriceDataAccountListener implements NotificationEventListener {
 
-    private final PublicKey publicKey;
     private static final Logger LOGGER = Logger.getLogger(PriceDataAccountListener.class.getName());
+    private final Map<String, Float> currentPriceMap;
+    private final String productName;
 
     @Override
     public void onNotificationEvent(Object data) {
@@ -26,14 +27,8 @@ public class PriceDataAccountListener implements NotificationEventListener {
                     Base64.getDecoder().decode(base64)
             );
 
-            LOGGER.info(
-                    String.format(
-                            "Asset %s, Price = %.6f, Confidence ± %.5f",
-                            publicKey.toBase58(),
-                            streamedPriceDataAccount.getAggregatePriceInfo().getPrice(),
-                            streamedPriceDataAccount.getAggregatePriceInfo().getConfidence()
-                    )
-            );
+            currentPriceMap.put(productName, streamedPriceDataAccount.getAggregatePriceInfo().getPrice());
+            LOGGER.info(currentPriceMap.toString());
         }
     }
 }
