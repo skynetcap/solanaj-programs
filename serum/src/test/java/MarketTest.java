@@ -136,6 +136,41 @@ public class MarketTest {
     }
 
     /**
+     * Uses a {@link MarketBuilder} class to retrieve data about the SOL/USDC Serum market.
+     */
+    @Test
+    public void marketBuilderwhEthUsdcTest() {
+        final PublicKey solUsdcPublicKey = new PublicKey("8Gmi2HhZmwQPVdCwzS7CM66MGstMXPcTVHA7jF19cLZz");
+
+        final Market solUsdcMarket = new MarketBuilder()
+                .setClient(client)
+                .setPublicKey(solUsdcPublicKey)
+                .setRetrieveOrderBooks(true)
+                .build();
+
+        final OrderBook bids = solUsdcMarket.getBidOrderBook();
+        final OrderBook asks = solUsdcMarket.getAskOrderBook();
+        LOGGER.info("Market = " + solUsdcMarket.toString());
+
+        final ArrayList<Order> asksOrders = asks.getOrders();
+        asksOrders.sort(Comparator.comparingLong(Order::getPrice).reversed());
+        asksOrders.forEach(order -> {
+            System.out.printf("whETH/USDC Ask: $%.4f (Quantity: %.4f)%n", order.getFloatPrice(), order.getFloatQuantity());
+        });
+
+        LOGGER.info("Bids");
+
+        final ArrayList<Order> orders = bids.getOrders();
+        orders.sort(Comparator.comparingLong(Order::getPrice).reversed());
+        orders.forEach(order -> {
+            System.out.printf("whETH/USDC Bid: $%.4f (Quantity: %.4f)%n", order.getFloatPrice(), order.getFloatQuantity());
+        });
+
+        // Verify that an order exists
+        assertTrue(orders.size() > 0);
+    }
+
+    /**
      * Uses a {@link MarketBuilder} class to retrieve the Event Queue from the SOL/USDC Serum market.
      */
     @Test
