@@ -14,6 +14,7 @@ import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -373,19 +374,17 @@ public class OrderTest {
     @Ignore
     public void iocPlaceOrderLqidTest() {
         // Replace with the public key of your LQID and USDC wallet
-        final PublicKey lqidWallet = PublicKey.valueOf("5uRbRHoVD6EeBM3MLjx7GadMxbprvNvABZGfmS1hVVGG");
-        final PublicKey usdcPayer = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
+        final PublicKey lqidWallet = PublicKey.valueOf("AcnzwJRyEiqAGkZgpc5jr9R7uNorBQBH9Vd1mepzU29w");
+        final PublicKey usdcPayer = PublicKey.valueOf("5yHduya2yKQdZFPU4rTfi4cRG8M5tjK3wcVRSZ6CnafP");
 
-        // Build account from secretkey.dat
-        byte[] data = new byte[0];
+        // Create account from private key
+        Account account = null;
         try {
-            data = Files.readAllBytes(Paths.get("secretkey.dat"));
+            account = Account.fromJson(Files.readString(Paths.get("src/test/resources/mainnet.json")));
+            LOGGER.info("our pubkey = " + account.getPublicKey());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Create account from private key
-        final Account account = new Account(Base58.decode(new String(data)));
 
         // Get OXY/USDC market
         final Market lqidUsdcMarket = new MarketBuilder()
