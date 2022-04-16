@@ -39,6 +39,13 @@ public class PythTest {
                 )
         );
 
+        LOGGER.info(
+                String.format(
+                        "Mapping Account Pubkey = %s",
+                        MAPPING_ACCOUNT.toBase58()
+                )
+        );
+
         // Magic Number
         int magicInt = mappingAccount.getMagicNumber();
         LOGGER.info(
@@ -87,6 +94,7 @@ public class PythTest {
 
     @Test
     public void priceDataAccountTest() {
+        final int EXPECTED_MIN_BCH_USD_PUBLISHERS = 3;
         final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
         final PublicKey productAccountKey = mappingAccount.getProductAccountKeys().get(0);
 
@@ -118,14 +126,23 @@ public class PythTest {
 
         LOGGER.info(
                 String.format(
-                        "drv1 = %.4f, drv2 = %.4f, drv3 = %.4f",
+                        "Minimum publishers = %d",
+                        priceDataAccount.getMinPublishers()
+                )
+        );
+        assertTrue(priceDataAccount.getMinPublishers() >= EXPECTED_MIN_BCH_USD_PUBLISHERS);
+
+        LOGGER.info(
+                String.format(
+                        "drv1 = %.4f, drv2 = %d, drv3 = %d, drv4 = %d",
                         priceDataAccount.getDrv1(),
                         priceDataAccount.getDrv2(),
-                        priceDataAccount.getDrv3()
+                        priceDataAccount.getDrv3(),
+                        priceDataAccount.getDrv4()
                 )
         );
 
-        assertEquals(0.0f, priceDataAccount.getDrv1(), 0.0);
+        assertEquals(0.0f, priceDataAccount.getDrv2(), 0.0);
     }
 
     @Test

@@ -32,4 +32,17 @@ public class PythUtils {
         // four bytes converted into an integer!
         return bb.getInt(0);
     }
+
+    public static short readInt16(byte[] data, int offset) {
+        ByteBuffer bb = ByteBuffer.wrap(
+                Arrays.copyOfRange(
+                        data,
+                        offset,
+                        offset + 2
+                )
+        );
+
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        return bb.getShort(0);
+    }
 }
