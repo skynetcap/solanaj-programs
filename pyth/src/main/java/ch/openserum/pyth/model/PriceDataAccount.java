@@ -57,9 +57,11 @@ public class PriceDataAccount {
 
     private long drv1Component;
     private float drv1;
-    private long drv2Component;
-    private float drv2;
+    private byte drv2;
+    private short drv3;
+    private int drv4;
 
+    private byte minPublishers;
     private PublicKey productAccountKey;
     private PublicKey nextPriceAccountKey;
     private long previousSlot;
@@ -68,8 +70,8 @@ public class PriceDataAccount {
     private long previousConfidenceComponent;
     private float previousConfidence;
 
-    private long drv3Component;
-    private float drv3;
+    private long drv5Component;
+    private float drv5;
 
     private PriceInfo aggregatePriceInfo;
     private List<PriceComponent> priceComponents; // Up to 32 elements
@@ -106,15 +108,26 @@ public class PriceDataAccount {
         priceDataAccount.setDrv1Component(drv1Component);
         priceDataAccount.setDrv1(drv1);
 
-        long drv2Component = Utils.readInt64(data, DRV_2_COMPONENT_OFFSET);
-        float drv2 = (float) drv2Component * (float) Math.pow(10, priceDataAccount.getExponent());
-        priceDataAccount.setDrv2Component(drv2Component);
+        // minimum number of publishers for status to be TRADING
+        byte minPublishers = Arrays.copyOfRange(data, DRV_2_COMPONENT_OFFSET, DRV_2_COMPONENT_OFFSET + 1)[0];
+        priceDataAccount.setMinPublishers(minPublishers);
+
+        final int DRV_2_BYTE_OFFSET = DRV_2_COMPONENT_OFFSET + 1;
+        byte drv2 = Arrays.copyOfRange(data, DRV_2_BYTE_OFFSET, DRV_2_BYTE_OFFSET + 1)[0];
         priceDataAccount.setDrv2(drv2);
 
-        long drv3Component = Utils.readInt64(data, DRV_3_COMPONENT_OFFSET);
-        float drv3 = (float) drv3Component * (float) Math.pow(10, priceDataAccount.getExponent());
-        priceDataAccount.setDrv3Component(drv3Component);
+        final int DRV_3_SHORT_OFFSET = DRV_2_BYTE_OFFSET + 1;
+        short drv3 = PythUtils.readInt16(data, DRV_3_SHORT_OFFSET);
         priceDataAccount.setDrv3(drv3);
+
+        final int DRV_4_INT_OFFSET = DRV_3_SHORT_OFFSET + 2;
+        int drv4 = PythUtils.readInt32(data, DRV_4_INT_OFFSET);
+        priceDataAccount.setDrv4(drv4);
+
+        long drv5Component = Utils.readInt64(data, DRV_3_COMPONENT_OFFSET);
+        float drv5 = (float) drv5Component * (float) Math.pow(10, priceDataAccount.getExponent());
+        priceDataAccount.setDrv5Component(drv5Component);
+        priceDataAccount.setDrv5(drv5);
 
         priceDataAccount.setProductAccountKey(PublicKey.readPubkey(data, PRODUCT_ACCOUNT_KEY_OFFSET));
         final PublicKey nextPriceAccountKey = PublicKey.readPubkey(data, NEXT_PRICE_ACCOUNT_KEY_OFFSET);
