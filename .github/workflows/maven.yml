@@ -28,7 +28,7 @@ jobs:
       name: Navigate to SolanaJ directory
     - uses: actions/checkout@v2
       with:
-        repository: skynetcapital/solanaj
+        repository: skynetcap/solanaj
         ref: v1.6-SNAPSHOT
     - name: Build SolanaJ with Maven
       run: mvn clean install
