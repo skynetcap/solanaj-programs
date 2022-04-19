@@ -49,7 +49,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/skynetcapital/solanaj-programs</url>
+            <url>https://maven.pkg.github.com/skynetcap/solanaj-programs</url>
         </repository>
     </distributionManagement>
 

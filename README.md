@@ -15,4 +15,4 @@ After running `mvn clean install`:
 ```
 
 # Examples
-[Serum examples](https://github.com/skynetcapital/solanaj-programs/blob/master/serum/README.md)
+[Serum examples](https://github.com/skynetcap/solanaj-programs/blob/master/serum/README.md)
