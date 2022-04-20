@@ -182,4 +182,29 @@ public class PythTest {
 
         Thread.sleep(60000L);
     }
+
+    @Test
+    public void iterateProductsTest() throws InterruptedException {
+        // Iterate all products and get their price once
+        final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
+        Thread.sleep(100L);
+
+        final List<PublicKey> productAccountKeys = mappingAccount.getProductAccountKeys();
+        for (PublicKey productAccountKey : productAccountKeys) {
+            final ProductAccount productAccount = pythManager.getProductAccount(productAccountKey);
+            final PublicKey priceDataAccountKey = productAccount.getPriceAccountKey();
+            Thread.sleep(200L);
+
+            final PriceDataAccount priceDataAccount = pythManager.getPriceDataAccount(priceDataAccountKey);
+            Thread.sleep(300L);
+
+            LOGGER.info(
+                    String.format(
+                            "Asset: %s, Price: %.2f",
+                            productAccount.getProductAttributes().get("description"),
+                            priceDataAccount.getAggregatePriceInfo().getPrice()
+                    )
+            );
+        }
+    }
 }
