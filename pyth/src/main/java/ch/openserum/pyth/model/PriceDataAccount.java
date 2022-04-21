@@ -52,8 +52,8 @@ public class PriceDataAccount {
     private long lastSlot;
     private long validSlot;
 
-    private PriceEma twap;
-    private PriceEma twac;
+    private PriceEma emaPrice;
+    private PriceEma emaConfidence;
 
     private long drv1Component;
     private float drv1;
@@ -89,14 +89,14 @@ public class PriceDataAccount {
                 .validSlot(Utils.readInt64(data, VALID_SLOT_OFFSET))
                 .build();
 
-        priceDataAccount.setTwap(
+        priceDataAccount.setEmaPrice(
                 PriceEma.readPriceEma(
                         Arrays.copyOfRange(data, TWAP_OFFSET, TWAP_OFFSET + PriceEma.SIZE),
                         priceDataAccount.getExponent()
                 )
         );
 
-        priceDataAccount.setTwac(
+        priceDataAccount.setEmaConfidence(
                 PriceEma.readPriceEma(
                         Arrays.copyOfRange(data, TWAC_OFFSET, TWAC_OFFSET + PriceEma.SIZE),
                         priceDataAccount.getExponent()
