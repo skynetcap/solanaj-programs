@@ -13,6 +13,7 @@
         <module>serum</module>
         <module>bonfida</module>
         <module>pyth</module>
+        <module>magiceden</module>
     </modules>
 
     <properties>
