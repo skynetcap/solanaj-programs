@@ -36,7 +36,15 @@ public class AuctionHouseProgram extends Program {
             final long buyerPrice,
             final long tokenSize
     ) {
-        // Add signer to AccountMeta keys
+        ByteBuffer buffer = ByteBuffer.allocate(27);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(-5943767438166989261L); // anchor sighash for "sell"
+        buffer.put(tradeStateBump);
+        buffer.put(freeTradeStateBump);
+        buffer.put(programAsSignerBump);
+        buffer.putLong(buyerPrice);
+        buffer.putLong(tokenSize);
+
         final List<AccountMeta> keys = new ArrayList<>();
         keys.add(new AccountMeta(wallet, true, true));
         keys.add(new AccountMeta(tokenAccount, false, true));
@@ -53,7 +61,7 @@ public class AuctionHouseProgram extends Program {
         keys.add(new AccountMeta(SYSVAR_RENT_PUBKEY, false, false));
 
 
-        byte[] instructionData = null; //buffer.array();
+        byte[] instructionData = buffer.array();
 
         return createTransactionInstruction(
                 wallet,
