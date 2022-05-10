@@ -13,6 +13,13 @@ import java.util.List;
 
 public class AuctionHouseProgram extends Program {
 
+    private static final PublicKey TOKEN_PROGRAM_ID =
+            PublicKey.valueOf("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+    private static final PublicKey SYSTEM_PROGRAM_ID =
+            PublicKey.valueOf("11111111111111111111111111111111");
+    private static final PublicKey SYSVAR_RENT_PUBKEY =
+            PublicKey.valueOf("SysvarRent111111111111111111111111111111111");
+
     public static TransactionInstruction sell(
             final PublicKey wallet,
             final PublicKey tokenAccount,
@@ -31,10 +38,19 @@ public class AuctionHouseProgram extends Program {
     ) {
         // Add signer to AccountMeta keys
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(tokenAccount, false, false));
-        keys.add(new AccountMeta(auctionHouse, true, true));
-        keys.add(new AccountMeta(metadata, false, true));
-        keys.add(new AccountMeta(authority, false, false));
+        keys.add(new AccountMeta(wallet, true, true));
+        keys.add(new AccountMeta(tokenAccount, false, true));
+        keys.add(new AccountMeta(metadata, false, false));
+        keys.add(new AccountMeta(authority, true, true));
+        keys.add(new AccountMeta(metadata, false, false));
+        keys.add(new AccountMeta(auctionHouse, false, false));
+        keys.add(new AccountMeta(auctionHouseFeeAccount, false, true));
+        keys.add(new AccountMeta(sellerTradeState, false, true));
+        keys.add(new AccountMeta(freeSellerTradeState, false, true));
+        keys.add(new AccountMeta(TOKEN_PROGRAM_ID, false, false));
+        keys.add(new AccountMeta(SYSTEM_PROGRAM_ID, false, false));
+        keys.add(new AccountMeta(programAsSigner, false, false));
+        keys.add(new AccountMeta(SYSVAR_RENT_PUBKEY, false, false));
 
 
         byte[] instructionData = null; //buffer.array();
