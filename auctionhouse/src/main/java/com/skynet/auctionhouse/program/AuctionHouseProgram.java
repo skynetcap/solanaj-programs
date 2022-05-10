@@ -1,4 +1,4 @@
-package com.skynet.magiceden.program;
+package com.skynet.auctionhouse.program;
 
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
@@ -11,7 +11,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EdenProgram extends Program {
+public class AuctionHouseProgram extends Program {
 
     /**
      * Registers a name at the SPL Name Registry for the given Solana {@link Account}.
