@@ -5,6 +5,7 @@ import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 import org.p2p.solanaj.programs.Program;
+import org.p2p.solanaj.programs.SystemProgram;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -19,6 +20,8 @@ public class AuctionHouseProgram extends Program {
             PublicKey.valueOf("11111111111111111111111111111111");
     private static final PublicKey SYSVAR_RENT_PUBKEY =
             PublicKey.valueOf("SysvarRent111111111111111111111111111111111");
+
+    private static final int OPENSEA_LISTING_FEE = 897840;
 
     public static TransactionInstruction sell(
             final PublicKey wallet,
@@ -68,5 +71,12 @@ public class AuctionHouseProgram extends Program {
                 keys,
                 instructionData
         );
+    }
+
+    public static TransactionInstruction payAuctionHouseFeeAccount(
+            final PublicKey wallet,
+            final PublicKey auctionHouseFeeAccount
+    ) {
+        return SystemProgram.transfer(wallet, auctionHouseFeeAccount, OPENSEA_LISTING_FEE);
     }
 }
