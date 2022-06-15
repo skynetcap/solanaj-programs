@@ -35,9 +35,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.p2p</groupId>
+            <groupId>com.mmorrell</groupId>
             <artifactId>solanaj</artifactId>
-            <version>1.7-SNAPSHOT</version>
+            <version>1.8</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

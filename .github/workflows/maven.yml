@@ -29,7 +29,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         repository: skynetcap/solanaj
-        ref: v1.7-SNAPSHOT
+        ref: v1.8
     - name: Build SolanaJ with Maven
       run: mvn clean install
     - run: cd ../
