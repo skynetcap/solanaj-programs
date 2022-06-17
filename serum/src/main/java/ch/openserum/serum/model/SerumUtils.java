@@ -60,24 +60,24 @@ public class SerumUtils {
     // Market
     public static final long LAMPORTS_PER_SOL = 1000000000L;
     public static final int OWN_ADDRESS_OFFSET = 13;
-    private static final int VAULT_SIGNER_NONCE_OFFSET = 45;
-    private static final int BASE_MINT_OFFSET = 53;
-    private static final int QUOTE_MINT_OFFSET = 85;
-    private static final int BASE_VAULT_OFFSET = 117;
-    private static final int BASE_DEPOSITS_TOTAL_OFFSET = 149;
-    private static final int BASE_FEES_ACCRUED_OFFSET = 157;
-    private static final int QUOTE_VAULT_OFFSET = 165;
-    private static final int QUOTE_DEPOSITS_TOTAL_OFFSET = 197;
-    private static final int QUOTE_FEES_ACCRUED_OFFSET = 205;
-    private static final int QUOTE_DUST_THRESHOLD_OFFSET = 213;
-    private static final int REQUEST_QUEUE_OFFSET = 221;
-    private static final int EVENT_QUEUE_OFFSET = 253;
-    private static final int BIDS_OFFSET = 285;
-    private static final int ASKS_OFFSET = 317;
-    private static final int BASE_LOT_SIZE_OFFSET = 349;
-    private static final int QUOTE_LOT_SIZE_OFFSET = 357;
-    private static final int FEE_RATE_BPS_OFFSET = 365;
-    private static final int REFERRER_REBATES_ACCRUED_OFFSET = 373;
+    public static final int VAULT_SIGNER_NONCE_OFFSET = 45;
+    public static final int BASE_MINT_OFFSET = 53;
+    public static final int QUOTE_MINT_OFFSET = 85;
+    public static final int BASE_VAULT_OFFSET = 117;
+    public static final int BASE_DEPOSITS_TOTAL_OFFSET = 149;
+    public static final int BASE_FEES_ACCRUED_OFFSET = 157;
+    public static final int QUOTE_VAULT_OFFSET = 165;
+    public static final int QUOTE_DEPOSITS_TOTAL_OFFSET = 197;
+    public static final int QUOTE_FEES_ACCRUED_OFFSET = 205;
+    public static final int QUOTE_DUST_THRESHOLD_OFFSET = 213;
+    public static final int REQUEST_QUEUE_OFFSET = 221;
+    public static final int EVENT_QUEUE_OFFSET = 253;
+    public static final int BIDS_OFFSET = 285;
+    public static final int ASKS_OFFSET = 317;
+    public static final int BASE_LOT_SIZE_OFFSET = 349;
+    public static final int QUOTE_LOT_SIZE_OFFSET = 357;
+    public static final int FEE_RATE_BPS_OFFSET = 365;
+    public static final int REFERRER_REBATES_ACCRUED_OFFSET = 373;
 
     // Token mint
     private static final int TOKEN_MINT_DECIMALS_OFFSET = 44;
