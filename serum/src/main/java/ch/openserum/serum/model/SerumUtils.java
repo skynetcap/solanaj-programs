@@ -60,6 +60,7 @@ public class SerumUtils {
     // Market
     public static final long LAMPORTS_PER_SOL = 1000000000L;
     public static final int OWN_ADDRESS_OFFSET = 13;
+    public static final int TOKEN_MINT_DECIMALS_OFFSET = 44;
     public static final int VAULT_SIGNER_NONCE_OFFSET = 45;
     public static final int BASE_MINT_OFFSET = 53;
     public static final int QUOTE_MINT_OFFSET = 85;
@@ -78,9 +79,7 @@ public class SerumUtils {
     public static final int QUOTE_LOT_SIZE_OFFSET = 357;
     public static final int FEE_RATE_BPS_OFFSET = 365;
     public static final int REFERRER_REBATES_ACCRUED_OFFSET = 373;
-
-    // Token mint
-    private static final int TOKEN_MINT_DECIMALS_OFFSET = 44;
+    public static final int MARKET_ACCOUNT_SIZE = 388;
 
     public static final PublicKey SERUM_PROGRAM_ID_V3 = new PublicKey("9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin");
     public static final PublicKey WRAPPED_SOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
