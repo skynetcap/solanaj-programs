@@ -1,5 +1,6 @@
 package ch.openserum.serum.model;
 
+import ch.openserum.serum.manager.OrderBookCacheManager;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
@@ -22,13 +23,21 @@ public class MarketBuilder {
     private boolean retrieveOrderbooks = false;
     private boolean retrieveEventQueue = false;
     private boolean retrieveDecimalsOnly = false;
+    private boolean orderBookCacheEnabled = false;
     private boolean built = false;
     private byte[] base64AccountInfo;
+    private OrderBookCacheManager orderBookCacheManager;
 
     private Map<PublicKey, Byte> decimalsCache = new ConcurrentHashMap<>();
 
     public MarketBuilder setRetrieveOrderBooks(boolean retrieveOrderbooks) {
         this.retrieveOrderbooks = retrieveOrderbooks;
+        return this;
+    }
+
+    public MarketBuilder setOrderBookCacheEnabled(boolean orderBookCacheEnabled) {
+        this.orderBookCacheEnabled = orderBookCacheEnabled;
+        this.orderBookCacheManager = orderBookCacheEnabled ? new OrderBookCacheManager(this.client) : null;
         return this;
     }
 
@@ -49,6 +58,10 @@ public class MarketBuilder {
         return retrieveDecimalsOnly;
     }
 
+    public boolean isOrderBookCacheEnabled() {
+        return orderBookCacheEnabled;
+    }
+
     public MarketBuilder setRetrieveEventQueue(boolean retrieveEventQueue) {
         this.retrieveEventQueue = retrieveEventQueue;
         return this;
@@ -59,6 +72,10 @@ public class MarketBuilder {
         return this;
     }
 
+    /**
+     * Builds a new {@link Market} object with fresh data. Also called during reload().
+     * @return {@link Market} object with live data
+     */
     public Market build() {
         // Only lookup account info one time since it never changes (except for fees accrued, not important imo)
         if (!built) {
@@ -96,25 +113,21 @@ public class MarketBuilder {
             market.setBaseDecimals(baseDecimals);
             market.setQuoteDecimals(quoteDecimals);
 
-            // Data from the order books (multi-threaded)
-            final CompletableFuture<byte[]> bidThread = CompletableFuture.supplyAsync(() -> retrieveAccountData(market.getBids()));
-            final CompletableFuture<byte[]> askThread = CompletableFuture.supplyAsync(() -> retrieveAccountData(market.getAsks()));
+            // Data from the order books (multithreaded)
+            final CompletableFuture<OrderBook> bidThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getBids()));
+            final CompletableFuture<OrderBook> askThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getAsks()));
             final CompletableFuture<Void> combinedFutures = CompletableFuture.allOf(bidThread, askThread);
 
-            byte[] base64BidOrderbook, base64AskOrderbook;
+            OrderBook bidOrderBook, askOrderBook;
             try {
                 combinedFutures.get();
-                base64BidOrderbook = bidThread.get();
-                base64AskOrderbook = askThread.get();
+                bidOrderBook = bidThread.get();
+                askOrderBook = askThread.get();
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
 
-            // TODO - change/limit how we pass the decimals around
-            // Currently giving them to everything for testing
-            OrderBook bidOrderBook = OrderBook.readOrderBook(base64BidOrderbook);
-            OrderBook askOrderBook = OrderBook.readOrderBook(base64AskOrderbook);
-
+            // TODO - Investigate this hideous pattern
             bidOrderBook.setBaseDecimals(baseDecimals);
             bidOrderBook.setQuoteDecimals(quoteDecimals);
             askOrderBook.setBaseDecimals(baseDecimals);
@@ -236,5 +249,28 @@ public class MarketBuilder {
 
     public Market reload() {
         return build();
+    }
+
+    private OrderBook retrieveOrderBook(PublicKey publicKey) {
+        if (orderBookCacheEnabled) {
+            // Use a 1-second expireAfterWrite cache if enabled.
+            return orderBookCacheManager.getOrderBook(publicKey);
+        } else {
+            // Fresh hit
+            try {
+                return OrderBook.readOrderBook(
+                        Base64.getDecoder().decode(
+                                client.getApi().getAccountInfo(
+                                                publicKey
+                                        )
+                                        .getValue()
+                                        .getData()
+                                        .get(0)
+                        )
+                );
+            } catch (RpcException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

@@ -6,6 +6,8 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.utils.ByteUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +15,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -21,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 public class MarketTest {
 
     private final RpcClient client = new RpcClient(Cluster.MAINNET);
-    private static final Logger LOGGER = Logger.getLogger(MarketTest.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MarketTest.class);
 
     /**
      * Uses a {@link MarketBuilder} class to retrieve data about the BTC/USDC Serum market.
@@ -46,6 +47,48 @@ public class MarketTest {
         // Verify at least 1 bid and 1 ask (should always be for BTC/USDC)
         assertTrue(bids.getOrders().size() > 0);
         assertTrue(asks.getOrders().size() > 0);
+    }
+
+    @Test
+    public void orderBookCacheTest() throws InterruptedException {
+        final PublicKey marketId = new PublicKey("9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT");
+        final MarketBuilder solUsdcMarketBuilder = new MarketBuilder()
+                .setClient(client)
+                .setPublicKey(marketId)
+                .setRetrieveOrderBooks(true)
+                .setOrderBookCacheEnabled(true);
+
+        Market solUsdcMarket = solUsdcMarketBuilder.build();
+        Order bestBid = solUsdcMarket.getBidOrderBook().getBestBid();
+        Order bestAsk = solUsdcMarket.getAskOrderBook().getBestAsk();
+
+        LOGGER.debug(
+                String.format(
+                        "%.2f x %.2f, %.2f x %.2f",
+                        bestBid.getFloatPrice(),
+                        bestBid.getFloatQuantity(),
+                        bestAsk.getFloatPrice(),
+                        bestAsk.getFloatQuantity()
+                )
+        );
+
+        for (int i = 0; i < 500; i++) {
+            solUsdcMarket = solUsdcMarketBuilder.reload();
+            bestBid = solUsdcMarket.getBidOrderBook().getBestBid();
+            bestAsk = solUsdcMarket.getAskOrderBook().getBestAsk();
+
+            LOGGER.debug(
+                    String.format(
+                            "%.2f x %.2f, %.2f x %.2f",
+                            bestBid.getFloatQuantity(),
+                            bestBid.getFloatPrice(),
+                            bestAsk.getFloatQuantity(),
+                            bestAsk.getFloatPrice()
+                    )
+            );
+
+            Thread.sleep(200L);
+        }
     }
 
     /**
@@ -85,9 +128,9 @@ public class MarketTest {
    StartOffset(d): 00001277, EndOffset(d): 00001292, Length(d): 00000016 */
 
         byte[] rawData = {
-                (byte)0xDB, (byte)0xFE, (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
-                (byte)0xFF, (byte)0xFF, (byte)0x01, (byte)0x00, (byte)0x00, (byte)0x00,
-                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00
+                (byte) 0xDB, (byte) 0xFE, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+                (byte) 0xFF, (byte) 0xFF, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
         };
 
         long seqNum = Utils.readInt64(rawData, 0);
