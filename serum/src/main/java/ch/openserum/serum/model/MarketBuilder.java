@@ -8,7 +8,9 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Builds a {@link Market} object, which can have polled data including bid/ask {@link OrderBook}s
@@ -94,10 +96,19 @@ public class MarketBuilder {
             market.setBaseDecimals(baseDecimals);
             market.setQuoteDecimals(quoteDecimals);
 
-            // TODO - multi-thread these
-            // Data from the order books
-            byte[] base64BidOrderbook = retrieveAccountData(market.getBids());
-            byte[] base64AskOrderbook = retrieveAccountData(market.getAsks());
+            // Data from the order books (multi-threaded)
+            final CompletableFuture<byte[]> bidThread = CompletableFuture.supplyAsync(() -> retrieveAccountData(market.getBids()));
+            final CompletableFuture<byte[]> askThread = CompletableFuture.supplyAsync(() -> retrieveAccountData(market.getAsks()));
+            final CompletableFuture<Void> combinedFutures = CompletableFuture.allOf(bidThread, askThread);
+
+            byte[] base64BidOrderbook, base64AskOrderbook;
+            try {
+                combinedFutures.get();
+                base64BidOrderbook = bidThread.get();
+                base64AskOrderbook = askThread.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
 
             // TODO - change/limit how we pass the decimals around
             // Currently giving them to everything for testing
