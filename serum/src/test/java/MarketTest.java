@@ -50,6 +50,7 @@ public class MarketTest {
     }
 
     @Test
+    @Ignore
     public void orderBookCacheTest() throws InterruptedException {
         final PublicKey marketId = new PublicKey("9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT");
         final MarketBuilder solUsdcMarketBuilder = new MarketBuilder()
