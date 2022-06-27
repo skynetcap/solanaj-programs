@@ -7,7 +7,7 @@
     <groupId>ch.openserum</groupId>
     <artifactId>solanaj-programs</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <modules>
         <module>mango</module>
         <module>serum</module>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.mmorrell</groupId>
             <artifactId>solanaj</artifactId>
-            <version>1.8</version>
+            <version>1.9-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
