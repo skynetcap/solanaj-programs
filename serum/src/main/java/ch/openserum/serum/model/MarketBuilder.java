@@ -229,7 +229,7 @@ public class MarketBuilder {
         AccountInfo orderBook = null;
 
         try {
-            orderBook = client.getApi().getAccountInfo(publicKey);
+            orderBook = client.getApi().getAccountInfo(publicKey, Map.of("commitment", Commitment.CONFIRMED));
         } catch (RpcException e) {
             e.printStackTrace();
         }
