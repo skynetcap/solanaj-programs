@@ -9,8 +9,10 @@ import org.apache.logging.log4j.Logger;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
+import org.p2p.solanaj.rpc.types.config.Commitment;
 
 import java.util.Base64;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class OrderBookCacheManager {
@@ -32,7 +34,8 @@ public class OrderBookCacheManager {
                             return OrderBook.readOrderBook(
                                     Base64.getDecoder().decode(
                                             client.getApi().getAccountInfo(
-                                                    PublicKey.valueOf(marketId)
+                                                    PublicKey.valueOf(marketId),
+                                                    Map.of("commitment", Commitment.CONFIRMED)
                                             )
                                                     .getValue()
                                                     .getData()

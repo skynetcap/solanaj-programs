@@ -5,6 +5,7 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
+import org.p2p.solanaj.rpc.types.config.Commitment;
 
 import java.util.Base64;
 import java.util.List;
@@ -261,7 +262,8 @@ public class MarketBuilder {
                 return OrderBook.readOrderBook(
                         Base64.getDecoder().decode(
                                 client.getApi().getAccountInfo(
-                                                publicKey
+                                                publicKey,
+                                                Map.of("commitment", Commitment.CONFIRMED)
                                         )
                                         .getValue()
                                         .getData()
