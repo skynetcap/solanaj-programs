@@ -6,7 +6,7 @@ A SolanaJ module for interfacing with Pyth.
 <dependency>
         <groupId>ch.openserum</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 

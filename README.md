@@ -10,7 +10,7 @@ After running `mvn clean install`:
 <dependency>
         <groupId>ch.openserum</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
