@@ -6,6 +6,7 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.config.Commitment;
+import org.p2p.solanaj.rpc.types.config.RpcSendTransactionConfig;
 
 import java.util.Base64;
 import java.util.List;
@@ -229,7 +230,15 @@ public class MarketBuilder {
         AccountInfo orderBook = null;
 
         try {
-            orderBook = client.getApi().getAccountInfo(publicKey, Map.of("commitment", Commitment.CONFIRMED));
+            orderBook = client.getApi().getAccountInfo(
+                    publicKey,
+                    Map.of(
+                            "commitment",
+                            Commitment.CONFIRMED,
+                            "encoding",
+                            RpcSendTransactionConfig.Encoding.base64.getEncoding()
+                    )
+            );
         } catch (RpcException e) {
             e.printStackTrace();
         }
