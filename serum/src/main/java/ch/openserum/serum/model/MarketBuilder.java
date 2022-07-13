@@ -26,6 +26,7 @@ public class MarketBuilder {
     private boolean retrieveEventQueue = false;
     private boolean retrieveDecimalsOnly = false;
     private boolean orderBookCacheEnabled = false;
+    private long minContextSlot = 0L;
     private boolean built = false;
     private byte[] base64AccountInfo;
     private OrderBookCacheManager orderBookCacheManager;
@@ -45,6 +46,13 @@ public class MarketBuilder {
 
     public MarketBuilder setClient(RpcClient client) {
         this.client = client;
+        return this;
+    }
+
+    public MarketBuilder setMinContextSlot(long minContextSlot) {
+        if (minContextSlot > this.minContextSlot) {
+            this.minContextSlot = minContextSlot;
+        }
         return this;
     }
 
@@ -76,6 +84,7 @@ public class MarketBuilder {
 
     /**
      * Builds a new {@link Market} object with fresh data. Also called during reload().
+     *
      * @return {@link Market} object with live data
      */
     public Market build() {
@@ -205,6 +214,7 @@ public class MarketBuilder {
 
     /**
      * Retrieves decimals for a given Token Mint's {@link PublicKey} from Solana account data.
+     *
      * @param tokenMint
      * @return
      */
@@ -236,15 +246,17 @@ public class MarketBuilder {
                             "commitment",
                             Commitment.CONFIRMED,
                             "encoding",
-                            RpcSendTransactionConfig.Encoding.base64.getEncoding()
+                            RpcSendTransactionConfig.Encoding.base64.getEncoding(),
+                            "minContextSlot",
+                            minContextSlot
                     )
             );
+            setMinContextSlot(orderBook.getContext().getSlot());
         } catch (RpcException e) {
             e.printStackTrace();
         }
 
         final List<String> accountData = orderBook.getValue().getData();
-
         return Base64.getDecoder().decode(accountData.get(0));
     }
 
