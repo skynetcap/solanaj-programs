@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
+import org.p2p.solanaj.rpc.RpcException;
+import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.utils.ByteUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -28,7 +31,7 @@ public class MarketTest {
      * Uses a {@link MarketBuilder} class to retrieve data about the BTC/USDC Serum market.
      */
     @Test
-    public void marketBuilderBtcUsdcTest() {
+    public void marketBuilderBtcUsdcTest() throws RpcException, InterruptedException {
         // Pubkey of SRM/USDC market
         final PublicKey publicKey = new PublicKey("ByRys5tuUWDgL73G8JBAEfkdFf8JWBzPBDHsBVQ5vbQA"); //SRM/USDC
 
@@ -47,6 +50,25 @@ public class MarketTest {
         // Verify at least 1 bid and 1 ask (should always be for BTC/USDC)
         assertTrue(bids.getOrders().size() > 0);
         assertTrue(asks.getOrders().size() > 0);
+
+        AccountInfo mktInfo = client.getApi().getAccountInfo(solUsdcMarket.getEventQueueKey());
+
+        LOGGER.info("mktInfo [len]: " + mktInfo.toString().length());
+        LOGGER.info("Slot: " + mktInfo.getContext().getSlot());
+
+        Thread.sleep(2000L);
+
+        LOGGER.info("---- Using minContextSlot ----");
+
+        AccountInfo mktInfoWithSlot = client.getApi().getAccountInfo(
+                solUsdcMarket.getEventQueueKey(),
+                Map.of(
+                    "minContextSlot", mktInfo.getContext().getSlot()
+                )
+        );
+
+        LOGGER.info("mktInfo [len]: " + mktInfo.toString().length());
+        LOGGER.info("Slot: " + mktInfo.getContext().getSlot());
     }
 
     @Test
