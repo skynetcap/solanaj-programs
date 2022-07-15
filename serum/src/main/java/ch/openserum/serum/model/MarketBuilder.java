@@ -252,12 +252,14 @@ public class MarketBuilder {
                     )
             );
             setMinContextSlot(orderBook.getContext().getSlot());
+
+            final List<String> accountData = orderBook.getValue().getData();
+            return Base64.getDecoder().decode(accountData.get(0));
         } catch (RpcException e) {
             e.printStackTrace();
         }
 
-        final List<String> accountData = orderBook.getValue().getData();
-        return Base64.getDecoder().decode(accountData.get(0));
+        return new byte[0];
     }
 
     public PublicKey getPublicKey() {
