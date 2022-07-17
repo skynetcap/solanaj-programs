@@ -14,10 +14,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -63,7 +60,7 @@ public class MarketTest {
         AccountInfo mktInfoWithSlot = client.getApi().getAccountInfo(
                 solUsdcMarket.getEventQueueKey(),
                 Map.of(
-                    "minContextSlot", mktInfo.getContext().getSlot()
+                        "minContextSlot", mktInfo.getContext().getSlot()
                 )
         );
 
@@ -139,6 +136,22 @@ public class MarketTest {
         assertEquals(78, slab.getFreeListLen());
         assertEquals(56, slab.getFreeListHead());
         assertEquals(32, slab.getLeafCount());
+    }
+
+    @Test
+    public void mangoPerpOrderBookTest() throws RpcException {
+        //solperp 2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi
+        PublicKey bidsPubkey = PublicKey.readPubkey(
+                Base64.getDecoder().decode(client.getApi().getAccountInfo(PublicKey.valueOf("2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi")).getValue().getData().get(0)),
+                40
+        );
+        OrderBook bids = OrderBook.readMangoOrderBook(
+                Base64.getDecoder().decode(
+                        client.getApi().getAccountInfo(bidsPubkey).getValue().getData().get(0)
+                )
+        );
+
+        LOGGER.info(bids);
     }
 
     /**

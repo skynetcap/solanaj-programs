@@ -89,9 +89,9 @@ public class Slab {
     // Offsets. TODO put these in their own file
     // STARTS at 13, since accountflags from the orderbook struct ends there. TODO - refactor this into something sensible
 
-    private static final int BUMP_INDEX_OFFSET = 13;
-    private static final int FREE_LIST_LEN_OFFSET = 21;
-    private static final int FREE_LIST_HEAD_OFFSET = 29;
+    private static final int BUMP_INDEX_OFFSET = 13; // -5 for mango = 8
+    private static final int FREE_LIST_LEN_OFFSET = 21; // 16
+    private static final int FREE_LIST_HEAD_OFFSET = 29; //
     private static final int ROOT_OFFSET = 33;
     private static final int LEAF_COUNT_OFFSET = 37;
     private static final int SLAB_NODE_OFFSET = 45;
@@ -102,6 +102,34 @@ public class Slab {
     private int root;
     private int leafCount;
     private ArrayList<SlabNode> slabNodes;
+
+    public static Slab readMangoOrderBookSlab(byte[] data) {
+        final Slab slab = new Slab();
+
+        long bumpIndex = ByteUtils.readUint64(data, 8).longValue();
+        slab.setBumpIndex((int) bumpIndex);
+
+        long freeListLen = ByteUtils.readUint64(data, 16).longValue();
+        slab.setFreeListLen((int) freeListLen);
+
+        int freeListHead = slab.readInt(data, 24);
+        slab.setFreeListHead(freeListHead);
+
+        int root = slab.readInt(data, 28);
+        slab.setRoot(root);
+
+        long leafCount = ByteUtils.readUint64(data, 32).longValue();
+        slab.setLeafCount((int) leafCount);
+
+        ArrayList<SlabNode> slabNodes = new ArrayList<>();
+        byte[] slabNodeBytes = ByteUtils.readBytes(data, 40, data.length - 40);
+
+        // TODO - pass in the start of the slabNodes binary instead of start of entire binary
+        slabNodes = slab.readSlabNodes(slabNodeBytes, (int) bumpIndex);
+        slab.setSlabNodes(slabNodes);
+
+        return slab;
+    }
 
     public static Slab readOrderBookSlab(byte[] data) {
         final Slab slab = new Slab();
@@ -152,7 +180,7 @@ public class Slab {
     public SlabNode readSlabNode(byte[] data) {
         int tag = readInt32(ByteUtils.readBytes(data, 0, INT32_SIZE));
         byte[] blob1 = ByteUtils.readBytes(data, 4, 68);
-        SlabNode slabNode;
+        SlabNode slabNode = null;
 
         if (tag == 0) {
 //            System.out.println("tag 0 detected: uninitialized");
@@ -216,7 +244,7 @@ public class Slab {
 //            System.out.println("tag 4 detected: lastfreenode");
             slabNode = null;
         } else {
-            throw new RuntimeException("unknown tag detected during slab deserialization = " + tag);
+            // throw new RuntimeException("unknown tag detected during slab deserialization = " + tag);
         }
 
 //        System.out.println();
@@ -300,6 +328,12 @@ public class Slab {
         final byte[] bumpIndexBytes = ByteUtils.readBytes(data, BUMP_INDEX_OFFSET, INT32_SIZE);
 
         return readInt32(bumpIndexBytes);
+    }
+
+    public int readInt(byte[] data, int offset) {
+        final byte[] val = ByteUtils.readBytes(data, offset, INT32_SIZE);
+
+        return readInt32(val);
     }
 
     public int readInt32(byte[] data) {

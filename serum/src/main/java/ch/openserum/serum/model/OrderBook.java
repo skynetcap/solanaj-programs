@@ -34,7 +34,18 @@ public class OrderBook {
         orderBook.setSlab(slab);
 
         return orderBook;
+    }
 
+    public static OrderBook readMangoOrderBook(byte[] data) {
+        final OrderBook orderBook = new OrderBook();
+
+        final AccountFlags accountFlags = AccountFlags.readAccountFlags(data, 0);
+        orderBook.setAccountFlags(accountFlags);
+
+        final Slab slab = Slab.readMangoOrderBookSlab(data);
+        orderBook.setSlab(slab);
+
+        return orderBook;
     }
 
     /**
