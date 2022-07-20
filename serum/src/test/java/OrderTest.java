@@ -388,6 +388,165 @@ public class OrderTest {
 //        )
 //    }
 
+    @Test
+    @Ignore
+    public void btcBot() throws RpcException, InterruptedException {
+        final PublicKey btcWallet = PublicKey.valueOf("GyFepQ1KrqoeiiejYWifZxrZkzwtWxu9KXzgQmzKNF7d");
+        final PublicKey usdcPayer = PublicKey.valueOf("5yHduya2yKQdZFPU4rTfi4cRG8M5tjK3wcVRSZ6CnafP");
+        final PublicKey ooa = PublicKey.valueOf("G5xANxunzHTR4tU63b18fh9PcdQkQFdiJH2Awrj2hqLz");
+
+        for (int i = 0; i < 20; i++) {
+            Transaction transaction = new Transaction();
+            Account account = null;
+            try {
+                account = Account.fromJson(Files.readString(Paths.get("src/test/resources/mainnet.json")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            final Market market = new MarketBuilder()
+                    .setPublicKey(PublicKey.valueOf("A8YFbxQYFVqKZaoYJLLUVcQiWP7G2MeEgW5wsAQgMvFw"))
+                    .setClient(client)
+                    .setRetrieveOrderBooks(true)
+                    .build();
+
+            // get midpoint
+            float midPoint = (market.getBidOrderBook().getBestBid().getFloatPrice() + market.getAskOrderBook().getBestAsk().getFloatPrice()) / 2;
+
+            final Order order = Order.builder()
+                    .floatPrice(midPoint)
+                    .floatQuantity(0.0069f)
+                    .clientOrderId(11133711L)
+                    .orderTypeLayout(OrderTypeLayout.LIMIT)
+                    .selfTradeBehaviorLayout(SelfTradeBehaviorLayout.DECREMENT_TAKE)
+                    .buy(true)
+                    .build();
+
+            serumManager.setOrderPrices(order, market);
+
+            transaction.addInstruction(
+                    SerumProgram.placeOrder(
+                            account,
+                            usdcPayer,
+                            ooa,
+                            market,
+                            order
+                    )
+            );
+
+            // Account 2
+            Account account2 = null;
+            try {
+                account2 = Account.fromJson(Files.readString(Paths.get("src/test/resources/dev2.json")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            final PublicKey btcWallet2 = PublicKey.valueOf("HkP6V9cQsk4HvpAn6HGefij9fQXd7roH7YvuzVcikmR9");
+            final PublicKey usdcPayer2 = PublicKey.valueOf("J2284fx3US2k1a7hYoG9k3odSVadtZGrTEMfDkjcjXUN");
+            final PublicKey ooa2 = PublicKey.valueOf("EQG3CD8Ld8mjXpY8aXHNo1xW3c75icz2Vc3kgAofxE5n");
+
+            final Order sellOrder = Order.builder()
+                    .floatPrice(midPoint)
+                    .floatQuantity(0.0069f)
+                    .clientOrderId(4201337L)
+                    .orderTypeLayout(OrderTypeLayout.LIMIT) //try ioc as workaround?
+                    .selfTradeBehaviorLayout(SelfTradeBehaviorLayout.DECREMENT_TAKE)
+                    .buy(false)
+                    .build();
+
+            serumManager.setOrderPrices(sellOrder, market);
+
+            transaction.addInstruction(
+                    SerumProgram.placeOrder(
+                            account2,
+                            btcWallet2,
+                            ooa2,
+                            market,
+                            sellOrder
+                    )
+            );
+
+            // crank before settle
+            transaction.addInstruction(
+                    SerumProgram.consumeEvents(
+                            account.getPublicKey(),
+                            List.of(
+                                    ooa
+                            ),
+                            market,
+                            btcWallet,
+                            usdcPayer
+                    )
+            );
+
+            transaction.addInstruction(
+                    SerumProgram.settleFunds(
+                            market,
+                            ooa,
+                            account.getPublicKey(),
+                            btcWallet,
+                            usdcPayer
+                    )
+            );
+
+            transaction.addInstruction(
+                    SerumProgram.consumeEvents(
+                            account2.getPublicKey(),
+                            List.of(
+                                    ooa2
+                            ),
+                            market,
+                            btcWallet2,
+                            usdcPayer2
+                    )
+            );
+
+
+            transaction.addInstruction(
+                    SerumProgram.settleFunds(
+                            market,
+                            ooa2,
+                            account2.getPublicKey(),
+                            btcWallet2,
+                            usdcPayer2
+                    )
+            );
+
+            long btcAmount = 6900L;
+            // dev 1 to dev 2 (send him btc)
+            transaction.addInstruction(
+                    TokenProgram.transfer(
+                            btcWallet,
+                            btcWallet2,
+                            btcAmount,
+                            account.getPublicKey()
+                    )
+            );
+
+            long usdcAfterFees = (long)(midPoint * 0.0069f) * 999_700;
+            // dev 2 to dev 1 (send him usdc)
+            transaction.addInstruction(
+                    TokenProgram.transfer(
+                            usdcPayer2,
+                            usdcPayer,
+                            usdcAfterFees,
+                            account2.getPublicKey()
+                    )
+            );
+
+            transaction.addInstruction(
+                    MemoProgram.writeUtf8(
+                            account.getPublicKey(),
+                            "https://www.youtube.com/watch?v=E1p8ziZS8dU"
+                    )
+            );
+            String transactionId = client.getApi().sendTransaction(transaction, List.of(account, account2), null);
+            LOGGER.info((i + 1) + " TX = " + transactionId);
+            Thread.sleep(50L);
+        }
+    }
+
 
     @Test
     @Ignore
