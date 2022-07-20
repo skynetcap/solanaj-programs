@@ -6,7 +6,8 @@ package ch.openserum.serum.model;
 public enum SelfTradeBehaviorLayout {
     DECREMENT_TAKE(0),
     CANCEL_PROVIDE(1),
-    ABORT_TRANSACTION(2);
+    ABORT_TRANSACTION(2),
+    UNKNOWN(9);
 
     private final int value;
 

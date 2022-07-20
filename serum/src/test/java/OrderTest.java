@@ -7,8 +7,12 @@ import org.junit.Test;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
+import org.p2p.solanaj.programs.MemoProgram;
+import org.p2p.solanaj.programs.SystemProgram;
+import org.p2p.solanaj.programs.TokenProgram;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
+import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
@@ -19,6 +23,7 @@ import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -29,19 +34,18 @@ import static org.junit.Assert.assertTrue;
 public class OrderTest {
 
     private static final Logger LOGGER = Logger.getLogger(OrderTest.class.getName());
-    private final RpcClient client = new RpcClient("https://solana-api.projectserum.com");
+    private final RpcClient client = new RpcClient("https://node.openserum.io/");
     private final SerumManager serumManager = new SerumManager(client);
     private static final PublicKey SOL_USDC_MARKET_V3 = PublicKey.valueOf("9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT");
 
     /**
      * Places a sell order for 0.1 SOL on SOL/USDC and a buy order for 0.001 USDC on SOL/USDC.
      * This test does NOT cancel the orders, you'll need to do that manually.
-     *
+     * <p>
      * Requires open orders accounts to already be manually created beforehand.
-     *
+     * <p>
      * You'll need to configure your USDC wallet's pubkey in the "usdcPayer" variable.
      * The SOL wallet will have it's SOL wrapped automatically.
-     *
      */
     @Test
     @Ignore
@@ -369,52 +373,174 @@ public class OrderTest {
         LOGGER.info("Settlement TX = " + settlementTransactionId);
     }
 
+//    @Test
+//    public void cloneOrcaWallet() throws RpcException {
+//        // clone this 5yHduya2yKQdZFPU4rTfi4cRG8M5tjK3wcVRSZ6CnafP
+//        AccountInfo accountInfo = client.getApi().getAccountInfo(new PublicKey("5yHduya2yKQdZFPU4rTfi4cRG8M5tjK3wcVRSZ6CnafP"));
+//        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+//
+//        Transaction createAccountTransaction = new Transaction();
+//
+//        createAccountTransaction.addInstruction(
+//                SystemProgram.createAccount(
+//
+//                )
+//        )
+//    }
+
 
     @Test
     @Ignore
-    public void iocPlaceOrderLqidTest() {
-        // Replace with the public key of your LQID and USDC wallet
-        final PublicKey lqidWallet = PublicKey.valueOf("AcnzwJRyEiqAGkZgpc5jr9R7uNorBQBH9Vd1mepzU29w");
+    public void orcaTrade() throws RpcException, InterruptedException {
+        final PublicKey orcaWallet = PublicKey.valueOf("BgLAeRn8nt2APbCerWyYvGrGUDoRxT4o2FYP51MgX6Kn");
         final PublicKey usdcPayer = PublicKey.valueOf("5yHduya2yKQdZFPU4rTfi4cRG8M5tjK3wcVRSZ6CnafP");
 
-        // Create account from private key
-        Account account = null;
-        try {
-            account = Account.fromJson(Files.readString(Paths.get("src/test/resources/mainnet.json")));
-            LOGGER.info("our pubkey = " + account.getPublicKey());
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (int i = 0; i < 50; i++) {
+            Transaction transaction = new Transaction();
+            Account account = null;
+            try {
+                account = Account.fromJson(Files.readString(Paths.get("src/test/resources/mainnet.json")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            final Market market = new MarketBuilder()
+                    .setPublicKey(PublicKey.valueOf("8N1KkhaCYDpj3awD58d85n973EwkpeYnRp84y1kdZpMX"))
+                    .setClient(client)
+                    .setRetrieveOrderBooks(true)
+                    .build();
+
+            final Order order = Order.builder()
+                    .floatPrice(0.97f)
+                    .floatQuantity(1f)
+                    .clientOrderId(11133711L)
+                    .orderTypeLayout(OrderTypeLayout.LIMIT)
+                    .selfTradeBehaviorLayout(SelfTradeBehaviorLayout.DECREMENT_TAKE)
+                    .buy(true)
+                    .build();
+
+            serumManager.setOrderPrices(order, market);
+
+            transaction.addInstruction(
+                    SerumProgram.placeOrder(
+                            account,
+                            usdcPayer,
+                            PublicKey.valueOf("5QNcrySBPvkVZhKZejGkneduCN2dJa5YHCqPhvo6ubDz"),
+                            market,
+                            order
+                    )
+            );
+
+            // Account 2
+            Account account2 = null;
+            try {
+                account2 = Account.fromJson(Files.readString(Paths.get("src/test/resources/dev2.json")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            final PublicKey orcaWallet2 = PublicKey.valueOf("D5Xy5xnfT3jSc5tkgESvzsXL59MxNwf19R1XcCxp6UXi");
+            final PublicKey usdcPayer2 = PublicKey.valueOf("J2284fx3US2k1a7hYoG9k3odSVadtZGrTEMfDkjcjXUN");
+            final PublicKey ooa2 = PublicKey.valueOf("8ZAGtBLxircxFZUhs1L8zUiFyX6gKo8BdsGfum2w5gjC");
+
+            final Order sellOrder = Order.builder()
+                    .floatPrice(0.97f)
+                    .floatQuantity(1f)
+                    .clientOrderId(4201337L)
+                    .orderTypeLayout(OrderTypeLayout.LIMIT) //try ioc as workaround?
+                    .selfTradeBehaviorLayout(SelfTradeBehaviorLayout.DECREMENT_TAKE)
+                    .buy(false)
+                    .build();
+
+            serumManager.setOrderPrices(sellOrder, market);
+
+            transaction.addInstruction(
+                    SerumProgram.placeOrder(
+                            account2,
+                            orcaWallet2,
+                            ooa2,
+                            market,
+                            sellOrder
+                    )
+            );
+
+            // crank before settle
+            transaction.addInstruction(
+                    SerumProgram.consumeEvents(
+                            account.getPublicKey(),
+                            List.of(
+                                    PublicKey.valueOf("5QNcrySBPvkVZhKZejGkneduCN2dJa5YHCqPhvo6ubDz")
+                            ),
+                            market,
+                            orcaWallet,
+                            usdcPayer
+                    )
+            );
+
+            transaction.addInstruction(
+                    SerumProgram.consumeEvents(
+                            account2.getPublicKey(),
+                            List.of(
+                                    ooa2
+                            ),
+                            market,
+                            orcaWallet2,
+                            usdcPayer2
+                    )
+            );
+
+            transaction.addInstruction(
+                    SerumProgram.settleFunds(
+                            market,
+                            PublicKey.valueOf("5QNcrySBPvkVZhKZejGkneduCN2dJa5YHCqPhvo6ubDz"),
+                            account.getPublicKey(),
+                            orcaWallet,
+                            usdcPayer
+                    )
+            );
+
+            transaction.addInstruction(
+                    SerumProgram.settleFunds(
+                            market,
+                            ooa2,
+                            account2.getPublicKey(),
+                            orcaWallet2,
+                            usdcPayer2
+                    )
+            );
+
+            long singleOrca = 1000000L;
+            // dev 1 to dev 2 (send him orca)
+            transaction.addInstruction(
+                    TokenProgram.transfer(
+                            orcaWallet,
+                            orcaWallet2,
+                            singleOrca,
+                            account.getPublicKey()
+                    )
+            );
+
+            long usdcAfterFees = 969612L;
+            // dev 2 to dev 1 (send him usdc)
+            transaction.addInstruction(
+                    TokenProgram.transfer(
+                            usdcPayer2,
+                            usdcPayer,
+                            usdcAfterFees,
+                            account2.getPublicKey()
+                    )
+            );
+
+            transaction.addInstruction(
+                    MemoProgram.writeUtf8(
+                            account.getPublicKey(),
+                            "Mess With The Best, Die Like The Rest."
+                    )
+            );
+            String transactionId = client.getApi().sendTransaction(transaction, List.of(account, account2), null);
+            LOGGER.info((i + 1) + " TX = " + transactionId);
+            Thread.sleep(50L);
         }
-
-        // Get OXY/USDC market
-        final Market lqidUsdcMarket = new MarketBuilder()
-                .setPublicKey(PublicKey.valueOf("4FPFh1iAiitKYMCPDBmEQrZVgA1DVMKHZBU2R7wjQWuu"))
-                .setClient(client)
-                .setRetrieveDecimalsOnly(true)
-                .build();
-
-        long orderId = 11133711L;
-
-        final Order order = Order.builder()
-                .floatPrice(0.20f)
-                .floatQuantity(0.01f)
-                .clientOrderId(orderId)
-                .orderTypeLayout(OrderTypeLayout.IOC)
-                .selfTradeBehaviorLayout(SelfTradeBehaviorLayout.DECREMENT_TAKE)
-                .buy(true).build();
-
-        // Place order
-        String transactionId = serumManager.placeOrder(
-                account,
-                lqidUsdcMarket,
-                order,
-                lqidWallet,
-                usdcPayer
-        );
-
-        LOGGER.info(String.format("TX: %s", transactionId));
-
-        assertNotNull(transactionId);
     }
 
     @Test
@@ -909,7 +1035,7 @@ public class OrderTest {
                 }
 
                 final Transaction cancelTransaction = new Transaction();
-                for(int i = 1; i <= 10; i++) {
+                for (int i = 1; i <= 10; i++) {
                     cancelTransaction.addInstruction(
                             SerumProgram.cancelOrderByClientId(
                                     xrpBearUsdcMarket,
@@ -1157,7 +1283,7 @@ public class OrderTest {
                         }
                     }
 
-                    if (openOrdersAccount.getBaseTokenFree() > 0|| openOrdersAccount.getQuoteTokenFree() > 0) {
+                    if (openOrdersAccount.getBaseTokenFree() > 0 || openOrdersAccount.getQuoteTokenFree() > 0) {
                         // settle funds
                         hasUnsettledFunds = true;
                     }
@@ -1271,9 +1397,9 @@ public class OrderTest {
         // this rawData = key bytes for a 477.080 quantity bid at 0.0510 cents
 
         byte[] rawData = {
-                (byte)0xFC, (byte)0xFD, (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
-                (byte)0xFF, (byte)0xFF, (byte)0x33, (byte)0x00, (byte)0x00, (byte)0x00,
-                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00
+                (byte) 0xFC, (byte) 0xFD, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+                (byte) 0xFF, (byte) 0xFF, (byte) 0x33, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
         };
 
 
