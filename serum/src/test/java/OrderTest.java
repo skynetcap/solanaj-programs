@@ -15,6 +15,7 @@ import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
+import org.p2p.solanaj.rpc.types.config.Commitment;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -395,7 +396,7 @@ public class OrderTest {
         final PublicKey usdcPayer = PublicKey.valueOf("5yHduya2yKQdZFPU4rTfi4cRG8M5tjK3wcVRSZ6CnafP");
         final PublicKey ooa = PublicKey.valueOf("G5xANxunzHTR4tU63b18fh9PcdQkQFdiJH2Awrj2hqLz");
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             Transaction transaction = new Transaction();
             Account account = null;
             try {
@@ -450,7 +451,7 @@ public class OrderTest {
                     .floatPrice(midPoint)
                     .floatQuantity(0.0069f)
                     .clientOrderId(4201337L)
-                    .orderTypeLayout(OrderTypeLayout.LIMIT) //try ioc as workaround?
+                    .orderTypeLayout(OrderTypeLayout.LIMIT)
                     .selfTradeBehaviorLayout(SelfTradeBehaviorLayout.DECREMENT_TAKE)
                     .buy(false)
                     .build();
@@ -541,7 +542,7 @@ public class OrderTest {
                             "https://www.youtube.com/watch?v=E1p8ziZS8dU"
                     )
             );
-            String transactionId = client.getApi().sendTransaction(transaction, List.of(account, account2), null);
+            String transactionId = client.getApi().sendTransaction(transaction, List.of(account, account2), client.getApi().getRecentBlockhash(Commitment.PROCESSED));
             LOGGER.info((i + 1) + " TX = " + transactionId);
             Thread.sleep(50L);
         }
