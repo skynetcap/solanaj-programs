@@ -539,10 +539,11 @@ public class OrderTest {
             transaction.addInstruction(
                     MemoProgram.writeUtf8(
                             account.getPublicKey(),
-                            "https://www.youtube.com/watch?v=E1p8ziZS8dU"
+                            "Mess with the best, die like the rest."
                     )
             );
-            String transactionId = client.getApi().sendTransaction(transaction, List.of(account, account2), client.getApi().getRecentBlockhash(Commitment.PROCESSED));
+            String transactionId = client.getApi().sendTransaction(transaction, List.of(account, account2),
+                    client.getApi().getRecentBlockhash(Commitment.CONFIRMED));
             LOGGER.info((i + 1) + " TX = " + transactionId);
             Thread.sleep(50L);
         }
