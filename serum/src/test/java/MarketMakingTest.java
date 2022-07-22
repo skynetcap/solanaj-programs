@@ -85,9 +85,10 @@ public class MarketMakingTest {
         boolean ordersInitialized = false;
         while (orcaPriceCoingecko > 0.0f) {
             final Transaction transaction = new Transaction();
+            final Transaction cancelTx = new Transaction();
 
             if (ordersInitialized) {
-                transaction.addInstruction(
+                cancelTx.addInstruction(
                         SerumProgram.cancelOrderByClientId(
                                 market,
                                 openOrdersAccount,
@@ -96,7 +97,7 @@ public class MarketMakingTest {
                         )
                 );
 
-                transaction.addInstruction(
+                cancelTx.addInstruction(
                         SerumProgram.cancelOrderByClientId(
                                 market,
                                 openOrdersAccount,
@@ -104,6 +105,12 @@ public class MarketMakingTest {
                                 1142011L
                         )
                 );
+
+                try {
+                    client.getApi().sendTransaction(cancelTx, account);
+                } catch (RpcException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
             }
 
             transaction.addInstruction(
