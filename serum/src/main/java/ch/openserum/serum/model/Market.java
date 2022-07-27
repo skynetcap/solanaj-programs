@@ -6,11 +6,10 @@ import org.p2p.solanaj.core.PublicKey;
 /**
  * Class to represent a Serum market. Should be instantiated using a {@link .MarketBuilder}.
  */
-@EqualsAndHashCode(exclude = {"bidOrderBook", "askOrderBook", "eventQueue"})
+@EqualsAndHashCode(of = {"ownAddress"})
 public class Market {
 
     private AccountFlags accountFlags;
-
     private PublicKey ownAddress;
     private long vaultSignerNonce;
     private PublicKey baseMint;
