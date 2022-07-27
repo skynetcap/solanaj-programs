@@ -11,7 +11,6 @@ public class Market {
 
     private AccountFlags accountFlags;
 
-    @EqualsAndHashCode.Include
     private PublicKey ownAddress;
     private long vaultSignerNonce;
     private PublicKey baseMint;
@@ -35,9 +34,13 @@ public class Market {
     private long feeRateBps;
     private long referrerRebatesAccrued;
 
+    @EqualsAndHashCode.Exclude
     private OrderBook bidOrderBook;
+
+    @EqualsAndHashCode.Exclude
     private OrderBook askOrderBook;
 
+    @EqualsAndHashCode.Exclude
     private EventQueue eventQueue;
 
     // Data from token mints
