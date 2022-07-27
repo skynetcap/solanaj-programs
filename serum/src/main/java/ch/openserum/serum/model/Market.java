@@ -1,13 +1,17 @@
 package ch.openserum.serum.model;
 
+import lombok.EqualsAndHashCode;
 import org.p2p.solanaj.core.PublicKey;
 
 /**
  * Class to represent a Serum market. Should be instantiated using a {@link .MarketBuilder}.
  */
+@EqualsAndHashCode
 public class Market {
 
     private AccountFlags accountFlags;
+
+    @EqualsAndHashCode.Include
     private PublicKey ownAddress;
     private long vaultSignerNonce;
     private PublicKey baseMint;
