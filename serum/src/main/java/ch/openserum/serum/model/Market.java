@@ -6,7 +6,7 @@ import org.p2p.solanaj.core.PublicKey;
 /**
  * Class to represent a Serum market. Should be instantiated using a {@link .MarketBuilder}.
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Market {
 
     private AccountFlags accountFlags;
