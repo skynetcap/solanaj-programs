@@ -6,7 +6,7 @@ import org.p2p.solanaj.core.PublicKey;
 /**
  * Class to represent a Serum market. Should be instantiated using a {@link .MarketBuilder}.
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(exclude = {"bidOrderBook", "askOrderBook", "eventQueue"})
 public class Market {
 
     private AccountFlags accountFlags;
@@ -33,14 +33,8 @@ public class Market {
     private long quoteLotSize;
     private long feeRateBps;
     private long referrerRebatesAccrued;
-
-    @EqualsAndHashCode.Exclude
     private OrderBook bidOrderBook;
-
-    @EqualsAndHashCode.Exclude
     private OrderBook askOrderBook;
-
-    @EqualsAndHashCode.Exclude
     private EventQueue eventQueue;
 
     // Data from token mints
