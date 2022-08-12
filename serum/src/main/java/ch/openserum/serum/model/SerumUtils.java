@@ -1,4 +1,4 @@
-package ch.openserum.serum.model;
+package com.mmorrell.serum.model;
 
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
@@ -260,7 +260,7 @@ public class SerumUtils {
     public static long priceNumberToLots(float price, byte quoteDecimals, long baseLotSize, byte baseDecimals, long quoteLotSize) {
         double top = (price * Math.pow(10, quoteDecimals) * baseLotSize);
         double bottom = Math.pow(10, baseDecimals) * quoteLotSize;
-        return Math.round(top / bottom);
+        return (long) Math.ceil(top / bottom);
     }
 
     public static float baseSizeLotsToNumber(long size, long baseLotSize, long baseMultiplier) {
@@ -270,7 +270,7 @@ public class SerumUtils {
 
     public static long baseSizeNumberToLots(float size, byte baseDecimals, long baseLotSize) {
         double top = Math.round(size * Math.pow(10, baseDecimals));
-        return (long) (top / baseLotSize);
+        return (long) Math.ceil(top / baseLotSize);
     }
 
     public static OpenOrdersAccount findOpenOrdersAccountForOwner(RpcClient client, PublicKey marketAddress, PublicKey ownerAddress) {

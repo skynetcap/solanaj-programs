@@ -1,6 +1,6 @@
-package ch.openserum.pyth.model;
+package com.mmorrell.pyth.model;
 
-import ch.openserum.pyth.utils.PythUtils;
+import com.mmorrell.pyth.utils.PythUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

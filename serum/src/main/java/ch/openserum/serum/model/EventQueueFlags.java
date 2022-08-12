@@ -1,4 +1,4 @@
-package ch.openserum.serum.model;
+package com.mmorrell.serum.model;
 
 /**
  * Used to represent flags for Event Queue events

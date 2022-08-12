@@ -1,4 +1,4 @@
-package ch.openserum.pyth.utils;
+package com.mmorrell.pyth.utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

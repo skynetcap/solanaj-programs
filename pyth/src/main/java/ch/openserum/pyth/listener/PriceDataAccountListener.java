@@ -1,6 +1,6 @@
-package ch.openserum.pyth.listener;
+package com.mmorrell.pyth.listener;
 
-import ch.openserum.pyth.model.PriceDataAccount;
+import com.mmorrell.pyth.model.PriceDataAccount;
 import lombok.AllArgsConstructor;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.ws.listeners.NotificationEventListener;

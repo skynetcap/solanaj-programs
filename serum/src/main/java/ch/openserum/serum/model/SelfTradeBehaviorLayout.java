@@ -1,4 +1,4 @@
-package ch.openserum.serum.model;
+package com.mmorrell.serum.model;
 
 /**
  * Enum representing how your Serum {@link Order} behaves when you trade against yourself

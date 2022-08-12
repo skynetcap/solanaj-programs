@@ -1,4 +1,4 @@
-package ch.openserum.serum.model;
+package com.mmorrell.serum.model;
 
 /**
  * Enum representing an {@link Order}s order type such as limit, ioc, or post only.

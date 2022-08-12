@@ -1,4 +1,4 @@
-import ch.openserum.bonfida.manager.NamingManager;
+import com.mmorrell.bonfida.manager.NamingManager;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;

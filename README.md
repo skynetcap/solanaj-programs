@@ -8,7 +8,7 @@ solanaj-programs is not yet on Maven Central. You'll need to install it using `m
 After running `mvn clean install`:
 ```xml
 <dependency>
-        <groupId>ch.openserum</groupId>
+        <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
         <version>1.1-SNAPSHOT</version>
 </dependency>

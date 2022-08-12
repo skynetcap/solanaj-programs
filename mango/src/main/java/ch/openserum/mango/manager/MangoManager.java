@@ -1,9 +1,9 @@
-package ch.openserum.mango.manager;
+package com.mmorrell.mango.manager;
 
-import ch.openserum.mango.model.MangoPerpAccount;
-import ch.openserum.mango.model.MangoPerpGroup;
-import ch.openserum.mango.model.MangoGroup;
-import ch.openserum.mango.model.MarginAccount;
+import com.mmorrell.mango.model.MangoPerpAccount;
+import com.mmorrell.mango.model.MangoPerpGroup;
+import com.mmorrell.mango.model.MangoGroup;
+import com.mmorrell.mango.model.MarginAccount;
 import lombok.RequiredArgsConstructor;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;

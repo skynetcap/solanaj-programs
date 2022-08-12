@@ -1,4 +1,4 @@
-package ch.openserum.mango.model;
+package com.mmorrell.mango.model;
 
 public class MangoUtils {
 

@@ -1,4 +1,4 @@
-package ch.openserum.mango.model;
+package com.mmorrell.mango.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

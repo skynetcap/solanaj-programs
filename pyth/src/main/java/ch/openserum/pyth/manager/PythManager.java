@@ -1,8 +1,8 @@
-package ch.openserum.pyth.manager;
+package com.mmorrell.pyth.manager;
 
-import ch.openserum.pyth.model.MappingAccount;
-import ch.openserum.pyth.model.PriceDataAccount;
-import ch.openserum.pyth.model.ProductAccount;
+import com.mmorrell.pyth.model.MappingAccount;
+import com.mmorrell.pyth.model.PriceDataAccount;
+import com.mmorrell.pyth.model.ProductAccount;
 import lombok.RequiredArgsConstructor;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;

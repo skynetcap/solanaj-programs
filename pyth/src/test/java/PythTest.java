@@ -1,8 +1,8 @@
-import ch.openserum.pyth.listener.PriceDataAccountListener;
-import ch.openserum.pyth.manager.PythManager;
-import ch.openserum.pyth.model.MappingAccount;
-import ch.openserum.pyth.model.PriceDataAccount;
-import ch.openserum.pyth.model.ProductAccount;
+import com.mmorrell.pyth.listener.PriceDataAccountListener;
+import com.mmorrell.pyth.manager.PythManager;
+import com.mmorrell.pyth.model.MappingAccount;
+import com.mmorrell.pyth.model.PriceDataAccount;
+import com.mmorrell.pyth.model.ProductAccount;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
