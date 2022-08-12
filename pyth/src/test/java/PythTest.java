@@ -184,6 +184,7 @@ public class PythTest {
     }
 
     @Test
+    @Ignore
     public void iterateProductsTest() throws InterruptedException {
         // Iterate all products and get their price once
         final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
