@@ -3,14 +3,24 @@
 SolanaJ implementations of popular Solana programs, including the Project Serum DEX.
 
 # Installation
-solanaj-programs is not yet on Maven Central. You'll need to install it using `mvn clean install`.
+1. Add Sonatype repository to your project's pom.xml file:
 
-After running `mvn clean install`:
+```xml
+<repositories>
+  <repository>
+      <id>Sonatype Releases</id>
+      <url>https://oss.sonatype.org/content/repositories/releases/</url>
+  </repository>
+</repositories>
+```
+
+2. Add `solanaj-programs` dependency
+
 ```xml
 <dependency>
         <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
 </dependency>
 ```
 

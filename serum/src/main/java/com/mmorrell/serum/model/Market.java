@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import org.p2p.solanaj.core.PublicKey;
 
 /**
- * Class to represent a Serum market. Should be instantiated using a {@link .MarketBuilder}.
+ * Class to represent a Serum market. Should be instantiated using a {@link MarketBuilder}.
  */
 @EqualsAndHashCode(of = {"ownAddress"})
 public class Market {
