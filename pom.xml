@@ -19,7 +19,7 @@
     <scm>
         <connection>scm:git:git://github.com/skynetcap/solanaj-programs.git</connection>
         <developerConnection>scm:git:ssh://github.com/skynetcap/solanaj-programs.git</developerConnection>
-        <url>https://github.com/skynetcap/solanaj-programs/tree/main</url>
+        <url>https://github.com/skynetcap/solanaj-programs/tree/master</url>
     </scm>
     <developers>
         <developer>
