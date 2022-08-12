@@ -9,8 +9,6 @@ import org.p2p.solanaj.utils.ByteUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /*
 const EVENT_QUEUE_HEADER = struct([

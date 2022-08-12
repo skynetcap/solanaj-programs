@@ -1,4 +1,4 @@
-package com.skynet.magiceden.program;
+package com.mmorrell.magiceden.program;
 
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
