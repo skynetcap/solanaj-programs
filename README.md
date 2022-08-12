@@ -10,7 +10,7 @@ After running `mvn clean install`:
 <dependency>
         <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.2-SNAPSHOT</version>
 </dependency>
 ```
 
