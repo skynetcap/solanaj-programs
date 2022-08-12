@@ -3,18 +3,7 @@
 SolanaJ implementations of popular Solana programs, including the Project Serum DEX.
 
 # Installation
-1. Add Sonatype repository to your project's pom.xml file:
-
-```xml
-<repositories>
-  <repository>
-      <id>Sonatype Releases</id>
-      <url>https://oss.sonatype.org/content/repositories/releases/</url>
-  </repository>
-</repositories>
-```
-
-2. Add `solanaj-programs` dependency
+1. Add Maven dependency:
 
 ```xml
 <dependency>
