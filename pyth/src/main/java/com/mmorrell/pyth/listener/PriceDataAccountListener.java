@@ -2,7 +2,6 @@ package com.mmorrell.pyth.listener;
 
 import com.mmorrell.pyth.model.PriceDataAccount;
 import lombok.AllArgsConstructor;
-import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.ws.listeners.NotificationEventListener;
 
 import java.util.Base64;
