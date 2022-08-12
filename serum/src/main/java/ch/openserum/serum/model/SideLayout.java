@@ -1,4 +1,4 @@
-package ch.openserum.serum.model;
+package com.mmorrell.serum.model;
 
 /**
  * Enum representing if your Serum {@link Order} is a buy or sell

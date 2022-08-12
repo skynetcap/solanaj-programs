@@ -1,11 +1,11 @@
-package ch.openserum.serum.program;
+package com.mmorrell.serum.program;
 
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 import org.p2p.solanaj.programs.Program;
-import ch.openserum.serum.model.*;
+import com.mmorrell.serum.model.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

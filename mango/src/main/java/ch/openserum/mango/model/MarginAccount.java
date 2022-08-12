@@ -1,4 +1,4 @@
-package ch.openserum.mango.model;
+package com.mmorrell.mango.model;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import org.p2p.solanaj.core.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ch.openserum.mango.model.MangoUtils.ACCOUNT_FLAGS_SIZE_BYTES;
+import static com.mmorrell.mango.model.MangoUtils.ACCOUNT_FLAGS_SIZE_BYTES;
 import static org.p2p.solanaj.core.PublicKey.PUBLIC_KEY_LENGTH;
 
 @Builder

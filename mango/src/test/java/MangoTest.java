@@ -1,5 +1,5 @@
-import ch.openserum.mango.manager.MangoManager;
-import ch.openserum.mango.model.*;
+import com.mmorrell.mango.manager.MangoManager;
+import com.mmorrell.mango.model.*;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;

@@ -4,9 +4,9 @@ A SolanaJ module for interfacing with Pyth.
 ## Maven Installation
 ```xml
 <dependency>
-        <groupId>ch.openserum</groupId>
+        <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.2-SNAPSHOT</version>
 </dependency>
 ```
 

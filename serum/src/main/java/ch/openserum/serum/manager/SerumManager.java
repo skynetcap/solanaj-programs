@@ -1,7 +1,7 @@
-package ch.openserum.serum.manager;
+package com.mmorrell.serum.manager;
 
-import ch.openserum.serum.model.*;
-import ch.openserum.serum.program.SerumProgram;
+import com.mmorrell.serum.model.*;
+import com.mmorrell.serum.program.SerumProgram;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
@@ -739,7 +739,7 @@ public class SerumManager {
 
         order.setPrice(longPrice);
         order.setQuantity(longQuantity);
-        order.setMaxQuoteQuantity(maxQuoteQuantity);
+        order.setMaxQuoteQuantity(maxQuoteQuantity + 1);
     }
 
 

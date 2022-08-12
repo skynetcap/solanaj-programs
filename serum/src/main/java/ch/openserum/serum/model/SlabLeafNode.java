@@ -1,4 +1,4 @@
-package ch.openserum.serum.model;
+package com.mmorrell.serum.model;
 
 import org.p2p.solanaj.core.PublicKey;
 

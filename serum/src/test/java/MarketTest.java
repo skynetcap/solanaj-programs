@@ -1,4 +1,4 @@
-import ch.openserum.serum.model.*;
+import com.mmorrell.serum.model.*;
 import org.bitcoinj.core.Utils;
 import org.junit.Ignore;
 import org.junit.Test;

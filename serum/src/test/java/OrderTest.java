@@ -1,6 +1,6 @@
-import ch.openserum.serum.manager.SerumManager;
-import ch.openserum.serum.model.*;
-import ch.openserum.serum.program.SerumProgram;
+import com.mmorrell.serum.manager.SerumManager;
+import com.mmorrell.serum.model.*;
+import com.mmorrell.serum.program.SerumProgram;
 import org.bitcoinj.core.Base58;
 import org.junit.Ignore;
 import org.junit.Test;

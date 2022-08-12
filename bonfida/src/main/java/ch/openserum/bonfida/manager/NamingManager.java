@@ -1,6 +1,6 @@
-package ch.openserum.bonfida.manager;
+package com.mmorrell.bonfida.manager;
 
-import ch.openserum.bonfida.program.NamingServiceProgram;
+import com.mmorrell.bonfida.program.NamingServiceProgram;
 import org.bitcoinj.core.Base58;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;

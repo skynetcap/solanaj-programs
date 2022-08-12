@@ -1,4 +1,4 @@
-package ch.openserum.mango.model;
+package com.mmorrell.mango.model;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static ch.openserum.mango.model.MangoUtils.*;
+import static com.mmorrell.mango.model.MangoUtils.*;
 
 /**
  * Represents a deserialized v2 Mango Group

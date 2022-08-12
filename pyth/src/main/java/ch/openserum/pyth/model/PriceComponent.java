@@ -1,4 +1,4 @@
-package ch.openserum.pyth.model;
+package com.mmorrell.pyth.model;
 
 import lombok.*;
 import org.p2p.solanaj.core.PublicKey;

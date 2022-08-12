@@ -1,6 +1,6 @@
-package ch.openserum.serum.model;
+package com.mmorrell.serum.model;
 
-import ch.openserum.serum.manager.OrderBookCacheManager;
+import com.mmorrell.serum.manager.OrderBookCacheManager;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
