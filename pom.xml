@@ -6,7 +6,7 @@
     <groupId>com.mmorrell</groupId>
     <artifactId>solanaj-programs</artifactId>
     <packaging>pom</packaging>
-    <version>1.2</version>
+    <version>1.3</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Program libraries for SolanaJ, a library for Solana RPC</description>
     <url>https://github.com/skynetcap/solanaj-programs</url>
@@ -36,6 +36,7 @@
         <module>bonfida</module>
         <module>pyth</module>
         <module>magiceden</module>
+        <module>metaplex</module>
     </modules>
 
     <properties>
