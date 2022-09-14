@@ -97,7 +97,7 @@ public class NamingManager {
         return true;
     }
 
-    private PublicKey getNameAccountKey(byte[] hashedName, PublicKey nameClass, PublicKey parentName) {
+    public PublicKey getNameAccountKey(byte[] hashedName, PublicKey nameClass, PublicKey parentName) {
         PublicKey.ProgramDerivedAddress nameAccountKey = null;
 
         byte[] nameClassBytes, parentNameBytes;
@@ -129,7 +129,7 @@ public class NamingManager {
      * @param input domain name
      * @return byte array of sha256 hashed string
      */
-    private byte[] getHashedName(String input) {
+    public byte[] getHashedName(String input) {
         MessageDigest digest = null;
         input = HASH_PREFIX + input;
         try {

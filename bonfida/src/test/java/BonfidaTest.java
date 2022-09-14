@@ -6,9 +6,12 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.types.AccountInfo;
+import org.p2p.solanaj.rpc.types.Memcmp;
+import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertTrue;
@@ -19,6 +22,9 @@ public class BonfidaTest {
     private final NamingManager namingManager = new NamingManager(new RpcClient(Cluster.MAINNET));
     private static final String DOMAIN_NAME = ".sol";  // testdomainname.sol
     private final PublicKey skynetMainnetPubkey = new PublicKey("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq");
+    private final PublicKey bonfidaPubkey = new PublicKey("jCebN34bUfdeUYJT13J1yG16XWQpt5PDx6Mse9GUqhR");
+    private final RpcClient rpcClient = new RpcClient("https://ssc-dao.genesysgo.net/");
+    private static final PublicKey NAME_PROGRAM_ID = new PublicKey("namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX");
 
     @BeforeClass
     public static void beforeClass() throws InterruptedException {
@@ -82,5 +88,37 @@ public class BonfidaTest {
         );
 
         assertTrue(sbfPublicKey.toBase58().equalsIgnoreCase("2NoEcR9cC7Rn6bP9rBpky6B1eP9syyPf8FXRaf1myChv"));
+    }
+
+    @Test
+    public void resolveTest() throws Exception {
+        // find named accounts for user
+        List<ProgramAccount> programAccounts = rpcClient.getApi().getProgramAccounts(NAME_PROGRAM_ID,
+                32,
+                skynetMainnetPubkey.toBase58()
+        );
+
+        LOGGER.info(String.format("Prog accts: %s", programAccounts.size()));
+        for (ProgramAccount programAccount : programAccounts) {
+            LOGGER.info("ACCT: " + programAccount.getAccount().toString());
+            // pda
+            PublicKey.ProgramDerivedAddress centralState = PublicKey.findProgramAddress(
+                    List.of(
+                            bonfidaPubkey.toByteArray()
+                    ),
+                    bonfidaPubkey
+            );
+
+            byte[] hashedReverseLookup = namingManager.getHashedName(programAccount.getPubkey());
+            PublicKey nameAccountKey = namingManager.getNameAccountKey(hashedReverseLookup, centralState.getAddress(), null);
+            LOGGER.info(String.format("Name account key: %s", nameAccountKey.toBase58()));
+
+            // gai
+            byte[] data =
+                    Base64.getDecoder().decode(rpcClient.getApi().getAccountInfo(nameAccountKey).getValue().getData().get(0));
+
+            // bytes
+            LOGGER.info(String.format("Data: %s", Arrays.toString(data)));
+        }
     }
 }
