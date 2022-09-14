@@ -105,7 +105,6 @@ public class BonfidaTest {
                 bonfidaPubkey
         );
 
-
         // find named accounts for user
         ProgramAccountConfig config = new ProgramAccountConfig(
                 List.of(
@@ -115,34 +114,24 @@ public class BonfidaTest {
         config.setEncoding(RpcSendTransactionConfig.Encoding.base64);
 
         List<ProgramAccount> programAccounts = rpcClient.getApi().getProgramAccounts(NAME_PROGRAM_ID, config);
-        LOGGER.info(String.format("Prog accts: %s", programAccounts.size()));
         for (ProgramAccount programAccount : programAccounts) {
-            LOGGER.info("Program account = " + programAccount.getPubkey());
-
             byte[] hashedReverseLookup = namingManager.getHashedName(programAccount.getPubkey());
-
-            // todo - fixme
-            PublicKey thekey = PublicKey.findProgramAddress(Arrays.asList(hashedReverseLookup,
+            PublicKey nameAccountKey = PublicKey.findProgramAddress(Arrays.asList(hashedReverseLookup,
                             centralState.getAddress().toByteArray(),
                             ByteBuffer.allocate(32).array()),
                     NAME_PROGRAM_ID).getAddress();
 
-            LOGGER.info(String.format("Name account key: %s", thekey.toBase58()));
-
-            // gai
             try {
                 byte[] data =
-                        Base64.getDecoder().decode(rpcClient.getApi().getAccountInfo(thekey).getValue().getData().get(0));
+                        Base64.getDecoder().decode(rpcClient.getApi().getAccountInfo(nameAccountKey).getValue().getData().get(0));
 
                 // bytes
+                LOGGER.info(String.format("Name account key: %s", nameAccountKey.toBase58()));
                 LOGGER.info(String.format("Data: %s", Arrays.toString(data)));
 
-                /*
-                    let nameLength = new BN(name.data.slice(0, 4), "le").toNumber();
-                    return name.data.slice(4, 4 + nameLength).toString();
-                 */
                 int nameLength = (int) Utils.readUint32(data, 96);
                 String domainName = new String(ByteUtils.readBytes(data, 96 + 4, nameLength));
+
                 LOGGER.info("Domain name for " + skynetMainnetPubkey.toBase58() + ", = " + domainName + ".sol");
             } catch (Exception ex) {
                 // LOGGER.info("no info found..");
