@@ -98,6 +98,7 @@ public class BonfidaTest {
 
     @Test
     public void resolveTest() throws Exception {
+        LOGGER.info("Looking up domains for: " + skynetMainnetPubkey.toBase58());
         PublicKey.ProgramDerivedAddress centralState = PublicKey.findProgramAddress(
                 List.of(
                         bonfidaPubkey.toByteArray()
