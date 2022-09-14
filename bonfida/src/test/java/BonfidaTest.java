@@ -1,4 +1,5 @@
 import com.mmorrell.bonfida.manager.NamingManager;
+import org.bitcoinj.core.Utils;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -6,9 +7,14 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.types.AccountInfo;
+import org.p2p.solanaj.rpc.types.Filter;
 import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
+import org.p2p.solanaj.rpc.types.config.ProgramAccountConfig;
+import org.p2p.solanaj.rpc.types.config.RpcSendTransactionConfig;
+import org.p2p.solanaj.utils.ByteUtils;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -23,7 +29,7 @@ public class BonfidaTest {
     private static final String DOMAIN_NAME = ".sol";  // testdomainname.sol
     private final PublicKey skynetMainnetPubkey = new PublicKey("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq");
     private final PublicKey bonfidaPubkey = new PublicKey("jCebN34bUfdeUYJT13J1yG16XWQpt5PDx6Mse9GUqhR");
-    private final RpcClient rpcClient = new RpcClient("https://ssc-dao.genesysgo.net/");
+    private final RpcClient rpcClient = new RpcClient("https://solana-api.projectserum.com/");
     private static final PublicKey NAME_PROGRAM_ID = new PublicKey("namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX");
 
     @BeforeClass
@@ -92,33 +98,55 @@ public class BonfidaTest {
 
     @Test
     public void resolveTest() throws Exception {
-        // find named accounts for user
-        List<ProgramAccount> programAccounts = rpcClient.getApi().getProgramAccounts(NAME_PROGRAM_ID,
-                32,
-                skynetMainnetPubkey.toBase58()
+        PublicKey.ProgramDerivedAddress centralState = PublicKey.findProgramAddress(
+                List.of(
+                        bonfidaPubkey.toByteArray()
+                ),
+                bonfidaPubkey
         );
 
+
+        // find named accounts for user
+        ProgramAccountConfig config = new ProgramAccountConfig(
+                List.of(
+                        new Filter(new Memcmp(32, skynetMainnetPubkey.toBase58()))
+                )
+        );
+        config.setEncoding(RpcSendTransactionConfig.Encoding.base64);
+
+        List<ProgramAccount> programAccounts = rpcClient.getApi().getProgramAccounts(NAME_PROGRAM_ID, config);
         LOGGER.info(String.format("Prog accts: %s", programAccounts.size()));
         for (ProgramAccount programAccount : programAccounts) {
-            LOGGER.info("ACCT: " + programAccount.getAccount().toString());
-            // pda
-            PublicKey.ProgramDerivedAddress centralState = PublicKey.findProgramAddress(
-                    List.of(
-                            bonfidaPubkey.toByteArray()
-                    ),
-                    bonfidaPubkey
-            );
+            LOGGER.info("Program account = " + programAccount.getPubkey());
 
             byte[] hashedReverseLookup = namingManager.getHashedName(programAccount.getPubkey());
-            PublicKey nameAccountKey = namingManager.getNameAccountKey(hashedReverseLookup, centralState.getAddress(), null);
-            LOGGER.info(String.format("Name account key: %s", nameAccountKey.toBase58()));
+
+            // todo - fixme
+            PublicKey thekey = PublicKey.findProgramAddress(Arrays.asList(hashedReverseLookup,
+                            centralState.getAddress().toByteArray(),
+                            ByteBuffer.allocate(32).array()),
+                    NAME_PROGRAM_ID).getAddress();
+
+            LOGGER.info(String.format("Name account key: %s", thekey.toBase58()));
 
             // gai
-            byte[] data =
-                    Base64.getDecoder().decode(rpcClient.getApi().getAccountInfo(nameAccountKey).getValue().getData().get(0));
+            try {
+                byte[] data =
+                        Base64.getDecoder().decode(rpcClient.getApi().getAccountInfo(thekey).getValue().getData().get(0));
 
-            // bytes
-            LOGGER.info(String.format("Data: %s", Arrays.toString(data)));
+                // bytes
+                LOGGER.info(String.format("Data: %s", Arrays.toString(data)));
+
+                /*
+                    let nameLength = new BN(name.data.slice(0, 4), "le").toNumber();
+                    return name.data.slice(4, 4 + nameLength).toString();
+                 */
+                int nameLength = (int) Utils.readUint32(data, 96);
+                String domainName = new String(ByteUtils.readBytes(data, 96 + 4, nameLength));
+                LOGGER.info("Domain name for " + skynetMainnetPubkey.toBase58() + ", = " + domainName + ".sol");
+            } catch (Exception ex) {
+                // LOGGER.info("no info found..");
+            }
         }
     }
 }
