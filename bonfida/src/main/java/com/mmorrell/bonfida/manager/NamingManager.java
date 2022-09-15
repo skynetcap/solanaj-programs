@@ -2,14 +2,18 @@ package com.mmorrell.bonfida.manager;
 
 import com.mmorrell.bonfida.program.NamingServiceProgram;
 import org.bitcoinj.core.Base58;
+import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
+import org.p2p.solanaj.rpc.types.Filter;
 import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
+import org.p2p.solanaj.rpc.types.config.ProgramAccountConfig;
+import org.p2p.solanaj.rpc.types.config.RpcSendTransactionConfig;
 import org.p2p.solanaj.utils.ByteUtils;
 
 import java.nio.ByteBuffer;
@@ -19,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 public class NamingManager {
@@ -37,6 +42,7 @@ public class NamingManager {
     private static final PublicKey TWITTER_VERIFICATION_AUTHORITY = new PublicKey("867BLob5b52i81SNaV9Awm5ejkZV6VGSv9SxLcwukDDJ");
     private static final PublicKey TWITTER_ROOT_PARENT_REGISTRY_KEY = new PublicKey("AFrGkxNmVLBn3mKhvfJJABvm8RJkTtRhHDoaF97pQZaA");
     private static final PublicKey SOL_TLD_AUTHORITY = new PublicKey("58PwtjSDuFHuUkYjH9BYnnQKHfwo9reZhC2zMJv9JPkx");
+    private static final PublicKey BONFIDA_PUBKEY = new PublicKey("jCebN34bUfdeUYJT13J1yG16XWQpt5PDx6Mse9GUqhR");
 
     public NamingManager(final RpcClient client) {
         this.client = client;
@@ -45,18 +51,18 @@ public class NamingManager {
     /**
      * Creates a .sol domain name with the specified name and payer.
      *
-     * @param name domain name
-     * @param payer account paying for this transaction
-     * @param nameOwner pubkey to associate this domain with
-     * @param nameClass "The class of this new name"
+     * @param name       domain name
+     * @param payer      account paying for this transaction
+     * @param nameOwner  pubkey to associate this domain with
+     * @param nameClass  "The class of this new name"
      * @param parentName "The parent name of the new name. If specified its owner needs to sign"
      * @return true if domain name creation succeeded.
      */
     public boolean createNameRegistry(final String name,
-                                     final Account payer,
-                                     final PublicKey nameOwner,
-                                     final PublicKey nameClass,
-                                     final PublicKey parentName) {
+                                      final Account payer,
+                                      final PublicKey nameOwner,
+                                      final PublicKey nameClass,
+                                      final PublicKey parentName) {
 
         String fullDomainName = HASH_PREFIX + name;
         byte[] hashedName = getHashedName(fullDomainName);
@@ -97,7 +103,7 @@ public class NamingManager {
         return true;
     }
 
-    private PublicKey getNameAccountKey(byte[] hashedName, PublicKey nameClass, PublicKey parentName) {
+    public PublicKey getNameAccountKey(byte[] hashedName, PublicKey nameClass, PublicKey parentName) {
         PublicKey.ProgramDerivedAddress nameAccountKey = null;
 
         byte[] nameClassBytes, parentNameBytes;
@@ -126,10 +132,11 @@ public class NamingManager {
 
     /**
      * Sha-256 the prefix + name, into byte array
+     *
      * @param input domain name
      * @return byte array of sha256 hashed string
      */
-    private byte[] getHashedName(String input) {
+    public byte[] getHashedName(String input) {
         MessageDigest digest = null;
         input = HASH_PREFIX + input;
         try {
@@ -164,6 +171,7 @@ public class NamingManager {
 
     /**
      * Looks up a Bonfida-associated Twitter account from a given owner's Pubkey
+     *
      * @param publicKey owner of Bonfida-associated Twitter account
      * @return twitter handle of the pubkey
      */
@@ -212,6 +220,7 @@ public class NamingManager {
 
     /**
      * Looks up a Pubkey associated with a Twitter handle using Bonfida's naming service
+     *
      * @param twitterHandle twitter handle to look up
      * @return pubkey associated with the twitter handle
      */
@@ -221,6 +230,7 @@ public class NamingManager {
 
     /**
      * Looks up a Pubkey associated with a .sol domain using Bonfida's naming service
+     *
      * @param solDomain sol domain to lookup
      * @return pubkey associated with the sol domain
      */
@@ -241,5 +251,62 @@ public class NamingManager {
         PublicKey owner = PublicKey.readPubkey(data, 32);
 
         return owner;
+    }
+
+    public Optional<String> getDomainNameByPubkey(PublicKey publicKey) {
+        PublicKey.ProgramDerivedAddress centralState;
+        try {
+            centralState = PublicKey.findProgramAddress(
+                    List.of(
+                            BONFIDA_PUBKEY.toByteArray()
+                    ),
+                    BONFIDA_PUBKEY
+            );
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+
+        // find named accounts for user
+        ProgramAccountConfig config = new ProgramAccountConfig(
+                List.of(
+                        new Filter(new Memcmp(32, publicKey.toBase58()))
+                )
+        );
+        config.setEncoding(RpcSendTransactionConfig.Encoding.base64);
+
+        List<ProgramAccount> programAccounts;
+        try {
+            programAccounts = client.getApi().getProgramAccounts(NAME_PROGRAM_ID, config);
+        } catch (RpcException e) {
+            return Optional.empty();
+        }
+        for (ProgramAccount programAccount : programAccounts) {
+            byte[] hashedReverseLookup = getHashedName(programAccount.getPubkey());
+            PublicKey nameAccountKey;
+            try {
+                nameAccountKey = getNameAccountKey(
+                        hashedReverseLookup,
+                        centralState.getAddress(),
+                        null
+                );
+            } catch (Exception e) {
+                continue;
+            }
+
+            try {
+                byte[] data =
+                        Base64.getDecoder().decode(client.getApi().getAccountInfo(nameAccountKey).getValue().getData().get(0));
+
+                int nameLength = (int) Utils.readUint32(data, 96);
+                String domainName = new String(ByteUtils.readBytes(data, 96 + 4, nameLength));
+
+                return Optional.of(domainName);
+            } catch (Exception ex) {
+                // LOGGER.info("no info found..");
+            }
+        }
+
+        // Nothing found in the for loop, return empty.
+        return Optional.empty();
     }
 }
