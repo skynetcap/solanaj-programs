@@ -33,12 +33,13 @@ public class MarketTest {
     @Test
     public void marketBuilderBtcUsdcTest() throws RpcException, InterruptedException {
         // Pubkey of SRM/USDC market
-        final PublicKey publicKey = new PublicKey("ByRys5tuUWDgL73G8JBAEfkdFf8JWBzPBDHsBVQ5vbQA"); //SRM/USDC
+        final PublicKey publicKey = new PublicKey("9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT"); //SRM/USDC
 
         final Market solUsdcMarket = new MarketBuilder()
                 .setClient(client)
                 .setPublicKey(publicKey)
                 .setRetrieveOrderBooks(true)
+                .setRetrieveEventQueue(true)
                 .build();
 
         final OrderBook bids = solUsdcMarket.getBidOrderBook();
