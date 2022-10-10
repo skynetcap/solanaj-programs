@@ -306,4 +306,13 @@ public class MangoTest {
         PublicKey pubkey2 = PublicKey.readPubkey(rawData2, 0);
         LOGGER.info("Pubkey2 = " + pubkey2.toBase58());
     }
+
+    @Test
+    public void mangoV3PerpMarketTest() throws RpcException {
+        PublicKey mngoUsdcPerp = new PublicKey("4nfmQP3KmUqEJ6qJLsS3offKgE96YUB4Rp7UQvm2Fbi9");
+        byte[] data = Base64.getDecoder().decode(client.getApi().getAccountInfo(mngoUsdcPerp).getValue().getData().get(0));
+
+        MangoPerpMarket mngoUsdcPerpMarket = MangoPerpMarket.readMangoPerpMarket(data);
+        LOGGER.info("mngoUsdcPerpMarket = " + mngoUsdcPerpMarket.toString());
+    }
 }
