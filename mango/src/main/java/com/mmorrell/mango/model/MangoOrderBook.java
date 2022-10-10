@@ -1,5 +1,12 @@
 package com.mmorrell.mango.model;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -14,6 +21,10 @@ import java.util.Comparator;
  * buffer_layout_1.blob(7),
  *
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class MangoOrderBook {
 
     private MangoSlab mangoSlab;
@@ -26,10 +37,9 @@ public class MangoOrderBook {
         final MangoOrderBook mangoMangoOrderBook = new MangoOrderBook();
 
         final MangoSlab mangoSlab = MangoSlab.readOrderBookSlab(data);
-        mangoMangoOrderBook.setSlab(mangoSlab);
+        mangoMangoOrderBook.setMangoSlab(mangoSlab);
 
         return mangoMangoOrderBook;
-
     }
 
     public ArrayList<MangoOrder> getMangoOrders() {
@@ -73,47 +83,6 @@ public class MangoOrderBook {
         final ArrayList<MangoOrder> MangoOrders = getMangoOrders();
         MangoOrders.sort(Comparator.comparingLong(MangoOrder::getPrice));
         return MangoOrders.get(0);
-    }
-
-    public MangoSlab getSlab() {
-        return mangoSlab;
-    }
-
-    public void setSlab(MangoSlab mangoSlab) {
-        this.mangoSlab = mangoSlab;
-    }
-
-    public void setBaseDecimals(byte baseDecimals) {
-        this.baseDecimals = baseDecimals;
-    }
-
-    public byte getBaseDecimals() {
-        return baseDecimals;
-    }
-
-    public void setQuoteDecimals(byte quoteDecimals) {
-        this.quoteDecimals = quoteDecimals;
-    }
-
-    public byte getQuoteDecimals() {
-        return quoteDecimals;
-    }
-
-
-    public void setBaseLotSize(long baseLotSize) {
-        this.baseLotSize = baseLotSize;
-    }
-
-    public long getBaseLotSize() {
-        return baseLotSize;
-    }
-
-    public void setQuoteLotSize(long quoteLotSize) {
-        this.quoteLotSize = quoteLotSize;
-    }
-
-    public long getQuoteLotSize() {
-        return quoteLotSize;
     }
 
 }

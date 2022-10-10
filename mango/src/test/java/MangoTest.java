@@ -7,6 +7,7 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -313,6 +314,52 @@ public class MangoTest {
         byte[] data = Base64.getDecoder().decode(client.getApi().getAccountInfo(mngoUsdcPerp).getValue().getData().get(0));
 
         MangoPerpMarket mngoUsdcPerpMarket = MangoPerpMarket.readMangoPerpMarket(data);
-        LOGGER.info("mngoUsdcPerpMarket = " + mngoUsdcPerpMarket.toString());
+        LOGGER.info("MNGO-PERP = " + mngoUsdcPerpMarket.toString());
+
+        // Bid Orderbook
+        MangoOrderBook bids = MangoOrderBook.readMangoOrderBook(
+                Base64.getDecoder().decode(
+                        client.getApi().getAccountInfo(mngoUsdcPerpMarket.getBids()).getValue().getData().get(0)
+                )
+        );
+
+        bids.setBaseDecimals((byte) 6);
+        bids.setQuoteDecimals((byte) 6);
+        bids.setBaseLotSize(mngoUsdcPerpMarket.getBaseLotSize());
+        bids.setQuoteLotSize(mngoUsdcPerpMarket.getQuoteLotSize());
+
+        // LOGGER.info(Arrays.toString(bids.getMangoOrders().toArray()));
+        MangoOrder bestBid = bids.getBestBid();
+        LOGGER.info(
+                String.format(
+                        "Best Bid: Buy %.4f MNGO @ $%.4f, Owner %s",
+                        bestBid.getFloatQuantity(),
+                        bestBid.getFloatPrice(),
+                        bestBid.getOwner()
+                )
+        );
+
+        // Ask Orderbook
+        MangoOrderBook asks = MangoOrderBook.readMangoOrderBook(
+                Base64.getDecoder().decode(
+                        client.getApi().getAccountInfo(mngoUsdcPerpMarket.getAsks()).getValue().getData().get(0)
+                )
+        );
+
+        asks.setBaseDecimals((byte) 6);
+        asks.setQuoteDecimals((byte) 6);
+        asks.setBaseLotSize(mngoUsdcPerpMarket.getBaseLotSize());
+        asks.setQuoteLotSize(mngoUsdcPerpMarket.getQuoteLotSize());
+
+        // LOGGER.info(Arrays.toString(asks.getMangoOrders().toArray()));
+        MangoOrder bestAsk = asks.getBestAsk();
+        LOGGER.info(
+                String.format(
+                        "Best Ask: Sell %.4f MNGO @ $%.4f, Owner %s",
+                        bestAsk.getFloatQuantity(),
+                        bestAsk.getFloatPrice(),
+                        bestAsk.getOwner().toBase58()
+                )
+        );
     }
 }

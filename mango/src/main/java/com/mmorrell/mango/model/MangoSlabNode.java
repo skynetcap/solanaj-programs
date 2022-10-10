@@ -1,5 +1,8 @@
 package com.mmorrell.mango.model;
 
+import lombok.Data;
+
+@Data
 public abstract class MangoSlabNode {
 
     public MangoSlabNode() {
@@ -16,19 +19,4 @@ public abstract class MangoSlabNode {
      * returns the variant of this slabnode. 5 possible values [uninitialized (0), innerNode(1), leafNode(2), freeNode(3), lastFreeNode(4));
      * @return variant of the slabNode
      */
-    public int getTag() {
-        return tag;
-    }
-
-    public void setTag(int tag) {
-        this.tag = tag;
-    }
-
-    public byte[] getBlob() {
-        return blob;
-    }
-
-    public void setBlob(byte[] blob) {
-        this.blob = blob;
-    }
 }

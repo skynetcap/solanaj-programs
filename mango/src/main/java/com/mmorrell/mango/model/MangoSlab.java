@@ -8,100 +8,23 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
-
-/**
- * export const ORDERBOOK_LAYOUT = struct([
- * blob(5), 0-4
- * accountFlagsLayout('accountFlags'), 5-12
- * SLAB_LAYOUT.replicate('slab'), 13 - ...
- * blob(7),
- * ]);
- * <p>
- * first 5 bytes = "serum", start at position 5
- * <p>
- * note: zero(4) = blob(4) = 4 bytes
- * <p>
- * export const SLAB_LAYOUT = struct([
- * SLAB_HEADER_LAYOUT,
- * seq(
- * SLAB_NODE_LAYOUT,
- * offset(
- * SLAB_HEADER_LAYOUT.layoutFor('bumpIndex'),
- * SLAB_HEADER_LAYOUT.offsetOf('bumpIndex') - SLAB_HEADER_LAYOUT.span,
- * ),
- * 'nodes',
- * ),
- * ]);
- * <p>
- * <p>
- * slab header layout:
- * const SLAB_HEADER_LAYOUT = struct(
- * [
- * // Number of modified slab nodes
- * u32('bumpIndex'), 13-16
- * zeros(4), // Consider slabs with more than 2^32 nodes to be invalid 17-20
- * <p>
- * // Linked list of unused nodes
- * u32('freeListLen'), 21-24
- * zeros(4), //25-28
- * u32('freeListHead'), 29-32
- * <p>
- * u32('root'), 33-36
- * <p>
- * u32('leafCount'), 37-40
- * zeros(4), 41-44.
- * ],
- * 'header',
- * );
- * <p>
- * 45 - 48 = ??? = tag and then 68 bytes of data, for N number of times, where N = offset(
- * *       SLAB_HEADER_LAYOUT.layoutFor('bumpIndex'),
- * *       SLAB_HEADER_LAYOUT.offsetOf('bumpIndex') - SLAB_HEADER_LAYOUT.span,
- * *     );
- * <p>
- * 45-48 = tag 1,
- * 49-116 = blob 1
- * 117-120 = tag 2
- * 121-188 = blob 2
- * 189-192 = tag 3
- * ...
- * <p>
- * const SLAB_NODE_LAYOUT = union(u32('tag'), blob(68), 'node');
- * SLAB_NODE_LAYOUT.addVariant(0, struct([]), 'uninitialized');
- * SLAB_NODE_LAYOUT.addVariant(
- * 1,
- * struct([
- * // Only the first prefixLen high-order bits of key are meaningful
- * u32('prefixLen'),
- * u128('key'),
- * seq(u32(), 2, 'children'),
- * ]),
- * 'innerNode',
- * );
- * <p>
- * ....
- */
-// Takes in bytes following an AccountFlag object.
 public class MangoSlab {
 
     private static final int INT32_SIZE = 4;
 
-    // Offsets. TODO put these in their own file
-    // STARTS at 13, since accountflags from the orderbook struct ends there. TODO - refactor this into something sensible
-
-    private static final int BUMP_INDEX_OFFSET = 13;
-    private static final int FREE_LIST_LEN_OFFSET = 21;
-    private static final int FREE_LIST_HEAD_OFFSET = 29;
-    private static final int ROOT_OFFSET = 33;
-    private static final int LEAF_COUNT_OFFSET = 37;
-    private static final int SLAB_NODE_OFFSET = 45;
+    private static final int BUMP_INDEX_OFFSET = 8;
+    private static final int FREE_LIST_LEN_OFFSET = 16;
+    private static final int FREE_LIST_HEAD_OFFSET = 24;
+    private static final int ROOT_OFFSET = 28;
+    private static final int LEAF_COUNT_OFFSET = 32;
+    private static final int SLAB_NODE_OFFSET = 40;
 
     private int bumpIndex;
     private int freeListLen;
-    private int freeListHead; // memory address?
+    private int freeListHead;
     private int root;
     private int leafCount;
-    private ArrayList<MangoSlabNode> MangoSlabNodes;
+    private ArrayList<MangoSlabNode> mangoSlabNodes;
 
     public static MangoSlab readOrderBookSlab(byte[] data) {
         final MangoSlab mangoSlab = new MangoSlab();
@@ -121,20 +44,18 @@ public class MangoSlab {
         int leafCount = mangoSlab.readLeafcount(data);
         mangoSlab.setLeafCount(leafCount);
 
-        ArrayList<MangoSlabNode> MangoSlabNodes = new ArrayList<>();
-        byte[] MangoSlabNodeBytes = ByteUtils.readBytes(data, SLAB_NODE_OFFSET, data.length - 45);
+        ArrayList<MangoSlabNode> mangoSlabNodes;
+        byte[] mangoSlabNodeBytes = ByteUtils.readBytes(data, SLAB_NODE_OFFSET, 1024 * 88);
 
-        // TODO - pass in the start of the MangoSlabNodes binary instead of start of entire binary
-        MangoSlabNodes = mangoSlab.readMangoSlabNodes(MangoSlabNodeBytes, bumpIndex);
-        mangoSlab.setMangoSlabNodes(MangoSlabNodes);
+        mangoSlabNodes = mangoSlab.readMangoSlabNodes(mangoSlabNodeBytes, bumpIndex);
+        mangoSlab.setMangoSlabNodes(mangoSlabNodes);
 
         return mangoSlab;
     }
 
     /**
-     * [tag 4 bytes][blob 68 bytes]
+     * [tag 4 bytes][blob 84 bytes]
      * repeated for N times
-     * todo- add parameter N to this call
      *
      * @param data
      * @return
@@ -143,85 +64,57 @@ public class MangoSlab {
         ArrayList<MangoSlabNode> MangoSlabNodes = new ArrayList<>();
 
         for (int i = 0; i < bumpIndex; i++) {
-            MangoSlabNodes.add(readMangoSlabNode(ByteUtils.readBytes(data, (72 * i), 72)));
+            MangoSlabNodes.add(readMangoSlabNode(ByteUtils.readBytes(data, (88 * i), 88)));
         }
 
+        // 88 instead of 72 length for mango
         return MangoSlabNodes;
     }
 
     public MangoSlabNode readMangoSlabNode(byte[] data) {
         int tag = readInt32(ByteUtils.readBytes(data, 0, INT32_SIZE));
-        byte[] blob1 = ByteUtils.readBytes(data, 4, 68);
-        MangoSlabNode MangoSlabNode;
+        byte[] blobData = ByteUtils.readBytes(data, 4, 84);
+        MangoSlabNode mangoSlabNode;
 
         if (tag == 0) {
-//            System.out.println("tag 0 detected: uninitialized");
-            MangoSlabNode = null;
+            mangoSlabNode = null;
         } else if (tag == 1) {
-//            System.out.println("tag 1 detected: innernode");
-            int prefixLen = readInt32(ByteUtils.readBytes(blob1, 0, INT32_SIZE));
-//            System.out.println("prefixLen = " + prefixLen);
-
-            // Only the first prefixLen high-order bits of key are meaningful\
+            int prefixLen = readInt32(ByteUtils.readBytes(blobData, 0, INT32_SIZE));
+            // Only the first prefixLen high-order bits of key are meaningful
             int numBytesToRead = (int) Math.ceil(prefixLen / 4.00);
-//            System.out.println("size of key (in bytes) = " + numBytesToRead);
-
-            byte[] key = ByteUtils.readBytes(blob1, 4, numBytesToRead);
-//            System.out.println("key = " + new String(key));
-
-            int child1 = readInt32(ByteUtils.readBytes(blob1, 20, 4));
-//            System.out.println("child1 = " + child1);
-
-            int child2 = readInt32(ByteUtils.readBytes(blob1, 24, 4));
-//            System.out.println("child2 = " + child2);
-
-            MangoSlabNode = new MangoSlabInnerNode(prefixLen, key, child1, child2);
+            byte[] key = ByteUtils.readBytes(blobData, 4, numBytesToRead);
+            int child1 = readInt32(ByteUtils.readBytes(blobData, 20, 4));
+            int child2 = readInt32(ByteUtils.readBytes(blobData, 24, 4));
+            mangoSlabNode = new MangoSlabInnerNode(prefixLen, key, child1, child2);
         } else if (tag == 2) {
-//            System.out.println("tag 2 detected: leafnode");
-            byte ownerSlot = ByteUtils.readBytes(blob1, 0, 1)[0];
-//            System.out.println("ownerSlot = " + ownerSlot);
-            byte feeTier = ByteUtils.readBytes(blob1, 1, 1)[0];
-//            System.out.println("feeTier = " + feeTier);
-            // 2 empty bytes
+            byte ownerSlot = ByteUtils.readBytes(blobData, 0, 1)[0];
+            byte orderType = ByteUtils.readBytes(blobData, 1, 1)[0];
+            byte version = ByteUtils.readBytes(blobData, 2, 1)[0];
+            byte timeInForce = ByteUtils.readBytes(blobData, 3, 1)[0];
 
             // "(price, seqNum)"
             // key starts at byte 4, u128. u128 = 128 bits = 16 * 8
-            byte[] key = ByteUtils.readBytes(blob1, 4, 16);
-//            System.out.println("key = " + new String(key));
-            long seqNum = Utils.readInt64(key, 0);
+            byte[] key = ByteUtils.readBytes(blobData, 4, 16);
+            long seqNum = Utils.readInt64(key, 0); // unused?
             long price = Utils.readInt64(key, 8);
+            PublicKey owner = PublicKey.readPubkey(blobData, 20);
+            long quantity = Utils.readInt64(blobData, 52);
+            long clientOrderId = Utils.readInt64(blobData, 60);
+            long bestInitial = Utils.readInt64(blobData, 68);
+            long timeStamp = Utils.readInt64(blobData, 76);
 
-//            System.out.println("price = " + price);
-
-
-            // Open orders account
-            PublicKey owner = PublicKey.readPubkey(blob1, 20);
-//            System.out.println("owner = " + owner.toBase58());
-
-            // In units of lot size
-            long quantity = Utils.readInt64(blob1, 52);
-//            System.out.println("quantity = " + quantity);
-
-            long clientOrderId = Utils.readInt64(blob1, 60);
-//            System.out.println("clientOrderId = " + clientOrderId);
-
-            MangoSlabNode = new MangoSlabLeafNode(ownerSlot, feeTier, key, owner, quantity, clientOrderId, price);
+            mangoSlabNode = new MangoSlabLeafNode(ownerSlot, orderType, version, timeInForce, key, owner, quantity,
+                    clientOrderId, price, bestInitial, timeStamp);
         } else if (tag == 3) {
-//            System.out.println("tag 3 detected: freenode");
-            int next = readInt32(ByteUtils.readBytes(blob1, 0, 4));
-//            System.out.println("next = " + next);
-
-            MangoSlabNode = new MangoSlabInnerNode();
+            // int next = readInt32(ByteUtils.readBytes(blobData, 0, 4));
+            mangoSlabNode = new MangoSlabInnerNode();
         } else if (tag == 4) {
-//            System.out.println("tag 4 detected: lastfreenode");
-            MangoSlabNode = null;
+            mangoSlabNode = null;
         } else {
             throw new RuntimeException("unknown tag detected during slab deserialization = " + tag);
         }
 
-//        System.out.println();
-
-        return MangoSlabNode;
+        return mangoSlabNode;
     }
 
     private String getTagType(int tag) {
@@ -319,10 +212,10 @@ public class MangoSlab {
     }
 
     public ArrayList<MangoSlabNode> getMangoSlabNodes() {
-        return MangoSlabNodes;
+        return mangoSlabNodes;
     }
 
-    public void setMangoSlabNodes(ArrayList<MangoSlabNode> MangoSlabNodes) {
-        this.MangoSlabNodes = MangoSlabNodes;
+    public void setMangoSlabNodes(ArrayList<MangoSlabNode> mangoSlabNodes) {
+        this.mangoSlabNodes = mangoSlabNodes;
     }
 }
