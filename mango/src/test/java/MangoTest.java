@@ -187,8 +187,8 @@ public class MangoTest {
 
     @Test
     public void mangoV3Test() {
-        final MangoPerpGroup mangoPerpGroup = devnetMangoManager.getMangoPerpGroup(
-                PublicKey.valueOf("ECAikQUnS8HGLnzGrqEYA6Daz8nRRu9GsbfLbwMfK23P")
+        final MangoPerpGroup mangoPerpGroup = mangoManager.getMangoPerpGroup(
+                PublicKey.valueOf("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue")
         );
 
         LOGGER.info(
