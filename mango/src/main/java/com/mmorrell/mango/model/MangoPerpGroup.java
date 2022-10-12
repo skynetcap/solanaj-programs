@@ -24,7 +24,7 @@ import static com.mmorrell.mango.model.MangoUtils.U64_SIZE_BYTES;
 public class MangoPerpGroup {
 
     // Constants
-    private static final int MAX_TOKENS = 32;
+    private static final int MAX_TOKENS = 16;
     private static final int MAX_PAIRS = MAX_TOKENS - 1;
 
     // Offsets

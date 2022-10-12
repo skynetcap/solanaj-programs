@@ -14,7 +14,7 @@ import org.p2p.solanaj.core.PublicKey;
 public class MangoPerpMarketInfo {
 
     public static final int MANGO_PERP_MARKET_INFO_LAYOUT_SIZE = PublicKey.PUBLIC_KEY_LENGTH
-            + (5 * I80F48.I80F48_LENGTH)
+            + (7 * I80F48.I80F48_LENGTH)
             + (2 * MangoUtils.U64_SIZE_BYTES);
 
     private static final int SPOT_MARKET_OFFSET = 0;
