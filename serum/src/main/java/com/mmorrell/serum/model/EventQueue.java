@@ -1,5 +1,6 @@
 package com.mmorrell.serum.model;
 
+import com.mmorrell.common.model.AccountFlags;
 import lombok.Getter;
 import lombok.Setter;
 import org.bitcoinj.core.Utils;

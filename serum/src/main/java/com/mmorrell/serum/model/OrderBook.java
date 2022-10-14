@@ -1,10 +1,12 @@
 package com.mmorrell.serum.model;
 
+import com.mmorrell.common.model.AccountFlags;
 import com.mmorrell.common.model.GenericOrder;
 import com.mmorrell.common.model.GenericOrderBook;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,14 +20,11 @@ import java.util.List;
  * buffer_layout_1.blob(7),
  *
  */
+@Getter
+@Setter
 public class OrderBook extends GenericOrderBook {
 
-    private AccountFlags accountFlags;
     private Slab slab;
-    private byte baseDecimals;
-    private byte quoteDecimals;
-    private long baseLotSize;
-    private long quoteLotSize;
 
     /**
      * Reads values into an existing order book object, and returns it.
@@ -54,7 +53,7 @@ public class OrderBook extends GenericOrderBook {
             return null;
         }
 
-        final ArrayList<Order> orders = new ArrayList<>();
+        final ArrayList<GenericOrder> orders = new ArrayList<>();
 
         slab.getSlabNodes().forEach(slabNode -> {
             if (slabNode instanceof SlabLeafNode) {
@@ -63,8 +62,9 @@ public class OrderBook extends GenericOrderBook {
                         .price(slabLeafNode.getPrice())
                         .quantity(slabLeafNode.getQuantity())
                         .clientOrderId(slabLeafNode.getClientOrderId())
-                        .floatPrice(SerumUtils.priceLotsToNumber(slabLeafNode.getPrice(), baseDecimals, quoteDecimals, baseLotSize, quoteLotSize))
-                        .floatQuantity((float) ((slabLeafNode.getQuantity() * baseLotSize) / SerumUtils.getBaseSplTokenMultiplier(baseDecimals)))
+                        .floatPrice(SerumUtils.priceLotsToNumber(slabLeafNode.getPrice(), this.getBaseDecimals(),
+                                this.getQuoteDecimals(), this.getBaseLotSize(), this.getQuoteLotSize()))
+                        .floatQuantity((float) ((slabLeafNode.getQuantity() * this.getBaseLotSize()) / SerumUtils.getBaseSplTokenMultiplier(this.getBaseDecimals())))
                         .owner(slabLeafNode.getOwner())
                         .build()
                 );
@@ -72,71 +72,6 @@ public class OrderBook extends GenericOrderBook {
         });
 
         return orders;
-    }
-
-    /**
-     * Retrieves the top {@link Order} for bids (sorted by price descending).
-     * @return
-     */
-    public Order getBestBid() {
-        final ArrayList<Order> orders = getOrders();
-        orders.sort(Comparator.comparingLong(Order::getPrice).reversed());
-        return orders.get(0);
-    }
-
-    public Order getBestAsk() {
-        final ArrayList<Order> orders = getOrders();
-        orders.sort(Comparator.comparingLong(Order::getPrice));
-        return orders.get(0);
-    }
-
-    public Slab getSlab() {
-        return slab;
-    }
-
-    public void setSlab(Slab slab) {
-        this.slab = slab;
-    }
-
-    public AccountFlags getAccountFlags() {
-        return accountFlags;
-    }
-
-    public void setAccountFlags(AccountFlags accountFlags) {
-        this.accountFlags = accountFlags;
-    }
-
-    public void setBaseDecimals(byte baseDecimals) {
-        this.baseDecimals = baseDecimals;
-    }
-
-    public byte getBaseDecimals() {
-        return baseDecimals;
-    }
-
-    public void setQuoteDecimals(byte quoteDecimals) {
-        this.quoteDecimals = quoteDecimals;
-    }
-
-    public byte getQuoteDecimals() {
-        return quoteDecimals;
-    }
-
-
-    public void setBaseLotSize(long baseLotSize) {
-        this.baseLotSize = baseLotSize;
-    }
-
-    public long getBaseLotSize() {
-        return baseLotSize;
-    }
-
-    public void setQuoteLotSize(long quoteLotSize) {
-        this.quoteLotSize = quoteLotSize;
-    }
-
-    public long getQuoteLotSize() {
-        return quoteLotSize;
     }
 
 }

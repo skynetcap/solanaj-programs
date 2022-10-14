@@ -1,5 +1,6 @@
 package com.mmorrell.serum.model;
 
+import com.mmorrell.common.model.AccountFlags;
 import lombok.EqualsAndHashCode;
 import org.p2p.solanaj.core.PublicKey;
 

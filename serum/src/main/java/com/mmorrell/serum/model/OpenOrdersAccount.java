@@ -1,5 +1,6 @@
 package com.mmorrell.serum.model;
 
+import com.mmorrell.common.model.AccountFlags;
 import lombok.ToString;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
