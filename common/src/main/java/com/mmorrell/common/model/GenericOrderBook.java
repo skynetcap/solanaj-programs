@@ -20,7 +20,6 @@ public abstract class GenericOrderBook {
     private double multiplier;
 
     public abstract List<GenericOrder> getOrders();
-    public abstract GenericOrderBook readOrderBook(byte[] data);
 
     public GenericOrder getBestBid() {
         final List<GenericOrder> orders = getOrders();

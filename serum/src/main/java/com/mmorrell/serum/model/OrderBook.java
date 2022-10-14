@@ -33,14 +33,16 @@ public class OrderBook extends GenericOrderBook {
      * @param data order book byte data
      * @return existing order book object, updated with read values from the bytes
      */
-    public GenericOrderBook readOrderBook(byte[] data) {
+    public static GenericOrderBook readOrderBook(byte[] data) {
+        final OrderBook orderBook = new OrderBook();
+
         final AccountFlags accountFlags = AccountFlags.readAccountFlags(data);
-        this.setAccountFlags(accountFlags);
+        orderBook.setAccountFlags(accountFlags);
 
         final Slab slab = Slab.readOrderBookSlab(data);
-        this.setSlab(slab);
+        orderBook.setSlab(slab);
 
-        return this;
+        return orderBook;
     }
 
     /**

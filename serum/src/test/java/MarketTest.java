@@ -1,3 +1,5 @@
+import com.mmorrell.common.model.GenericOrder;
+import com.mmorrell.common.model.GenericOrderBook;
 import com.mmorrell.serum.model.*;
 import org.bitcoinj.core.Utils;
 import org.junit.Ignore;
@@ -41,8 +43,8 @@ public class MarketTest {
                 .setRetrieveOrderBooks(true)
                 .build();
 
-        final OrderBook bids = solUsdcMarket.getBidOrderBook();
-        final OrderBook asks = solUsdcMarket.getAskOrderBook();
+        final GenericOrderBook bids = solUsdcMarket.getBidOrderBook();
+        final GenericOrderBook asks = solUsdcMarket.getAskOrderBook();
 
         LOGGER.info("Best bid = " + bids.getBestBid().getPrice() / 1000.0);
         LOGGER.info("Best ask = " + asks.getBestAsk().getPrice() / 1000.0);
@@ -82,8 +84,8 @@ public class MarketTest {
                 .setOrderBookCacheEnabled(true);
 
         Market solUsdcMarket = solUsdcMarketBuilder.build();
-        Order bestBid = solUsdcMarket.getBidOrderBook().getBestBid();
-        Order bestAsk = solUsdcMarket.getAskOrderBook().getBestAsk();
+        GenericOrder bestBid = solUsdcMarket.getBidOrderBook().getBestBid();
+        GenericOrder bestAsk = solUsdcMarket.getAskOrderBook().getBestAsk();
 
         LOGGER.debug(
                 String.format(
@@ -128,17 +130,9 @@ public class MarketTest {
             e.printStackTrace();
         }
 
-        OrderBook bidOrderBook = OrderBook.readOrderBook(data);
+        GenericOrderBook bidOrderBook = new OrderBook().readOrderBook(data);
 
         LOGGER.info(bidOrderBook.getAccountFlags().toString());
-
-        Slab slab = bidOrderBook.getSlab();
-
-        assertNotNull(slab);
-        assertEquals(141, slab.getBumpIndex());
-        assertEquals(78, slab.getFreeListLen());
-        assertEquals(56, slab.getFreeListHead());
-        assertEquals(32, slab.getLeafCount());
     }
 
     /**
@@ -179,20 +173,20 @@ public class MarketTest {
                 .setRetrieveOrderBooks(true)
                 .build();
 
-        final OrderBook bids = solUsdcMarket.getBidOrderBook();
-        final OrderBook asks = solUsdcMarket.getAskOrderBook();
+        final GenericOrderBook bids = solUsdcMarket.getBidOrderBook();
+        final GenericOrderBook asks = solUsdcMarket.getAskOrderBook();
         LOGGER.info("Market = " + solUsdcMarket.toString());
 
-        final ArrayList<Order> asksOrders = asks.getOrders();
-        asksOrders.sort(Comparator.comparingLong(Order::getPrice).reversed());
+        final List<GenericOrder> asksOrders = asks.getOrders();
+        asksOrders.sort(Comparator.comparingLong(GenericOrder::getPrice).reversed());
         asksOrders.forEach(order -> {
             System.out.printf("SOL/USDC Ask: $%.4f (Quantity: %.4f)%n", order.getFloatPrice(), order.getFloatQuantity());
         });
 
         LOGGER.info("Bids");
 
-        final ArrayList<Order> orders = bids.getOrders();
-        orders.sort(Comparator.comparingLong(Order::getPrice).reversed());
+        final List<GenericOrder> orders = bids.getOrders();
+        orders.sort(Comparator.comparingLong(GenericOrder::getPrice).reversed());
         orders.forEach(order -> {
             System.out.printf("SOL/USDC Bid: $%.4f (Quantity: %.4f)%n", order.getFloatPrice(), order.getFloatQuantity());
         });
@@ -214,20 +208,20 @@ public class MarketTest {
                 .setRetrieveOrderBooks(true)
                 .build();
 
-        final OrderBook bids = solUsdcMarket.getBidOrderBook();
-        final OrderBook asks = solUsdcMarket.getAskOrderBook();
+        final GenericOrderBook bids = solUsdcMarket.getBidOrderBook();
+        final GenericOrderBook asks = solUsdcMarket.getAskOrderBook();
         LOGGER.info("Market = " + solUsdcMarket.toString());
 
-        final ArrayList<Order> asksOrders = asks.getOrders();
-        asksOrders.sort(Comparator.comparingLong(Order::getPrice).reversed());
+        final List<GenericOrder> asksOrders = asks.getOrders();
+        asksOrders.sort(Comparator.comparingLong(GenericOrder::getPrice).reversed());
         asksOrders.forEach(order -> {
             System.out.printf("whETH/USDC Ask: $%.4f (Quantity: %.4f)%n", order.getFloatPrice(), order.getFloatQuantity());
         });
 
         LOGGER.info("Bids");
 
-        final ArrayList<Order> orders = bids.getOrders();
-        orders.sort(Comparator.comparingLong(Order::getPrice).reversed());
+        final List<GenericOrder> orders = bids.getOrders();
+        orders.sort(Comparator.comparingLong(GenericOrder::getPrice).reversed());
         orders.forEach(order -> {
             System.out.printf("whETH/USDC Bid: $%.4f (Quantity: %.4f)%n", order.getFloatPrice(), order.getFloatQuantity());
         });

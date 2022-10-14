@@ -12,7 +12,6 @@ import org.p2p.solanaj.core.PublicKey;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class GenericOrder {
 
     private long price;

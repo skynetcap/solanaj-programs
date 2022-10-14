@@ -1,5 +1,6 @@
 package com.mmorrell.serum.model;
 
+import com.mmorrell.common.model.GenericOrderBook;
 import com.mmorrell.serum.manager.OrderBookCacheManager;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -125,11 +126,12 @@ public class MarketBuilder {
             market.setQuoteDecimals(quoteDecimals);
 
             // Data from the order books (multithreaded)
-            final CompletableFuture<OrderBook> bidThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getBids()));
-            final CompletableFuture<OrderBook> askThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getAsks()));
+            final CompletableFuture<GenericOrderBook> bidThread =
+                    CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getBids()));
+            final CompletableFuture<GenericOrderBook> askThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getAsks()));
             final CompletableFuture<Void> combinedFutures = CompletableFuture.allOf(bidThread, askThread);
 
-            OrderBook bidOrderBook, askOrderBook;
+            GenericOrderBook bidOrderBook, askOrderBook;
             try {
                 combinedFutures.get();
                 bidOrderBook = bidThread.get();
@@ -275,7 +277,7 @@ public class MarketBuilder {
         return build();
     }
 
-    private OrderBook retrieveOrderBook(PublicKey publicKey) {
+    private GenericOrderBook retrieveOrderBook(PublicKey publicKey) {
         if (orderBookCacheEnabled) {
             // Use a 1-second expireAfterWrite cache if enabled.
             return orderBookCacheManager.getOrderBook(publicKey);
