@@ -1,5 +1,8 @@
 package com.mmorrell.serum.model;
 
+import com.mmorrell.common.model.GenericOrder;
+import com.mmorrell.common.model.GenericOrderBook;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,7 +18,7 @@ import java.util.List;
  * buffer_layout_1.blob(7),
  *
  */
-public class OrderBook {
+public class OrderBook extends GenericOrderBook {
 
     private AccountFlags accountFlags;
     private Slab slab;
@@ -24,17 +27,21 @@ public class OrderBook {
     private long baseLotSize;
     private long quoteLotSize;
 
-    public static OrderBook readOrderBook(byte[] data) {
-        final OrderBook orderBook = new OrderBook();
-
+    /**
+     * Reads values into an existing order book object, and returns it.
+     * This is a pseudo-static replacement for the static readOrderBook method, given the abstract.
+     *
+     * @param data order book byte data
+     * @return existing order book object, updated with read values from the bytes
+     */
+    public GenericOrderBook readOrderBook(byte[] data) {
         final AccountFlags accountFlags = AccountFlags.readAccountFlags(data);
-        orderBook.setAccountFlags(accountFlags);
+        this.setAccountFlags(accountFlags);
 
         final Slab slab = Slab.readOrderBookSlab(data);
-        orderBook.setSlab(slab);
+        this.setSlab(slab);
 
-        return orderBook;
-
+        return this;
     }
 
     /**
@@ -42,7 +49,7 @@ public class OrderBook {
      *
      * @return {@link List} containing {@link Order}s built from existing the {@link OrderBook} {@link Slab}.
      */
-    public ArrayList<Order> getOrders() {
+    public List<GenericOrder> getOrders() {
         if (slab == null) {
             return null;
         }
@@ -65,8 +72,6 @@ public class OrderBook {
         });
 
         return orders;
-
-
     }
 
     /**
