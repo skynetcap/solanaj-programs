@@ -1,6 +1,12 @@
-import com.mmorrell.common.model.GenericOrderBook;
+import com.mmorrell.common.SerumUtils;
+import com.mmorrell.common.model.Market;
+import com.mmorrell.common.model.MarketBuilder;
+import com.mmorrell.common.model.OpenOrdersAccount;
+import com.mmorrell.common.model.Order;
+import com.mmorrell.common.model.OrderTypeLayout;
+import com.mmorrell.common.model.SelfTradeBehaviorLayout;
+import com.mmorrell.common.model.SideLayout;
 import com.mmorrell.serum.manager.SerumManager;
-import com.mmorrell.serum.model.*;
 import com.mmorrell.serum.program.SerumProgram;
 import org.bitcoinj.core.Base58;
 import org.junit.Ignore;

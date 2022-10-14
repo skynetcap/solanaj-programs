@@ -1,8 +1,12 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.zeta.model;
 
+import com.mmorrell.common.SerumUtils;
 import com.mmorrell.common.model.AccountFlags;
 import com.mmorrell.common.model.GenericOrder;
 import com.mmorrell.common.model.GenericOrderBook;
+import com.mmorrell.common.model.Order;
+import com.mmorrell.common.model.Slab;
+import com.mmorrell.common.model.SlabLeafNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +26,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class OrderBook extends GenericOrderBook {
+public class ZetaOrderBook extends GenericOrderBook {
 
     private Slab slab;
 
@@ -34,7 +38,7 @@ public class OrderBook extends GenericOrderBook {
      * @return existing order book object, updated with read values from the bytes
      */
     public static GenericOrderBook readOrderBook(byte[] data) {
-        final OrderBook orderBook = new OrderBook();
+        final ZetaOrderBook orderBook = new ZetaOrderBook();
 
         final AccountFlags accountFlags = AccountFlags.readAccountFlags(data);
         orderBook.setAccountFlags(accountFlags);
@@ -48,7 +52,7 @@ public class OrderBook extends GenericOrderBook {
     /**
      * Build's an {@link Order} {@link ArrayList} from existing data.
      *
-     * @return {@link List} containing {@link Order}s built from existing the {@link OrderBook} {@link Slab}.
+     * @return {@link List} containing {@link Order}s built from existing the {@link ZetaOrderBook} {@link Slab}.
      */
     public List<GenericOrder> getOrders() {
         if (slab == null) {
@@ -58,8 +62,7 @@ public class OrderBook extends GenericOrderBook {
         final ArrayList<GenericOrder> orders = new ArrayList<>();
 
         slab.getSlabNodes().forEach(slabNode -> {
-            if (slabNode instanceof SlabLeafNode) {
-                SlabLeafNode slabLeafNode = (SlabLeafNode) slabNode;
+            if (slabNode instanceof SlabLeafNode slabLeafNode) {
                 orders.add(Order.builder()
                         .price(slabLeafNode.getPrice())
                         .quantity(slabLeafNode.getQuantity())

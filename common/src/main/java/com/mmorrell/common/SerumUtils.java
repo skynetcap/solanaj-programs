@@ -1,5 +1,10 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common;
 
+import com.mmorrell.common.model.Market;
+import com.mmorrell.common.model.OpenOrdersAccount;
+import com.mmorrell.common.model.OrderTypeLayout;
+import com.mmorrell.common.model.SelfTradeBehaviorLayout;
+import com.mmorrell.common.model.SideLayout;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;

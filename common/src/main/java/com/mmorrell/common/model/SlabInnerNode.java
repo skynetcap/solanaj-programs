@@ -1,4 +1,4 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
 import java.util.Arrays;
 

@@ -1,6 +1,5 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
-import com.mmorrell.common.model.AccountFlags;
 import lombok.ToString;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
@@ -11,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Represents a Serum Open Orders account. Generally built from {@link SerumUtils}.
+ * Represents a Serum Open Orders account.
  */
 @ToString
 public class OpenOrdersAccount {

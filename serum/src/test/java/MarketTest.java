@@ -1,6 +1,9 @@
 import com.mmorrell.common.model.GenericOrder;
 import com.mmorrell.common.model.GenericOrderBook;
-import com.mmorrell.serum.model.*;
+import com.mmorrell.common.model.Market;
+import com.mmorrell.common.model.MarketBuilder;
+import com.mmorrell.common.model.OrderBook;
+import com.mmorrell.common.model.TradeEvent;
 import org.bitcoinj.core.Utils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +19,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;

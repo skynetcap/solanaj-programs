@@ -1,7 +1,6 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
-import com.mmorrell.common.model.AccountFlags;
-import com.mmorrell.common.model.GenericOrderBook;
+import com.mmorrell.common.SerumUtils;
 import lombok.EqualsAndHashCode;
 import org.p2p.solanaj.core.PublicKey;
 

@@ -1,7 +1,6 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
-import com.mmorrell.common.model.GenericOrderBook;
-import com.mmorrell.serum.manager.OrderBookCacheManager;
+import com.mmorrell.common.SerumUtils;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;

@@ -1,5 +1,7 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
+import com.mmorrell.common.model.EventQueue;
+import com.mmorrell.common.model.EventQueueFlags;
 import org.p2p.solanaj.core.PublicKey;
 
 import java.util.Arrays;

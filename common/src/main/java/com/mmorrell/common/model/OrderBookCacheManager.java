@@ -1,7 +1,5 @@
-package com.mmorrell.serum.manager;
+package com.mmorrell.common.model;
 
-import com.mmorrell.common.model.GenericOrderBook;
-import com.mmorrell.serum.model.OrderBook;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

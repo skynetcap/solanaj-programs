@@ -1,11 +1,16 @@
 package com.mmorrell.serum.program;
 
+import com.mmorrell.common.SerumUtils;
+import com.mmorrell.common.model.Market;
+import com.mmorrell.common.model.MarketBuilder;
+import com.mmorrell.common.model.OpenOrdersAccount;
+import com.mmorrell.common.model.Order;
+import com.mmorrell.common.model.SideLayout;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 import org.p2p.solanaj.programs.Program;
-import com.mmorrell.serum.model.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -1,6 +1,8 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
 import com.mmorrell.common.model.GenericOrder;
+import com.mmorrell.common.model.OrderTypeLayout;
+import com.mmorrell.common.model.SelfTradeBehaviorLayout;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
