@@ -13,20 +13,13 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This class represents a Serum orderbook, that get deserialized from bytes.
- *
- * Note:
- *
- * buffer_layout_1.blob(5),
- * layout_1.accountFlagsLayout('accountFlags'),
- * slab_1.SLAB_LAYOUT.replicate('slab'),
- * buffer_layout_1.blob(7),
- *
- */
 @Getter
 @Setter
 public class ZetaOrderBook extends GenericOrderBook {
+
+    public ZetaOrderBook() {
+        super(0.001);
+    }
 
     private Slab slab;
 
@@ -69,7 +62,7 @@ public class ZetaOrderBook extends GenericOrderBook {
                         .clientOrderId(slabLeafNode.getClientOrderId())
                         .floatPrice(SerumUtils.priceLotsToNumber(slabLeafNode.getPrice(), this.getBaseDecimals(),
                                 this.getQuoteDecimals(), this.getBaseLotSize(), this.getQuoteLotSize()))
-                        .floatQuantity((float) ((slabLeafNode.getQuantity() * this.getBaseLotSize()) / SerumUtils.getBaseSplTokenMultiplier(this.getBaseDecimals())))
+                        .floatQuantity((float) ((slabLeafNode.getQuantity() * this.getBaseLotSize()) / SerumUtils.getBaseSplTokenMultiplier(this.getBaseDecimals())) * (float) this.getMultiplier())
                         .owner(slabLeafNode.getOwner())
                         .build()
                 );

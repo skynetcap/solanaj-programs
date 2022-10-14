@@ -19,6 +19,10 @@ public abstract class GenericOrderBook {
     private long quoteLotSize;
     private double multiplier;
 
+    public GenericOrderBook(double multiplier) {
+        this.multiplier = multiplier;
+    }
+
     public abstract List<GenericOrder> getOrders();
 
     public GenericOrder getBestBid() {
