@@ -48,5 +48,9 @@ public class ZetaTest {
         zetaAskOrderBook.getOrders().forEach(genericOrder -> {
             System.out.println(genericOrder.toString());
         });
+
+        // TODO - Add reverse lookup for OOA > Zeta account.
+        // This requires going from Zeta > OOA, and matching, since OOA always has the same owner.
+        // E.g. we need a function: getOwnerOfZetaOoa(ooaPubkey)
     }
 }
