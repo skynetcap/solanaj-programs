@@ -31,6 +31,10 @@ public class MarketBuilder {
     private byte[] base64AccountInfo;
     private OrderBookCacheManager orderBookCacheManager;
 
+    private byte baseDecimals;
+    private byte quoteDecimals;
+    private boolean isDecimalsSet = false;
+
     private Map<PublicKey, Byte> decimalsCache = new ConcurrentHashMap<>();
 
     public MarketBuilder setRetrieveOrderBooks(boolean retrieveOrderbooks) {
@@ -102,23 +106,21 @@ public class MarketBuilder {
 
         // Get Order books
         if (retrieveOrderbooks) {
-            // Data from the token mints
-            // first, check the cache for the byte. otherwise, make a request for it
-            byte baseDecimals;
-            byte quoteDecimals;
 
-            if (decimalsCache.containsKey(market.getBaseMint())) {
-                baseDecimals = decimalsCache.get(market.getBaseMint());
-            } else {
-                baseDecimals = getMintDecimals(market.getBaseMint());
-                decimalsCache.put(market.getBaseMint(), baseDecimals);
-            }
+            if (!isDecimalsSet) {
+                if (decimalsCache.containsKey(market.getBaseMint())) {
+                    baseDecimals = decimalsCache.get(market.getBaseMint());
+                } else {
+                    baseDecimals = getMintDecimals(market.getBaseMint());
+                    decimalsCache.put(market.getBaseMint(), baseDecimals);
+                }
 
-            if (decimalsCache.containsKey(market.getQuoteMint())) {
-                quoteDecimals = decimalsCache.get(market.getQuoteMint());
-            } else {
-                quoteDecimals = getMintDecimals(market.getQuoteMint());
-                decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                if (decimalsCache.containsKey(market.getQuoteMint())) {
+                    quoteDecimals = decimalsCache.get(market.getQuoteMint());
+                } else {
+                    quoteDecimals = getMintDecimals(market.getQuoteMint());
+                    decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                }
             }
 
             market.setBaseDecimals(baseDecimals);
@@ -157,23 +159,21 @@ public class MarketBuilder {
         if (retrieveEventQueue) {
             byte[] base64EventQueue = retrieveAccountData(market.getEventQueueKey());
 
-            // first, check the cache for the byte. otherwise, make a request for it
-            // TODO - unduplicate this code
-            byte baseDecimals;
-            byte quoteDecimals;
 
-            if (decimalsCache.containsKey(market.getBaseMint())) {
-                baseDecimals = decimalsCache.get(market.getBaseMint());
-            } else {
-                baseDecimals = getMintDecimals(market.getBaseMint());
-                decimalsCache.put(market.getBaseMint(), baseDecimals);
-            }
+            if (!isDecimalsSet) {
+                if (decimalsCache.containsKey(market.getBaseMint())) {
+                    baseDecimals = decimalsCache.get(market.getBaseMint());
+                } else {
+                    baseDecimals = getMintDecimals(market.getBaseMint());
+                    decimalsCache.put(market.getBaseMint(), baseDecimals);
+                }
 
-            if (decimalsCache.containsKey(market.getQuoteMint())) {
-                quoteDecimals = decimalsCache.get(market.getQuoteMint());
-            } else {
-                quoteDecimals = getMintDecimals(market.getQuoteMint());
-                decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                if (decimalsCache.containsKey(market.getQuoteMint())) {
+                    quoteDecimals = decimalsCache.get(market.getQuoteMint());
+                } else {
+                    quoteDecimals = getMintDecimals(market.getQuoteMint());
+                    decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                }
             }
 
             market.setBaseDecimals(baseDecimals);
@@ -188,9 +188,6 @@ public class MarketBuilder {
 
         // Used by SerumManager for most lightweight lookup possible
         if (!retrieveEventQueue && !retrieveOrderbooks && retrieveDecimalsOnly) {
-            byte baseDecimals;
-            byte quoteDecimals;
-
             if (decimalsCache.containsKey(market.getBaseMint())) {
                 baseDecimals = decimalsCache.get(market.getBaseMint());
             } else {
@@ -298,5 +295,13 @@ public class MarketBuilder {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public MarketBuilder setDecimals(int baseDecimals, int quoteDecimals) {
+        this.baseDecimals = (byte) baseDecimals;
+        this.quoteDecimals = (byte) quoteDecimals;
+        this.isDecimalsSet = true;
+
+        return this;
     }
 }
