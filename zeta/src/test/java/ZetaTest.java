@@ -1,11 +1,6 @@
-import com.mmorrell.common.model.GenericOrder;
 import com.mmorrell.common.model.GenericOrderBook;
 import com.mmorrell.common.model.Market;
 import com.mmorrell.common.model.MarketBuilder;
-import com.mmorrell.zeta.model.ZetaOrderBook;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -13,12 +8,10 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 
 import java.util.Base64;
-import java.util.List;
 
 public class ZetaTest {
 
     private final RpcClient client = new RpcClient(Cluster.MAINNET);
-    private static final Logger LOGGER = LogManager.getLogger(ZetaTest.class);
 
     @Test
     public void zetaTest() throws RpcException {
