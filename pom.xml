@@ -6,7 +6,7 @@
     <groupId>com.mmorrell</groupId>
     <artifactId>solanaj-programs</artifactId>
     <packaging>pom</packaging>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Program libraries for SolanaJ, a library for Solana RPC</description>
     <url>https://github.com/skynetcap/solanaj-programs</url>
@@ -31,11 +31,13 @@
     </developers>
 
     <modules>
+        <module>common</module>
         <module>mango</module>
         <module>serum</module>
         <module>bonfida</module>
         <module>pyth</module>
         <module>magiceden</module>
+        <module>zeta</module>
     </modules>
 
     <properties>

@@ -1,5 +1,6 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
+import com.mmorrell.common.SerumUtils;
 import lombok.EqualsAndHashCode;
 import org.p2p.solanaj.core.PublicKey;
 
@@ -32,8 +33,8 @@ public class Market {
     private long quoteLotSize;
     private long feeRateBps;
     private long referrerRebatesAccrued;
-    private OrderBook bidOrderBook;
-    private OrderBook askOrderBook;
+    private GenericOrderBook bidOrderBook;
+    private GenericOrderBook askOrderBook;
     private EventQueue eventQueue;
 
     // Data from token mints
@@ -64,19 +65,19 @@ public class Market {
         this.eventQueue = eventQueue;
     }
 
-    public OrderBook getBidOrderBook() {
+    public GenericOrderBook getBidOrderBook() {
         return bidOrderBook;
     }
 
-    public void setBidOrderBook(OrderBook bidOrderBook) {
+    public void setBidOrderBook(GenericOrderBook bidOrderBook) {
         this.bidOrderBook = bidOrderBook;
     }
 
-    public OrderBook getAskOrderBook() {
+    public GenericOrderBook getAskOrderBook() {
         return askOrderBook;
     }
 
-    public void setAskOrderBook(OrderBook askOrderBook) {
+    public void setAskOrderBook(GenericOrderBook askOrderBook) {
         this.askOrderBook = askOrderBook;
     }
 

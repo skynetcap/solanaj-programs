@@ -1,4 +1,4 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
@@ -8,79 +8,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
-
-/**
- * export const ORDERBOOK_LAYOUT = struct([
- * blob(5), 0-4
- * accountFlagsLayout('accountFlags'), 5-12
- * SLAB_LAYOUT.replicate('slab'), 13 - ...
- * blob(7),
- * ]);
- * <p>
- * first 5 bytes = "serum", start at position 5
- * <p>
- * note: zero(4) = blob(4) = 4 bytes
- * <p>
- * export const SLAB_LAYOUT = struct([
- * SLAB_HEADER_LAYOUT,
- * seq(
- * SLAB_NODE_LAYOUT,
- * offset(
- * SLAB_HEADER_LAYOUT.layoutFor('bumpIndex'),
- * SLAB_HEADER_LAYOUT.offsetOf('bumpIndex') - SLAB_HEADER_LAYOUT.span,
- * ),
- * 'nodes',
- * ),
- * ]);
- * <p>
- * <p>
- * slab header layout:
- * const SLAB_HEADER_LAYOUT = struct(
- * [
- * // Number of modified slab nodes
- * u32('bumpIndex'), 13-16
- * zeros(4), // Consider slabs with more than 2^32 nodes to be invalid 17-20
- * <p>
- * // Linked list of unused nodes
- * u32('freeListLen'), 21-24
- * zeros(4), //25-28
- * u32('freeListHead'), 29-32
- * <p>
- * u32('root'), 33-36
- * <p>
- * u32('leafCount'), 37-40
- * zeros(4), 41-44.
- * ],
- * 'header',
- * );
- * <p>
- * 45 - 48 = ??? = tag and then 68 bytes of data, for N number of times, where N = offset(
- * *       SLAB_HEADER_LAYOUT.layoutFor('bumpIndex'),
- * *       SLAB_HEADER_LAYOUT.offsetOf('bumpIndex') - SLAB_HEADER_LAYOUT.span,
- * *     );
- * <p>
- * 45-48 = tag 1,
- * 49-116 = blob 1
- * 117-120 = tag 2
- * 121-188 = blob 2
- * 189-192 = tag 3
- * ...
- * <p>
- * const SLAB_NODE_LAYOUT = union(u32('tag'), blob(68), 'node');
- * SLAB_NODE_LAYOUT.addVariant(0, struct([]), 'uninitialized');
- * SLAB_NODE_LAYOUT.addVariant(
- * 1,
- * struct([
- * // Only the first prefixLen high-order bits of key are meaningful
- * u32('prefixLen'),
- * u128('key'),
- * seq(u32(), 2, 'children'),
- * ]),
- * 'innerNode',
- * );
- * <p>
- * ....
- */
 // Takes in bytes following an AccountFlag object.
 public class Slab {
 

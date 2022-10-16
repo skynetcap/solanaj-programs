@@ -1,6 +1,6 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
-import com.mmorrell.serum.manager.OrderBookCacheManager;
+import com.mmorrell.common.SerumUtils;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
@@ -30,6 +30,10 @@ public class MarketBuilder {
     private boolean built = false;
     private byte[] base64AccountInfo;
     private OrderBookCacheManager orderBookCacheManager;
+
+    private byte baseDecimals;
+    private byte quoteDecimals;
+    private boolean isDecimalsSet = false;
 
     private Map<PublicKey, Byte> decimalsCache = new ConcurrentHashMap<>();
 
@@ -102,34 +106,33 @@ public class MarketBuilder {
 
         // Get Order books
         if (retrieveOrderbooks) {
-            // Data from the token mints
-            // first, check the cache for the byte. otherwise, make a request for it
-            byte baseDecimals;
-            byte quoteDecimals;
 
-            if (decimalsCache.containsKey(market.getBaseMint())) {
-                baseDecimals = decimalsCache.get(market.getBaseMint());
-            } else {
-                baseDecimals = getMintDecimals(market.getBaseMint());
-                decimalsCache.put(market.getBaseMint(), baseDecimals);
-            }
+            if (!isDecimalsSet) {
+                if (decimalsCache.containsKey(market.getBaseMint())) {
+                    baseDecimals = decimalsCache.get(market.getBaseMint());
+                } else {
+                    baseDecimals = getMintDecimals(market.getBaseMint());
+                    decimalsCache.put(market.getBaseMint(), baseDecimals);
+                }
 
-            if (decimalsCache.containsKey(market.getQuoteMint())) {
-                quoteDecimals = decimalsCache.get(market.getQuoteMint());
-            } else {
-                quoteDecimals = getMintDecimals(market.getQuoteMint());
-                decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                if (decimalsCache.containsKey(market.getQuoteMint())) {
+                    quoteDecimals = decimalsCache.get(market.getQuoteMint());
+                } else {
+                    quoteDecimals = getMintDecimals(market.getQuoteMint());
+                    decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                }
             }
 
             market.setBaseDecimals(baseDecimals);
             market.setQuoteDecimals(quoteDecimals);
 
             // Data from the order books (multithreaded)
-            final CompletableFuture<OrderBook> bidThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getBids()));
-            final CompletableFuture<OrderBook> askThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getAsks()));
+            final CompletableFuture<GenericOrderBook> bidThread =
+                    CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getBids()));
+            final CompletableFuture<GenericOrderBook> askThread = CompletableFuture.supplyAsync(() -> retrieveOrderBook(market.getAsks()));
             final CompletableFuture<Void> combinedFutures = CompletableFuture.allOf(bidThread, askThread);
 
-            OrderBook bidOrderBook, askOrderBook;
+            GenericOrderBook bidOrderBook, askOrderBook;
             try {
                 combinedFutures.get();
                 bidOrderBook = bidThread.get();
@@ -156,23 +159,21 @@ public class MarketBuilder {
         if (retrieveEventQueue) {
             byte[] base64EventQueue = retrieveAccountData(market.getEventQueueKey());
 
-            // first, check the cache for the byte. otherwise, make a request for it
-            // TODO - unduplicate this code
-            byte baseDecimals;
-            byte quoteDecimals;
 
-            if (decimalsCache.containsKey(market.getBaseMint())) {
-                baseDecimals = decimalsCache.get(market.getBaseMint());
-            } else {
-                baseDecimals = getMintDecimals(market.getBaseMint());
-                decimalsCache.put(market.getBaseMint(), baseDecimals);
-            }
+            if (!isDecimalsSet) {
+                if (decimalsCache.containsKey(market.getBaseMint())) {
+                    baseDecimals = decimalsCache.get(market.getBaseMint());
+                } else {
+                    baseDecimals = getMintDecimals(market.getBaseMint());
+                    decimalsCache.put(market.getBaseMint(), baseDecimals);
+                }
 
-            if (decimalsCache.containsKey(market.getQuoteMint())) {
-                quoteDecimals = decimalsCache.get(market.getQuoteMint());
-            } else {
-                quoteDecimals = getMintDecimals(market.getQuoteMint());
-                decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                if (decimalsCache.containsKey(market.getQuoteMint())) {
+                    quoteDecimals = decimalsCache.get(market.getQuoteMint());
+                } else {
+                    quoteDecimals = getMintDecimals(market.getQuoteMint());
+                    decimalsCache.put(market.getQuoteMint(), quoteDecimals);
+                }
             }
 
             market.setBaseDecimals(baseDecimals);
@@ -187,9 +188,6 @@ public class MarketBuilder {
 
         // Used by SerumManager for most lightweight lookup possible
         if (!retrieveEventQueue && !retrieveOrderbooks && retrieveDecimalsOnly) {
-            byte baseDecimals;
-            byte quoteDecimals;
-
             if (decimalsCache.containsKey(market.getBaseMint())) {
                 baseDecimals = decimalsCache.get(market.getBaseMint());
             } else {
@@ -275,7 +273,7 @@ public class MarketBuilder {
         return build();
     }
 
-    private OrderBook retrieveOrderBook(PublicKey publicKey) {
+    private GenericOrderBook retrieveOrderBook(PublicKey publicKey) {
         if (orderBookCacheEnabled) {
             // Use a 1-second expireAfterWrite cache if enabled.
             return orderBookCacheManager.getOrderBook(publicKey);
@@ -297,5 +295,13 @@ public class MarketBuilder {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public MarketBuilder setDecimals(int baseDecimals, int quoteDecimals) {
+        this.baseDecimals = (byte) baseDecimals;
+        this.quoteDecimals = (byte) quoteDecimals;
+        this.isDecimalsSet = true;
+
+        return this;
     }
 }

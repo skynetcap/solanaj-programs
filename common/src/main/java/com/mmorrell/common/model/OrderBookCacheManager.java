@@ -1,6 +1,5 @@
-package com.mmorrell.serum.manager;
+package com.mmorrell.common.model;
 
-import com.mmorrell.serum.model.OrderBook;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -24,12 +23,12 @@ public class OrderBookCacheManager {
         this.client = client;
     }
 
-    private final LoadingCache<String, OrderBook> orderbookCache = CacheBuilder.newBuilder()
+    private final LoadingCache<String, GenericOrderBook> orderbookCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.SECONDS)
             .build(
                     new CacheLoader<>() {
                         @Override
-                        public OrderBook load(String marketId) throws RpcException {
+                        public GenericOrderBook load(String marketId) throws RpcException {
                             // LOGGER.info("Cache Load Orderbook: " + marketId);
                             return OrderBook.readOrderBook(
                                     Base64.getDecoder().decode(
@@ -45,7 +44,7 @@ public class OrderBookCacheManager {
                         }
                     });
 
-    public OrderBook getOrderBook(PublicKey marketId) {
+    public GenericOrderBook getOrderBook(PublicKey marketId) {
         return orderbookCache.getUnchecked(marketId.toBase58());
     }
 

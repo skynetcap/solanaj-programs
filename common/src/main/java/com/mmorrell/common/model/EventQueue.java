@@ -1,5 +1,6 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.common.model;
 
+import com.mmorrell.common.SerumUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bitcoinj.core.Utils;
@@ -88,9 +89,6 @@ public class EventQueue {
         eventQueue.setQuoteDecimals(quoteDecimals);
         eventQueue.setBaseLotSize(baseLotSize);
         eventQueue.setQuoteLotSize(quoteLotSize);
-
-        // Verify that the "serum" padding exists
-        SerumUtils.validateSerumData(eventQueueData);
 
         // Read account flags
         AccountFlags accountFlags = AccountFlags.readAccountFlags(eventQueueData);

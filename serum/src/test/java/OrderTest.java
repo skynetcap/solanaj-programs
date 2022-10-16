@@ -1,5 +1,12 @@
+import com.mmorrell.common.SerumUtils;
+import com.mmorrell.common.model.Market;
+import com.mmorrell.common.model.MarketBuilder;
+import com.mmorrell.common.model.OpenOrdersAccount;
+import com.mmorrell.common.model.Order;
+import com.mmorrell.common.model.OrderTypeLayout;
+import com.mmorrell.common.model.SelfTradeBehaviorLayout;
+import com.mmorrell.common.model.SideLayout;
 import com.mmorrell.serum.manager.SerumManager;
-import com.mmorrell.serum.model.*;
 import com.mmorrell.serum.program.SerumProgram;
 import org.bitcoinj.core.Base58;
 import org.junit.Ignore;
@@ -1245,45 +1252,5 @@ public class OrderTest {
 
         // Verify we got a txId
         assertNotNull(transactionId);
-    }
-
-    @Test
-    @Ignore
-    public void lqidUsdcTest() {
-        byte[] data = new byte[0];
-
-        try {
-            data = Files.readAllBytes(Paths.get("src/test/resources/lqidusdc.bin"));  // LQID/USDC
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        OrderBook bidOrderBook = OrderBook.readOrderBook(data);
-        System.out.println(bidOrderBook.getAccountFlags().toString());
-        Slab slab = bidOrderBook.getSlab();
-
-        assertNotNull(slab);
-
-        /* C:\apps\solanaj\lqidusdc.bin (1/12/2021 8:55:59 AM)
-            StartOffset(d): 00001709, EndOffset(d): 00001724, Length(d): 00000016 */
-
-        // this rawData = key bytes for a 477.080 quantity bid at 0.0510 cents
-
-        byte[] rawData = {
-                (byte)0xFC, (byte)0xFD, (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
-                (byte)0xFF, (byte)0xFF, (byte)0x33, (byte)0x00, (byte)0x00, (byte)0x00,
-                (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00
-        };
-
-
-        slab.getSlabNodes().forEach(slabNode -> {
-            if (slabNode instanceof SlabLeafNode) {
-                SlabLeafNode slabLeafNode = (SlabLeafNode) slabNode;
-                if (Arrays.equals(rawData, slabLeafNode.getKey())) {
-                    System.out.println("Found the order");
-                }
-                System.out.println(slabNode);
-            }
-        });
     }
 }
