@@ -90,26 +90,25 @@
 <!--            <id>ossrh</id>-->
 <!--            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
 <!--        </repository>-->
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>a0lwuur0juhfu-artifactory-primary-0-snapshots</name>
-            <url>https://openserum.jfrog.io/artifactory/openserum-libs-snapshot</url>
-        </snapshotRepository>
+        <repository>
+            <id>local</id>
+            <url>http://localhost/private</url>
+        </repository>
     </distributionManagement>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.sonatype.plugins</groupId>-->
+<!--                <artifactId>nexus-staging-maven-plugin</artifactId>-->
+<!--                <version>1.6.13</version>-->
+<!--                <extensions>true</extensions>-->
+<!--                <configuration>-->
+<!--                    <serverId>ossrh</serverId>-->
+<!--                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>-->
+<!--                    <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -165,8 +164,8 @@
     </build>
     <repositories>
         <repository>
-            <id>Sonatype Releases</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <id>local</id>
+            <url>http://localhost/private</url>
         </repository>
     </repositories>
 </project>
