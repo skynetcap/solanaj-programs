@@ -14,6 +14,7 @@ public class ZetaProduct {
     private long strikeValue;
     private boolean dirty;
     private ZetaProductKind productKind;
+    private int expiryIndex;
 
     public static ZetaProduct readZetaProduct(byte[] data) {
         ZetaProductKind zetaProductKind = switch(data[42]) {

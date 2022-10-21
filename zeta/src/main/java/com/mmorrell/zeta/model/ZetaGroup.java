@@ -32,6 +32,8 @@ public class ZetaGroup {
                 .zetaExpiries(zetaExpiries)
                 .build();
 
+        double productsPerExpiry = Math.floor((double) zetaProducts.size() / (double) zetaExpiries.size());
+
         // Zeta Products
         for (int i = 0; i < NUM_PRODUCTS; i++) {
             int offset = PRODUCTS_OFFSET + (i * PRODUCT_SIZE_BYTES);
@@ -43,6 +45,9 @@ public class ZetaGroup {
                             offset + PRODUCT_SIZE_BYTES
                     )
             );
+
+            int productExpiryIndex = (int) Math.floor(i / productsPerExpiry);
+            zetaProduct.setExpiryIndex(productExpiryIndex);
 
             zetaProducts.add(zetaProduct);
         }
