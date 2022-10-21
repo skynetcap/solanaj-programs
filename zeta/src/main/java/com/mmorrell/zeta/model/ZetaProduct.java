@@ -14,6 +14,7 @@ public class ZetaProduct {
     private long strikeValue;
     private boolean dirty;
     private ZetaProductKind productKind;
+    private int expiryIndex;
 
     public static ZetaProduct readZetaProduct(byte[] data) {
         ZetaProductKind zetaProductKind = switch(data[42]) {
@@ -31,5 +32,11 @@ public class ZetaProduct {
                 .dirty(data[41] == 1)
                 .productKind(zetaProductKind)
                 .build();
+    }
+
+    public double getStrikeValueDouble() {
+        double strikeDouble = (double) strikeValue;
+        double precisionBn = Math.pow(10, 6);
+        return ((strikeDouble / precisionBn) + ((strikeDouble % precisionBn) / precisionBn));
     }
 }
