@@ -33,4 +33,10 @@ public class ZetaProduct {
                 .productKind(zetaProductKind)
                 .build();
     }
+
+    public double getStrikeValueDouble() {
+        double strikeDouble = (double) strikeValue;
+        double precisionBn = Math.pow(10, 6);
+        return ((strikeDouble / precisionBn) + ((strikeDouble % precisionBn) / precisionBn));
+    }
 }
