@@ -2,6 +2,7 @@ package com.mmorrell.zeta.model;
 
 import lombok.Builder;
 import lombok.Data;
+import org.p2p.solanaj.core.PublicKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ public class ZetaGroup {
     private static final int PRODUCTS_OFFSET = 507;
     private static final int EXPIRIES_OFFSET = 6441;
 
+    private PublicKey publicKey;
     private List<ZetaProduct> zetaProducts;
     private List<ZetaExpiry> zetaExpiries;
 
