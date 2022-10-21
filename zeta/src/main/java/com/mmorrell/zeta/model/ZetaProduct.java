@@ -15,6 +15,8 @@ public class ZetaProduct {
     private boolean dirty;
     private ZetaProductKind productKind;
     private int expiryIndex;
+    private double bestBid, bestAsk;
+    private double bestBidQuantity, bestAskQuantity;
 
     public static ZetaProduct readZetaProduct(byte[] data) {
         ZetaProductKind zetaProductKind = switch(data[42]) {

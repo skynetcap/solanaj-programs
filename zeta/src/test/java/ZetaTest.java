@@ -60,5 +60,9 @@ public class ZetaTest {
         ZetaGroup zetaGroup = ZetaGroup.readZetaGroup(data);
 
         System.out.println(zetaGroup.toString());
+
+        zetaGroup.getZetaProducts().forEach(zetaProduct -> {
+            System.out.println(zetaProduct.toString());
+        });
     }
 }

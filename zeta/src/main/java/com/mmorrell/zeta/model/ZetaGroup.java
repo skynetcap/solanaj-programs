@@ -34,7 +34,7 @@ public class ZetaGroup {
                 .zetaExpiries(zetaExpiries)
                 .build();
 
-        double productsPerExpiry = Math.floor((double) zetaProducts.size() / (double) zetaExpiries.size());
+        double productsPerExpiry = 23;
 
         // Zeta Products
         for (int i = 0; i < NUM_PRODUCTS; i++) {
