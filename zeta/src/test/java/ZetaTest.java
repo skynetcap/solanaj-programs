@@ -1,6 +1,7 @@
 import com.mmorrell.common.model.GenericOrderBook;
 import com.mmorrell.common.model.Market;
 import com.mmorrell.common.model.MarketBuilder;
+import com.mmorrell.zeta.model.ZetaGroup;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -45,5 +46,19 @@ public class ZetaTest {
         // TODO - Add reverse lookup for OOA > Zeta account.
         // This requires going from Zeta > OOA, and matching, since OOA always has the same owner.
         // E.g. we need a function: getOwnerOfZetaOoa(ooaPubkey)
+    }
+
+    @Test
+    public void zetaGroupTest() throws RpcException {
+        PublicKey zetaGroupPubkey = new PublicKey("CoGhjFdyqzMFr5xVgznuBjULvoFbFtNN4bCdQzRArNK2");
+        System.out.println(zetaGroupPubkey.toBase58());
+
+        byte[] data = Base64.getDecoder().decode(
+                client.getApi().getAccountInfo(zetaGroupPubkey).getValue().getData().get(0)
+        );
+
+        ZetaGroup zetaGroup = ZetaGroup.readZetaGroup(data);
+
+        System.out.println(zetaGroup.toString());
     }
 }
