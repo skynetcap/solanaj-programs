@@ -16,8 +16,8 @@ public class ZetaTest {
 
     @Test
     public void zetaTest() throws RpcException {
-        // Bids for market oTVAoRCiHnfEds5MTPerZk6VunEp24bCae8oSVrQmSU
-        PublicKey publicKey = new PublicKey("oTVAoRCiHnfEds5MTPerZk6VunEp24bCae8oSVrQmSU");
+        // Bids for market 21iZtRQWqBCBmq5oSCScpgU9JNEFLyEfWxdvpJxZuA8N
+        PublicKey publicKey = new PublicKey("21iZtRQWqBCBmq5oSCScpgU9JNEFLyEfWxdvpJxZuA8N");
         System.out.println(publicKey.toBase58());
 
         byte[] data = Base64.getDecoder().decode(

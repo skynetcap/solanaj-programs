@@ -6,6 +6,7 @@ import com.mmorrell.common.model.MarketBuilder;
 import com.mmorrell.common.model.OpenOrdersAccount;
 import com.mmorrell.common.model.Order;
 import com.mmorrell.common.model.SideLayout;
+import com.mmorrell.zeta.util.ZetaUtil;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
@@ -55,7 +56,7 @@ public class ZetaProgram extends Program {
         );
 
         return createTransactionInstruction(
-                SerumUtils.SERUM_PROGRAM_ID_V3,
+                ZetaUtil.ZETA_SERUM_PROGRAM_ID,
                 accountMetas,
                 transactionData
         );
@@ -171,7 +172,7 @@ public class ZetaProgram extends Program {
                 order
         );
 
-        return createTransactionInstruction(SerumUtils.SERUM_PROGRAM_ID_V3, keys, transactionData);
+        return createTransactionInstruction(ZetaUtil.ZETA_SERUM_PROGRAM_ID, keys, transactionData);
     }
 
     /**
@@ -243,7 +244,7 @@ public class ZetaProgram extends Program {
         );
 
         return createTransactionInstruction(
-                SerumUtils.SERUM_PROGRAM_ID_V3,
+                ZetaUtil.ZETA_SERUM_PROGRAM_ID,
                 accountMetas,
                 transactionData
         );
@@ -295,7 +296,7 @@ public class ZetaProgram extends Program {
         );
 
         return createTransactionInstruction(
-                SerumUtils.SERUM_PROGRAM_ID_V3,
+                ZetaUtil.ZETA_SERUM_PROGRAM_ID,
                 accountMetas,
                 transactionData
         );
@@ -351,7 +352,7 @@ public class ZetaProgram extends Program {
         byte[] transactionData = encodeSettleOrdersTransactionData();
 
         return createTransactionInstruction(
-                SerumUtils.SERUM_PROGRAM_ID_V3,
+                ZetaUtil.ZETA_SERUM_PROGRAM_ID,
                 accountMetas,
                 transactionData
         );
@@ -402,7 +403,7 @@ public class ZetaProgram extends Program {
         );
 
         return createTransactionInstruction(
-                SerumUtils.SERUM_PROGRAM_ID_V3,
+                ZetaUtil.ZETA_SERUM_PROGRAM_ID,
                 accountMetas,
                 transactionData
         );
