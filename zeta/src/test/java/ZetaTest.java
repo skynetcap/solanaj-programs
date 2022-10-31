@@ -2,14 +2,20 @@ import com.mmorrell.common.model.GenericOrderBook;
 import com.mmorrell.common.model.Market;
 import com.mmorrell.common.model.MarketBuilder;
 import com.mmorrell.zeta.model.ZetaGroup;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
+@Slf4j
 public class ZetaTest {
 
     private final RpcClient client = new RpcClient(Cluster.MAINNET);
@@ -42,6 +48,16 @@ public class ZetaTest {
         zetaAskOrderBook.getOrders().forEach(genericOrder -> {
             System.out.println(genericOrder.toString());
         });
+
+        // Create account from private key
+        Account account;
+        try {
+            account = Account.fromJson(Files.readString(Paths.get("src/main/resources/serummainnet.json")));
+            log.info("Pubkey = " + account.getPublicKey());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
 
         // TODO - Add reverse lookup for OOA > Zeta account.
         // This requires going from Zeta > OOA, and matching, since OOA always has the same owner.
