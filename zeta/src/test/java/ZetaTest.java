@@ -101,7 +101,7 @@ public class ZetaTest {
         Account account = null;
         try {
             account = Account.fromJson(Files.readString(Paths.get("src/test/resources/mainnet.json")));
-            System.out.println("Pubkey = " + account.getPublicKey());
+            // System.out.println("Pubkey = " + account.getPublicKey());
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -165,6 +165,6 @@ public class ZetaTest {
         );
 
         String transactionId = client.getApi().sendTransaction(transaction, account);
-        System.out.println("Zeta placeOrder: " + transactionId);
+        System.out.println("Transaction ID: " + transactionId);
     }
 }
