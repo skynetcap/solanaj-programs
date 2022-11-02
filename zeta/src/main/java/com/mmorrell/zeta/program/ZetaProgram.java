@@ -6,13 +6,17 @@ import com.mmorrell.common.model.MarketBuilder;
 import com.mmorrell.common.model.OpenOrdersAccount;
 import com.mmorrell.common.model.Order;
 import com.mmorrell.common.model.SideLayout;
+import com.mmorrell.zeta.model.ZetaOrderType;
+import com.mmorrell.zeta.model.ZetaSide;
 import com.mmorrell.zeta.util.ZetaUtil;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 import org.p2p.solanaj.programs.Program;
+import org.p2p.solanaj.utils.ByteUtils;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -78,144 +82,86 @@ public class ZetaProgram extends Program {
         return result.array();
     }
 
-    /**
-     * Overloaded version of placeOrder which assumes no SRM fee discount
-     *
-     * @param account    Account from private key which owns payer and openOrders
-     * @param payer      token pubkey funding the order. could be your USDC wallet for example.
-     * @param openOrders open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
-     * @param market     loaded market that we are trading on. this must be built by a {@link MarketBuilder}
-     * @param order      order we are placing
-     * @return {@link TransactionInstruction} for the placeOrder call
-     */
     public static TransactionInstruction placeOrder(Account account,
-                                                    PublicKey payer,
+                                                    PublicKey state,
+                                                    PublicKey zetaGroup,
+                                                    PublicKey marginAccount,
+                                                    PublicKey serumAuthority,
+                                                    PublicKey greeks,
                                                     PublicKey openOrders,
-                                                    Market market,
-                                                    Order order) {
-        return placeOrder(account, payer, openOrders, market, order, null);
-    }
-
-    public static TransactionInstruction placeOrder(Account account,
-                                                    PublicKey payer,
-                                                    PublicKey openOrders,
+                                                    PublicKey orderPayer,
+                                                    PublicKey coinWallet,
+                                                    PublicKey pcWallet,
+                                                    PublicKey oracle,
+                                                    PublicKey marketNode,
+                                                    PublicKey marketMint,
+                                                    PublicKey mintAuthority,
                                                     Market market,
                                                     Order order,
-                                                    PublicKey srmFeeDiscount) {
+                                                    ZetaSide side) {
 
-        final AccountMeta state = new AccountMeta(null, false, false);
-        final AccountMeta zetaGroup = new AccountMeta(null, false, false);
-        final AccountMeta marginAccount = new AccountMeta(null, false, true);
-        final AccountMeta authority = new AccountMeta(null, true, false);
-        final AccountMeta dexProgram = new AccountMeta(null, false, false);
-        final AccountMeta tokenProgram = new AccountMeta(null, false, false);
-        final AccountMeta serumAuthority = new AccountMeta(null, false, false);
-        final AccountMeta greeks = new AccountMeta(null, false, false);
-        final AccountMeta openOrdersMeta = new AccountMeta(null, false, true);
-        final AccountMeta rent = new AccountMeta(null, false, false);
+        final AccountMeta stateMeta = new AccountMeta(state, false, false);
+        final AccountMeta zetaGroupMeta = new AccountMeta(zetaGroup, false, false);
+        final AccountMeta marginAccountMeta = new AccountMeta(marginAccount, false, true);
+        final AccountMeta authorityMeta = new AccountMeta(account.getPublicKey(), true, false);
+        final AccountMeta dexProgram = new AccountMeta(ZetaUtil.ZETA_SERUM_PROGRAM_ID, false, false);
+        final AccountMeta tokenProgram = new AccountMeta(TOKEN_PROGRAM_ID, false, false);
+        final AccountMeta serumAuthorityMeta = new AccountMeta(serumAuthority, false, false);
+        final AccountMeta greeksMeta = new AccountMeta(greeks, false, false);
+        final AccountMeta openOrdersMeta = new AccountMeta(openOrders, false, true);
+        final AccountMeta rent = new AccountMeta(SYSVAR_RENT_PUBKEY, false, false);
 
         // marketAccounts
-        final AccountMeta marketMeta = new AccountMeta(null, false, true);
-        final AccountMeta requestQueue = new AccountMeta(null, false, true);
-        final AccountMeta eventQueue = new AccountMeta(null, false, true);
-        final AccountMeta bids = new AccountMeta(null, false, true);
-        final AccountMeta asks = new AccountMeta(null, false, true);
-        final AccountMeta orderPayerTokenAccount = new AccountMeta(null, false, true);
-        final AccountMeta coinVault = new AccountMeta(null, false, true);
-        final AccountMeta pcVault = new AccountMeta(null, false, true);
-        final AccountMeta coinWallet = new AccountMeta(null, false, true);
-        final AccountMeta pcWallet = new AccountMeta(null, false, true);
+        final AccountMeta marketMeta = new AccountMeta(market.getOwnAddress(), false, true);
+        final AccountMeta requestQueue = new AccountMeta(market.getRequestQueue(), false, true);
+        final AccountMeta eventQueue = new AccountMeta(market.getEventQueueKey(), false, true);
+        final AccountMeta bids = new AccountMeta(market.getBids(), false, true);
+        final AccountMeta asks = new AccountMeta(market.getAsks(), false, true);
+        final AccountMeta orderPayerTokenAccount = new AccountMeta(orderPayer, false, true);
+        final AccountMeta coinVault = new AccountMeta(market.getBaseVault(), false, true);
+        final AccountMeta pcVault = new AccountMeta(market.getQuoteVault(), false, true);
+        final AccountMeta coinWalletMeta = new AccountMeta(coinWallet, false, true);
+        final AccountMeta pcWalletMeta = new AccountMeta(pcWallet, false, true);
 
         // Last accounts
-        final AccountMeta oracle = new AccountMeta(null, false, false);
-        final AccountMeta marketNode = new AccountMeta(null, false, true);
-        final AccountMeta marketMint = new AccountMeta(null, false, true);
-        final AccountMeta mintAuthority = new AccountMeta(null, false, false);
+        final AccountMeta oracleMeta = new AccountMeta(oracle, false, false);
+        final AccountMeta marketNodeMeta = new AccountMeta(marketNode, false, true);
+        final AccountMeta marketMintMeta = new AccountMeta(marketMint, false, true);
+        final AccountMeta mintAuthorityMeta = new AccountMeta(mintAuthority, false, false);
 
-        long price = 1337L;
-        long size = 420L;
-        byte side = (byte) 0;
-        byte orderType = (byte) 0;
-        long clientOrderId = 4201337420L;
-        String tag = "skynet";
-
-        /*
-              "name": "placeOrderV3",
-              "args": [
-                {
-                  "name": "side",
-                  "type": {
-                    "defined": "Side"
-                  }
-                },
-                {
-                  "name": "orderType",
-                  "type": {
-                    "defined": "OrderType"
-                  }
-                },
-              ]
-            }
-         */
-
-
-        // pubkey: market
-        final AccountMeta marketKey = new AccountMeta(market.getOwnAddress(), false, true);
-
-        // openOrders account retrieval/creation should be done in the manager
-        final AccountMeta openOrdersKey = new AccountMeta(openOrders, false, true);
-
-        // pubkey: requestQueue
-        final AccountMeta requestQueueKey = new AccountMeta(market.getRequestQueue(), false, true);
-
-        // pubkey: eventQueue
-        final AccountMeta eventQueueKey = new AccountMeta(market.getEventQueueKey(), false, true);
-
-        // pubkey: bids
-        final AccountMeta bidsKey = new AccountMeta(market.getBids(), false, true);
-
-        // pubkey: asks
-        final AccountMeta asksKey = new AccountMeta(market.getAsks(), false, true);
-
-        // pubkey: payer
-        final AccountMeta payerKey = new AccountMeta(payer, false, true);
-
-        // pubkey: owner
-        final AccountMeta ownerKey = new AccountMeta(account.getPublicKey(), true, false);
-
-        // pubkey: baseVault
-        final AccountMeta baseVaultKey = new AccountMeta(market.getBaseVault(), false, true);
-
-        // pubkey: quoteVault
-        final AccountMeta quoteVaultKey = new AccountMeta(market.getQuoteVault(), false, true);
-
-        // pubkey: TOKEN_PROGRAM_ID
-        final AccountMeta tokenProgramIdKey = new AccountMeta(TOKEN_PROGRAM_ID, false, false);
-
-        // pubkey: SYSVAR_RENT_PUBKEY
-        final AccountMeta sysvarRentKey = new AccountMeta(SYSVAR_RENT_PUBKEY, false, false);
+        ZetaOrderType orderType = ZetaOrderType.LIMIT;
 
         final List<AccountMeta> keys = new ArrayList<>(List.of(
-                marketKey,
-                openOrdersKey,
-                requestQueueKey,
-                eventQueueKey,
-                bidsKey,
-                asksKey,
-                payerKey,
-                ownerKey,
-                baseVaultKey,
-                quoteVaultKey,
-                tokenProgramIdKey,
-                sysvarRentKey
+                stateMeta,
+                zetaGroupMeta,
+                marginAccountMeta,
+                authorityMeta,
+                dexProgram,
+                tokenProgram,
+                serumAuthorityMeta,
+                greeksMeta,
+                openOrdersMeta,
+                rent,
+                marketMeta,
+                requestQueue,
+                eventQueue,
+                bids,
+                asks,
+                orderPayerTokenAccount,
+                coinVault,
+                pcVault,
+                coinWalletMeta,
+                pcWalletMeta,
+                oracleMeta,
+                marketNodeMeta,
+                marketMintMeta,
+                mintAuthorityMeta
         ));
 
-        if (srmFeeDiscount != null) {
-            keys.add(new AccountMeta(srmFeeDiscount, false, false));
-        }
-
         byte[] transactionData = buildNewOrderv3InstructionData(
-                order
+                order,
+                side,
+                orderType
         );
 
         return createTransactionInstruction(ZetaUtil.ZETA_SERUM_PROGRAM_ID, keys, transactionData);
@@ -227,39 +173,28 @@ public class ZetaProgram extends Program {
      * @param order {@link Order} object containing all required details
      * @return transaction data
      */
-    public static byte[] buildNewOrderv3InstructionData(Order order) {
-        ByteBuffer result = ByteBuffer.allocate(51);
+    public static byte[] buildNewOrderv3InstructionData(Order order, ZetaSide side, ZetaOrderType orderType) {
+        long price = order.getPrice();
+        long size = order.getQuantity();
+
+        byte[] sigHash = new byte[]{
+                (byte) 0x92, (byte) 0x5D, (byte) 0x0E, (byte) 0xA7, (byte) 0x9F, (byte) 0x14,
+                (byte) 0x06, (byte) 0x3A
+        };
+
+        ByteBuffer result = ByteBuffer.allocate(35);
         result.order(ByteOrder.LITTLE_ENDIAN);
+        result.put(0, sigHash);
+        result.putLong(8, price);
+        result.putLong(16, size);
+        result.put(24, side.getValue());
+        result.put(25, orderType.getValue());
+        result.put(26, new byte[]{0x00, 0x01, 0x03, 0x00, 0x00, 0x00});
+        result.put(32, "sky".getBytes());
 
-        // Constant used to indicate newOrderv3
-        SerumUtils.writeNewOrderStructLayout(result);
-
-        // Order side (buy/sell) - enum
-        SerumUtils.writeSideLayout(result, order.isBuy() ? SideLayout.BUY : SideLayout.SELL);
-
-        // Limit price - uint64
-        SerumUtils.writeLimitPrice(result, order.getPrice());
-
-        // maxBaseQuantity - uint64 (for some reason 0.1 sol = 1L)
-        SerumUtils.writeMaxBaseQuantity(result, order.getQuantity());
-
-        // maxQuoteQuantity - uint64
-        SerumUtils.writeMaxQuoteQuantity(result, order.getMaxQuoteQuantity());
-
-        // selfTradeBehaviorLayout - selfTradeBehaviorLayout (serum-ts) - 4 bytes for a 1 byte enum
-        SerumUtils.writeSelfTradeBehavior(result, order.getSelfTradeBehaviorLayout());
-
-        // orderType - orderTypeLayout (enum)
-        SerumUtils.writeOrderType(result, order.getOrderTypeLayout());
-
-        // clientId - uint64
-        SerumUtils.writeClientId(result, order.getClientOrderId());
-
-        // "limit" - uint16 - might always be static equal to 65535
-        SerumUtils.writeLimit(result);
+        System.out.println("placeOrder Zeta hex: " + ByteUtils.bytesToHex(result.array()));
 
         byte[] arrayResult = result.array();
-
         return arrayResult;
     }
 
