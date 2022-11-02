@@ -135,8 +135,7 @@ public class ZetaProgram extends Program {
         result.put(32, "sky".getBytes());
 
         System.out.println("Placed order: Size " + order.getQuantity() + " @ Price " + order.getPrice());
-
-        // System.out.println("placeOrder Zeta hex: " + ByteUtils.bytesToHex(result.array()));
+        System.out.println("placeOrder Zeta hex: " + ByteUtils.bytesToHex(result.array()));
 
         return result.array();
     }
