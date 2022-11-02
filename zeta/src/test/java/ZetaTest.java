@@ -5,6 +5,7 @@ import com.mmorrell.common.model.Order;
 import com.mmorrell.common.model.OrderTypeLayout;
 import com.mmorrell.common.model.SelfTradeBehaviorLayout;
 import com.mmorrell.zeta.model.ZetaGroup;
+import com.mmorrell.zeta.model.ZetaSide;
 import com.mmorrell.zeta.program.ZetaProgram;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
@@ -97,50 +98,73 @@ public class ZetaTest {
     @Test
     @Ignore
     public void zetaPlaceOrderTest() throws RpcException {
-        // Replace with the public key of your USDC wallet
-        final PublicKey usdcPayer = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
-
         Account account = null;
         try {
-            account = Account.fromJson(Files.readString(Paths.get("src/main/resources/mainnet.json")));
+            account = Account.fromJson(Files.readString(Paths.get("src/test/resources/mainnet.json")));
             System.out.println("Pubkey = " + account.getPublicKey());
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
 
+        // quantity 420 = 0.420
+        // price 141200 = 0.1412
         long orderId = 11133711L;
         final Order order = Order.builder()
-                .floatPrice(0.15f)
-                .floatQuantity(0.03f)
+                .price(133700)
+                .quantity(420)
                 .clientOrderId(orderId)
                 .orderTypeLayout(OrderTypeLayout.LIMIT)
                 .selfTradeBehaviorLayout(SelfTradeBehaviorLayout.DECREMENT_TAKE)
                 .buy(true).build();
 
+        PublicKey state = new PublicKey("8eExPiLp47xbSDYkbuem4qnLUpbLTfZBeFuEJoh6EUr2");
+        PublicKey zetaGroup = new PublicKey("CoGhjFdyqzMFr5xVgznuBjULvoFbFtNN4bCdQzRArNK2");
+        PublicKey marginAccount = new PublicKey("CqJuZ6iemaF2YhpLfKAi7k6qQA3Y2Lta78TtCxsTan7x");
+        PublicKey serumAuthority = new PublicKey("AVNMK6wiGfppdQNg9WKfMRBXefDPGZFh2f3o1fRbgN8n");
+
+        PublicKey greeks = new PublicKey("FRTCRjf8T5hFHZ9PKGPhYYVRWMFHKje4KwMAEttnDNBe");
+        PublicKey openOrders = new PublicKey("w2Yf3EmttgmVM4ZwxEy9o7qJjTYrmjjhkWkhqn7NKkZ");
+
+        Market nov11CallMarket = new MarketBuilder()
+                .setPublicKey(new PublicKey("4LS1YmuTKby3LKFnMXEbsrUozNxcVC24qZDfi8ryEWHM"))
+                .setClient(client)
+                .build();
+
+        PublicKey orderPayerTokenAccount = new PublicKey("HYstShC94QEE9bR7VtRVzVXPLLbSY7pBAgCsSNHwbFVT");
+        PublicKey coinWallet = new PublicKey("6o6RCk1ogRL8yH4bDjmcb6pnBCRKkM7pxRjTDNynBb35");
+        PublicKey pcWallet = new PublicKey("HYstShC94QEE9bR7VtRVzVXPLLbSY7pBAgCsSNHwbFVT");
+
+        // Oracles
+        PublicKey oracle = new PublicKey("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG");
+        PublicKey marketNode = new PublicKey("FGxQspeZqJZbgwryafN9oTPec2TDG5sRDehkyuwaFe6w");
+        PublicKey marketMint = new PublicKey("J8UacxXk9orEDhZENQmp7fasHXaoyAXju2FDY8fqVMG9");
+        PublicKey mintAuthority = new PublicKey("AV1UvTbycnqMe4JqHKGCqhACRd2m79YmtEUJrnCUQ3GT");
+
         Transaction transaction = new Transaction();
         transaction.addInstruction(
                 ZetaProgram.placeOrder(
                         account,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                        state,
+                        zetaGroup,
+                        marginAccount,
+                        serumAuthority,
+                        greeks,
+                        openOrders,
+                        orderPayerTokenAccount,
+                        coinWallet,
+                        pcWallet,
+                        oracle,
+                        marketNode,
+                        marketMint,
+                        mintAuthority,
+                        nov11CallMarket,
+                        order,
+                        ZetaSide.BID
                 )
         );
 
-        // TODO cancel order
+        String transactionId = client.getApi().sendTransaction(transaction, account);
+        System.out.println("Zeta placeOrder: " + transactionId);
     }
 }

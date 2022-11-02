@@ -164,7 +164,7 @@ public class ZetaProgram extends Program {
                 orderType
         );
 
-        return createTransactionInstruction(ZetaUtil.ZETA_SERUM_PROGRAM_ID, keys, transactionData);
+        return createTransactionInstruction(ZetaUtil.ZETA_ROOT_PROGRAM_ID, keys, transactionData);
     }
 
     /**
