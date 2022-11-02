@@ -139,6 +139,7 @@ public class ZetaTest {
         PublicKey oracle = new PublicKey("H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG");
         PublicKey marketNode = new PublicKey("FGxQspeZqJZbgwryafN9oTPec2TDG5sRDehkyuwaFe6w");
         PublicKey marketMint = new PublicKey("J8UacxXk9orEDhZENQmp7fasHXaoyAXju2FDY8fqVMG9");
+        PublicKey marketAskMint = new PublicKey("8gMSzAKvFxJ5NKJhuoZmw2vTBiJxw9HkqFwSmghzMLY3");
         PublicKey mintAuthority = new PublicKey("AV1UvTbycnqMe4JqHKGCqhACRd2m79YmtEUJrnCUQ3GT");
 
         Transaction transaction = new Transaction();
@@ -161,6 +162,80 @@ public class ZetaTest {
                         nov11CallMarket,
                         order,
                         ZetaSide.BID
+                )
+        );
+
+        order.setPrice(order.getPrice() - 100);
+
+        transaction.addInstruction(
+                ZetaProgram.placeOrder(
+                        account,
+                        state,
+                        zetaGroup,
+                        marginAccount,
+                        serumAuthority,
+                        greeks,
+                        openOrders,
+                        orderPayerTokenAccount,
+                        coinWallet,
+                        pcWallet,
+                        oracle,
+                        marketNode,
+                        marketMint,
+                        mintAuthority,
+                        nov11CallMarket,
+                        order,
+                        ZetaSide.BID
+                )
+        );
+
+        // Asks
+        orderPayerTokenAccount = coinWallet;
+        marketMint = marketAskMint;
+        order.setPrice(420000);
+        order.setQuantity(420);
+        transaction.addInstruction(
+                ZetaProgram.placeOrder(
+                        account,
+                        state,
+                        zetaGroup,
+                        marginAccount,
+                        serumAuthority,
+                        greeks,
+                        openOrders,
+                        orderPayerTokenAccount,
+                        coinWallet,
+                        pcWallet,
+                        oracle,
+                        marketNode,
+                        marketMint,
+                        mintAuthority,
+                        nov11CallMarket,
+                        order,
+                        ZetaSide.ASK
+                )
+        );
+
+        order.setPrice(424200);
+        transaction.addInstruction(
+                ZetaProgram.placeOrder(
+                        account,
+                        state,
+                        zetaGroup,
+                        marginAccount,
+                        serumAuthority,
+                        greeks,
+                        openOrders,
+                        orderPayerTokenAccount,
+                        coinWallet,
+                        pcWallet,
+                        oracle,
+                        marketNode,
+                        marketMint,
+                        mintAuthority,
+                        nov11CallMarket,
+                        order,
+                        ZetaSide.ASK
                 )
         );
 
