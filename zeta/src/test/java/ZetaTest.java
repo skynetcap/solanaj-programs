@@ -258,8 +258,11 @@ public class ZetaTest {
                     )
             );
 
+
             String cxlTransactionId = client.getApi().sendTransaction(cxlTransaction, account);
             // System.out.println("Cancel Transaction ID: " + cxlTransactionId);
+            System.out.println("Sleeping 1000ms.");
+            Thread.sleep(1000L);
         }
     }
 }

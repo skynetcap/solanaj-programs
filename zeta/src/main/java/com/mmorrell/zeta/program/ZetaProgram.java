@@ -9,15 +9,10 @@ import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 import org.p2p.solanaj.programs.Program;
-import org.p2p.solanaj.utils.ByteUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ZetaProgram extends Program {
@@ -26,6 +21,16 @@ public class ZetaProgram extends Program {
             PublicKey.valueOf("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
     private static final PublicKey SYSVAR_RENT_PUBKEY =
             PublicKey.valueOf("SysvarRent111111111111111111111111111111111");
+
+    private static final byte[] CANCEL_ALL_MARKET_ORDERS_SIGHASH = new byte[] {
+            (byte) 0x8b, (byte) 0xbe, (byte) 0xe6, (byte) 0xf9, (byte) 0x4d, (byte) 0xa0, (byte) 0xce, (byte) 0x04
+    };
+
+    private static final byte[] PLACE_ORDER_SIGHASH = new byte[] {
+            (byte) 0x92, (byte) 0x5D, (byte) 0x0E, (byte) 0xA7, (byte) 0x9F, (byte) 0x14, (byte) 0x06, (byte) 0x3A
+    };
+
+    private static final String PLACE_ORDER_TAG = "sky";
 
     public static TransactionInstruction cancelAllMarketOrders(PublicKey authority,
                                                                PublicKey zetaGroup,
@@ -63,32 +68,10 @@ public class ZetaProgram extends Program {
         keys.add(asks);
         keys.add(eventQueue);
 
-        MessageDigest digest = null;
-        byte[] encodedHash = null;
-        int sigHashStart = 0;
-        int sigHashEnd = 8;
-
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-            encodedHash = Arrays.copyOfRange(
-                    digest.digest(
-                            "global:cancel_all_market_orders".getBytes(
-                                    StandardCharsets.UTF_8
-                            )
-                    ),
-                    sigHashStart,
-                    sigHashEnd
-            );
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        // return encodedHash;
-
         return createTransactionInstruction(
                 ZetaUtil.ZETA_ROOT_PROGRAM_ID,
                 keys,
-                encodedHash
+                CANCEL_ALL_MARKET_ORDERS_SIGHASH
         );
     }
 
@@ -187,20 +170,15 @@ public class ZetaProgram extends Program {
         long price = order.getPrice();
         long size = order.getQuantity();
 
-        byte[] sigHash = new byte[]{
-                (byte) 0x92, (byte) 0x5D, (byte) 0x0E, (byte) 0xA7, (byte) 0x9F, (byte) 0x14,
-                (byte) 0x06, (byte) 0x3A
-        };
-
         ByteBuffer result = ByteBuffer.allocate(35);
         result.order(ByteOrder.LITTLE_ENDIAN);
-        result.put(0, sigHash);
+        result.put(0, PLACE_ORDER_SIGHASH);
         result.putLong(8, price);
         result.putLong(16, size);
         result.put(24, side.getValue());
         result.put(25, orderType.getValue());
         result.put(26, new byte[]{0x00, 0x01, 0x03, 0x00, 0x00, 0x00});
-        result.put(32, "sky".getBytes());
+        result.put(32, PLACE_ORDER_TAG.getBytes());
 
         System.out.println("Placed order: Size " + order.getQuantity() + " @ Price " + order.getPrice());
         // System.out.println("placeOrder Zeta hex: " + ByteUtils.bytesToHex(result.array()));
