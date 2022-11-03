@@ -5,7 +5,6 @@ import com.mmorrell.common.model.Order;
 import com.mmorrell.zeta.model.ZetaOrderType;
 import com.mmorrell.zeta.model.ZetaSide;
 import com.mmorrell.zeta.util.ZetaUtil;
-import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
@@ -14,7 +13,11 @@ import org.p2p.solanaj.utils.ByteUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ZetaProgram extends Program {
@@ -24,7 +27,72 @@ public class ZetaProgram extends Program {
     private static final PublicKey SYSVAR_RENT_PUBKEY =
             PublicKey.valueOf("SysvarRent111111111111111111111111111111111");
 
-    public static TransactionInstruction placeOrder(Account account,
+    public static TransactionInstruction cancelAllMarketOrders(PublicKey authority,
+                                                               PublicKey zetaGroup,
+                                                               PublicKey state,
+                                                               PublicKey marginAccount,
+                                                               PublicKey serumAuthority,
+                                                               PublicKey openOrders,
+                                                               Market market) {
+        final ArrayList<AccountMeta> keys = new ArrayList<>();
+
+        // Signer
+        final AccountMeta authorityMeta = new AccountMeta(authority, true, false);
+
+        // Cancel Accounts
+        final AccountMeta zetaGroupMeta = new AccountMeta(zetaGroup, false, false);
+        final AccountMeta stateMeta = new AccountMeta(state, false, false);
+        final AccountMeta marginAccountMeta = new AccountMeta(marginAccount, false, true);
+        final AccountMeta dexProgram = new AccountMeta(ZetaUtil.ZETA_SERUM_PROGRAM_ID, false, false);
+        final AccountMeta serumAuthorityMeta = new AccountMeta(serumAuthority, false, false);
+        final AccountMeta openOrdersMeta = new AccountMeta(openOrders, false, true);
+        final AccountMeta marketMeta = new AccountMeta(market.getOwnAddress(), false, true);
+        final AccountMeta bids = new AccountMeta(market.getBids(), false, true);
+        final AccountMeta asks = new AccountMeta(market.getAsks(), false, true);
+        final AccountMeta eventQueue = new AccountMeta(market.getEventQueueKey(), false, true);
+
+        keys.add(authorityMeta);
+        keys.add(zetaGroupMeta);
+        keys.add(stateMeta);
+        keys.add(marginAccountMeta);
+        keys.add(dexProgram);
+        keys.add(serumAuthorityMeta);
+        keys.add(openOrdersMeta);
+        keys.add(marketMeta);
+        keys.add(bids);
+        keys.add(asks);
+        keys.add(eventQueue);
+
+        MessageDigest digest = null;
+        byte[] encodedHash = null;
+        int sigHashStart = 0;
+        int sigHashEnd = 8;
+
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+            encodedHash = Arrays.copyOfRange(
+                    digest.digest(
+                            "global:cancel_all_market_orders".getBytes(
+                                    StandardCharsets.UTF_8
+                            )
+                    ),
+                    sigHashStart,
+                    sigHashEnd
+            );
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        // return encodedHash;
+
+        return createTransactionInstruction(
+                ZetaUtil.ZETA_ROOT_PROGRAM_ID,
+                keys,
+                encodedHash
+        );
+    }
+
+    public static TransactionInstruction placeOrder(PublicKey authority,
                                                     PublicKey state,
                                                     PublicKey zetaGroup,
                                                     PublicKey marginAccount,
@@ -45,7 +113,7 @@ public class ZetaProgram extends Program {
         final AccountMeta stateMeta = new AccountMeta(state, false, false);
         final AccountMeta zetaGroupMeta = new AccountMeta(zetaGroup, false, false);
         final AccountMeta marginAccountMeta = new AccountMeta(marginAccount, false, true);
-        final AccountMeta authorityMeta = new AccountMeta(account.getPublicKey(), true, false);
+        final AccountMeta authorityMeta = new AccountMeta(authority, true, false);
         final AccountMeta dexProgram = new AccountMeta(ZetaUtil.ZETA_SERUM_PROGRAM_ID, false, false);
         final AccountMeta tokenProgram = new AccountMeta(TOKEN_PROGRAM_ID, false, false);
         final AccountMeta serumAuthorityMeta = new AccountMeta(serumAuthority, false, false);
@@ -135,7 +203,7 @@ public class ZetaProgram extends Program {
         result.put(32, "sky".getBytes());
 
         System.out.println("Placed order: Size " + order.getQuantity() + " @ Price " + order.getPrice());
-        System.out.println("placeOrder Zeta hex: " + ByteUtils.bytesToHex(result.array()));
+        // System.out.println("placeOrder Zeta hex: " + ByteUtils.bytesToHex(result.array()));
 
         return result.array();
     }
