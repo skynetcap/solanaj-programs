@@ -13,6 +13,7 @@ import java.util.List;
 public class ZetaGroup {
 
     private static final int NUM_PRODUCTS = 46;
+    private static final int NUM_PRODUCTS_PADDING = 91;
     private static final int NUM_EXPIRIES = 2;
 
     private static final int PRODUCT_SIZE_BYTES = 43;
@@ -24,6 +25,7 @@ public class ZetaGroup {
     private PublicKey publicKey;
     private List<ZetaProduct> zetaProducts;
     private List<ZetaExpiry> zetaExpiries;
+    private ZetaProduct zetaPerp;
 
     public static ZetaGroup readZetaGroup(byte[] data) {
         final List<ZetaProduct> zetaProducts = new ArrayList<>(NUM_PRODUCTS);
@@ -53,6 +55,18 @@ public class ZetaGroup {
 
             zetaProducts.add(zetaProduct);
         }
+
+        // Zeta perp
+        final ZetaProduct zetaPerp = ZetaProduct.readZetaProduct(
+                Arrays.copyOfRange(
+                        data,
+                        PRODUCTS_OFFSET + (NUM_PRODUCTS * PRODUCT_SIZE_BYTES) + (NUM_PRODUCTS_PADDING * PRODUCT_SIZE_BYTES),
+                        PRODUCTS_OFFSET + (NUM_PRODUCTS * PRODUCT_SIZE_BYTES) + (NUM_PRODUCTS_PADDING * PRODUCT_SIZE_BYTES) + PRODUCT_SIZE_BYTES
+                )
+        );
+
+        zetaGroup.setZetaPerp(zetaPerp);
+        zetaGroup.getZetaProducts().add(zetaPerp);
 
         // Zeta Expiries
         for (int i = 0; i < NUM_EXPIRIES; i++) {
