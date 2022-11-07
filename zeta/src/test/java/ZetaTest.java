@@ -313,56 +313,61 @@ public class ZetaTest {
         PublicKey mintAuthority = new PublicKey("AV1UvTbycnqMe4JqHKGCqhACRd2m79YmtEUJrnCUQ3GT");
         PublicKey perpSyncQueue = new PublicKey("5TcAGTDp5iaSLQwRK8m9r3uDQJKeat3vfwe3XA2vw12J");
 
-        for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 2; j++) {
+
+
             Transaction transaction = new Transaction();
-            transaction.addInstruction(
-                    ZetaProgram.placePerpOrder(
-                            account.getPublicKey(),
-                            state,
-                            zetaGroup,
-                            marginAccount,
-                            serumAuthority,
-                            greeks,
-                            openOrders,
-                            orderPayerTokenAccount,
-                            coinWallet,
-                            pcWallet,
-                            oracle,
-                            marketMint,
-                            mintAuthority,
-                            perpSyncQueue,
-                            solPerpMarket,
-                            order,
-                            ZetaSide.BID
-                    )
-            );
-            order.setPrice(order.getPrice() - 100);
+            for (int i = 0; i < 4; i++) {
+                transaction.addInstruction(
+                        ZetaProgram.placePerpOrder(
+                                account.getPublicKey(),
+                                state,
+                                zetaGroup,
+                                marginAccount,
+                                serumAuthority,
+                                greeks,
+                                openOrders,
+                                orderPayerTokenAccount,
+                                coinWallet,
+                                pcWallet,
+                                oracle,
+                                marketMint,
+                                mintAuthority,
+                                perpSyncQueue,
+                                solPerpMarket,
+                                order,
+                                ZetaSide.BID
+                        )
+                );
+                order.setPrice(order.getPrice() - 100);
+            }
 
             String transactionId = client.getApi().sendTransaction(transaction, account);
             System.out.println("TX: " + transactionId);
+
+
+            System.out.println("Sleeping 2.5s.");
+            Thread.sleep(2500L);
+            System.out.println("Cancelling...");
+
+            Transaction cxlTransaction = new Transaction();
+            cxlTransaction.addInstruction(
+                    ZetaProgram.cancelAllMarketOrders(
+                            account.getPublicKey(),
+                            zetaGroup,
+                            state,
+                            marginAccount,
+                            serumAuthority,
+                            openOrders,
+                            solPerpMarket
+                    )
+            );
+
+
+            String cxlTransactionId = client.getApi().sendTransaction(cxlTransaction, account);
+            System.out.println("Cancel Transaction ID: " + cxlTransactionId);
+            System.out.println("Sleeping 2500ms.");
+            Thread.sleep(2500L);
         }
-
-        System.out.println("Sleeping 2.5s.");
-        Thread.sleep(2500L);
-        System.out.println("Cancelling...");
-
-        Transaction cxlTransaction = new Transaction();
-        cxlTransaction.addInstruction(
-                ZetaProgram.cancelAllMarketOrders(
-                        account.getPublicKey(),
-                        zetaGroup,
-                        state,
-                        marginAccount,
-                        serumAuthority,
-                        openOrders,
-                        solPerpMarket
-                )
-        );
-
-
-        String cxlTransactionId = client.getApi().sendTransaction(cxlTransaction, account);
-        System.out.println("Cancel Transaction ID: " + cxlTransactionId);
-        System.out.println("Sleeping 1000ms.");
-        Thread.sleep(1000L);
     }
 }
