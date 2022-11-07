@@ -288,7 +288,7 @@ public class ZetaTest {
 
         long orderId = 11133711L;
         final Order order = Order.builder()
-                .price(13370)
+                .price(133700)
                 .quantity(420)
                 .clientOrderId(orderId)
                 .orderTypeLayout(OrderTypeLayout.LIMIT)
@@ -313,31 +313,34 @@ public class ZetaTest {
         PublicKey mintAuthority = new PublicKey("AV1UvTbycnqMe4JqHKGCqhACRd2m79YmtEUJrnCUQ3GT");
         PublicKey perpSyncQueue = new PublicKey("5TcAGTDp5iaSLQwRK8m9r3uDQJKeat3vfwe3XA2vw12J");
 
-        Transaction transaction = new Transaction();
-        transaction.addInstruction(
-                ZetaProgram.placePerpOrder(
-                        account.getPublicKey(),
-                        state,
-                        zetaGroup,
-                        marginAccount,
-                        serumAuthority,
-                        greeks,
-                        openOrders,
-                        orderPayerTokenAccount,
-                        coinWallet,
-                        pcWallet,
-                        oracle,
-                        marketMint,
-                        mintAuthority,
-                        perpSyncQueue,
-                        solPerpMarket,
-                        order,
-                        ZetaSide.BID
-                )
-        );
+        for (int i = 0; i < 5; i++) {
+            Transaction transaction = new Transaction();
+            transaction.addInstruction(
+                    ZetaProgram.placePerpOrder(
+                            account.getPublicKey(),
+                            state,
+                            zetaGroup,
+                            marginAccount,
+                            serumAuthority,
+                            greeks,
+                            openOrders,
+                            orderPayerTokenAccount,
+                            coinWallet,
+                            pcWallet,
+                            oracle,
+                            marketMint,
+                            mintAuthority,
+                            perpSyncQueue,
+                            solPerpMarket,
+                            order,
+                            ZetaSide.BID
+                    )
+            );
+            order.setPrice(order.getPrice() - 100);
 
-        String transactionId = client.getApi().sendTransaction(transaction, account);
-        System.out.println("TX: " + transactionId);
+            String transactionId = client.getApi().sendTransaction(transaction, account);
+            System.out.println("TX: " + transactionId);
+        }
 
         System.out.println("Sleeping 2.5s.");
         Thread.sleep(2500L);
