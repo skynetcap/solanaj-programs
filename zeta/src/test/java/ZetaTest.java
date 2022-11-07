@@ -82,7 +82,7 @@ public class ZetaTest {
 
         ZetaGroup zetaGroup = ZetaGroup.readZetaGroup(data);
 
-        System.out.println(zetaGroup.toString());
+        System.out.println(zetaGroup);
 
         zetaGroup.getZetaProducts().forEach(zetaProduct -> {
             System.out.println(zetaProduct.toString());
