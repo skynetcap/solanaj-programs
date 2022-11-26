@@ -1,4 +1,4 @@
-package com.mmorrell.zeta.model;
+package com.mmorrell.phoenix.model;
 
 import com.mmorrell.common.SerumUtils;
 import com.mmorrell.common.model.AccountFlags;

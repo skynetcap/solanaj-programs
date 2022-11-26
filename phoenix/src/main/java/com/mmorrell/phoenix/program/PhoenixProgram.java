@@ -1,4 +1,4 @@
-package com.mmorrell.zeta.program;
+package com.mmorrell.phoenix.program;
 
 import com.mmorrell.common.SerumUtils;
 import com.mmorrell.common.model.Market;
@@ -18,8 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ZetaProgram extends Program {
+public class PhoenixProgram extends Program {
 
+    private static final PublicKey PHOENIX_PROGRAM_ID =
+            PublicKey.valueOf("phnxNHfGNVjpVVuHkceK3MgwZ1bW25ijfWACKhVFbBH");
     private static final PublicKey TOKEN_PROGRAM_ID =
             PublicKey.valueOf("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
     private static final PublicKey SYSVAR_RENT_PUBKEY =

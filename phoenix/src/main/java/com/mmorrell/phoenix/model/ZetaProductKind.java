@@ -1,4 +1,4 @@
-package com.mmorrell.zeta.model;
+package com.mmorrell.phoenix.model;
 
 public enum ZetaProductKind {
 
