@@ -1,3 +1,4 @@
+import com.mmorrell.phoenix.model.PhoenixMarketHeader;
 import com.mmorrell.phoenix.program.PhoenixProgram;
 import com.mmorrell.phoenix.util.Keccak;
 import org.bitcoinj.core.Base58;
@@ -14,6 +15,8 @@ import java.util.List;
 public class PhoenixTest {
 
     private final RpcClient client = new RpcClient("https://cosmological-black-film.solana-devnet.quiknode.pro/d421efae93a5af6830da22fc2e6ed6a245c5aca1/");
+    private final int MARKET_HEADER_SIZE = 328;
+
 
     @Test
     public void phoenixGetMarketsTest() throws RpcException {
@@ -44,6 +47,13 @@ public class PhoenixTest {
         System.out.println("Number of markets: " + markets.size());
         markets.forEach(programAccount -> {
             System.out.println("Market: " + programAccount.getPubkey());
+
+            byte[] marketHeaderBytes = Arrays.copyOfRange(programAccount.getAccount().getDecodedData(), 0,
+                    MARKET_HEADER_SIZE);
+
+            PhoenixMarketHeader phoenixMarketHeader = PhoenixMarketHeader.readPhoenixMarketHeader(marketHeaderBytes);
+            System.out.println(phoenixMarketHeader);
+
         });
     }
 
