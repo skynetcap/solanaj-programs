@@ -33,15 +33,15 @@ public class PhoenixTest {
         byte[] input = Arrays.copyOfRange(keccakBytes, 0, 8);
         String payload = Base58.encode(input);
         System.out.println("B58 = " + payload);
+        // B58 = RgynHAVXA7V
 
-        List<ProgramAccount> markets = client.getApi().getProgramAccountsBase64(
+        final List<ProgramAccount> markets = client.getApi().getProgramAccountsBase64(
                 PhoenixProgram.PHOENIX_PROGRAM_ID,
                 0,
                 payload
         );
 
         System.out.println("Number of markets: " + markets.size());
-
         markets.forEach(programAccount -> {
             System.out.println("Market: " + programAccount.getPubkey());
         });
