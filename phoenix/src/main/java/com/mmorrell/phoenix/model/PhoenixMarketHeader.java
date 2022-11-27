@@ -10,6 +10,7 @@ import org.p2p.solanaj.core.PublicKey;
 @Builder
 public class PhoenixMarketHeader {
 
+    public static final int MARKET_HEADER_SIZE = 328;
     private long discriminant;
     private long status;
     private long bidsSize;
@@ -25,6 +26,20 @@ public class PhoenixMarketHeader {
     private PublicKey baseVaultKey;
     private long baseLotSize;
 
+    // Quote token
+    private int quoteDecimals;
+    private int quoteVaultBump;
+    private PublicKey quoteMintKey;
+    private PublicKey quoteVaultKey;
+    private long quoteLotSize;
+
+    // Metadata
+    private long tickSize;
+    private PublicKey authority;
+    private PublicKey feeDestination;
+    private long marketSequenceNumber;
+    private PublicKey successor;
+
     public static PhoenixMarketHeader readPhoenixMarketHeader(byte[] data) {
         return PhoenixMarketHeader.builder()
                 .discriminant(Utils.readInt64(data, 0))
@@ -37,6 +52,16 @@ public class PhoenixMarketHeader {
                 .baseMintKey(PublicKey.readPubkey(data, 48))
                 .baseVaultKey(PublicKey.readPubkey(data, 80))
                 .baseLotSize(Utils.readInt64(data, 112))
+                .quoteDecimals(PhoenixUtil.readInt32(data, 120))
+                .quoteVaultBump(PhoenixUtil.readInt32(data, 124))
+                .quoteMintKey(PublicKey.readPubkey(data, 128))
+                .quoteVaultKey(PublicKey.readPubkey(data, 160))
+                .quoteLotSize(Utils.readInt64(data, 192))
+                .tickSize(Utils.readInt64(data, 200))
+                .authority(PublicKey.readPubkey(data, 208))
+                .feeDestination(PublicKey.readPubkey(data, 240))
+                .marketSequenceNumber(Utils.readInt64(data, 272))
+                .successor(PublicKey.readPubkey(data, 280))
                 .build();
     }
 

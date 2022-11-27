@@ -15,46 +15,41 @@ import java.util.List;
 public class PhoenixTest {
 
     private final RpcClient client = new RpcClient("https://cosmological-black-film.solana-devnet.quiknode.pro/d421efae93a5af6830da22fc2e6ed6a245c5aca1/");
-    private final int MARKET_HEADER_SIZE = 328;
-
 
     @Test
     public void phoenixGetMarketsTest() throws RpcException {
         // GPA for all markets
-        String baseStr = "phoenix::program::accounts::MarketHeader";
-
-        Keccak keccak = new Keccak(256);
-        keccak.update(PhoenixProgram.PHOENIX_PROGRAM_ID.toByteArray());
-        keccak.update(baseStr.getBytes());
-
-        // convert to LE
-        ByteBuffer keccakBuffer = keccak.digest();
-        keccakBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        byte[] keccakBytes = keccakBuffer.array();
-
-        // create payload from first 8 bytes
-        byte[] input = Arrays.copyOfRange(keccakBytes, 0, 8);
-        String payload = Base58.encode(input);
-        System.out.println("B58 = " + payload);
-        // B58 = RgynHAVXA7V
-
         final List<ProgramAccount> markets = client.getApi().getProgramAccountsBase64(
                 PhoenixProgram.PHOENIX_PROGRAM_ID,
                 0,
-                payload
+                getDiscriminator("phoenix::program::accounts::MarketHeader")
         );
 
         System.out.println("Number of markets: " + markets.size());
         markets.forEach(programAccount -> {
             System.out.println("Market: " + programAccount.getPubkey());
 
-            byte[] marketHeaderBytes = Arrays.copyOfRange(programAccount.getAccount().getDecodedData(), 0,
-                    MARKET_HEADER_SIZE);
-
-            PhoenixMarketHeader phoenixMarketHeader = PhoenixMarketHeader.readPhoenixMarketHeader(marketHeaderBytes);
+            final PhoenixMarketHeader phoenixMarketHeader = PhoenixMarketHeader.readPhoenixMarketHeader(
+                    Arrays.copyOfRange(
+                            programAccount.getAccount().getDecodedData(),
+                            0,
+                            PhoenixMarketHeader.MARKET_HEADER_SIZE
+                    )
+            );
             System.out.println(phoenixMarketHeader);
 
         });
     }
 
+    private String getDiscriminator(String input) {
+        Keccak keccak = new Keccak(256);
+        keccak.update(PhoenixProgram.PHOENIX_PROGRAM_ID.toByteArray());
+        keccak.update(input.getBytes());
+
+        ByteBuffer keccakBuffer = keccak.digest();
+        keccakBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        byte[] keccakBytes = keccakBuffer.array();
+
+        return Base58.encode(Arrays.copyOfRange(keccakBytes, 0, 8));
+    }
 }
