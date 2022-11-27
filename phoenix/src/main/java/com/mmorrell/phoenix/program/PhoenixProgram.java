@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class PhoenixProgram extends Program {
 
-    private static final PublicKey PHOENIX_PROGRAM_ID =
+    public static final PublicKey PHOENIX_PROGRAM_ID =
             PublicKey.valueOf("phnxNHfGNVjpVVuHkceK3MgwZ1bW25ijfWACKhVFbBH");
     private static final PublicKey TOKEN_PROGRAM_ID =
             PublicKey.valueOf("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
