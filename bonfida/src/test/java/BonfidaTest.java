@@ -1,23 +1,13 @@
 import com.mmorrell.bonfida.manager.NamingManager;
-import org.bitcoinj.core.Utils;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
-import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.types.AccountInfo;
-import org.p2p.solanaj.rpc.types.Filter;
-import org.p2p.solanaj.rpc.types.Memcmp;
-import org.p2p.solanaj.rpc.types.ProgramAccount;
-import org.p2p.solanaj.rpc.types.config.ProgramAccountConfig;
-import org.p2p.solanaj.rpc.types.config.RpcSendTransactionConfig;
-import org.p2p.solanaj.utils.ByteUtils;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -27,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class BonfidaTest {
 
     private static final Logger LOGGER = Logger.getLogger(BonfidaTest.class.getName());
-    private final RpcClient rpcClient = new RpcClient("https://solana-api.projectserum.com/");
+    private final RpcClient rpcClient = new RpcClient("https://rpc.ankr.com/solana");
     private final NamingManager namingManager = new NamingManager(rpcClient);
     private static final String DOMAIN_NAME = ".sol";  // testdomainname.sol
     private final PublicKey skynetMainnetPubkey = new PublicKey("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq");
