@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+// Ignored since too many GPAs for free build server.
+@Ignore
 public class BonfidaTest {
 
     private static final Logger LOGGER = Logger.getLogger(BonfidaTest.class.getName());
