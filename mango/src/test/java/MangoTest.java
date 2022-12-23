@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class MangoTest {
 
-    private final RpcClient client = new RpcClient(Cluster.MAINNET);
+    private final RpcClient client = new RpcClient("https://rpc.ankr.com/solana");
     private final RpcClient devnetClient = new RpcClient("https://api.devnet.solana.com");
     private final MangoManager mangoManager = new MangoManager(client);
     private final MangoManager devnetMangoManager = new MangoManager(devnetClient);
