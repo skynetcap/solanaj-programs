@@ -83,6 +83,8 @@ public class SerumUtils {
 
     public static final PublicKey SERUM_PROGRAM_ID_V3 = new PublicKey("srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX");
     public static final PublicKey WRAPPED_SOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
+    public static final PublicKey USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    public static final PublicKey USDT_MINT = new PublicKey("Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB");
 
     public static PublicKey readOwnAddressPubkey(byte[] bytes) {
         return PublicKey.readPubkey(bytes, OWN_ADDRESS_OFFSET);

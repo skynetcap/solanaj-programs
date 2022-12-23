@@ -223,6 +223,18 @@ public class MarketBuilder {
             return 9;
         }
 
+        // USDC and USDT cases
+        if (tokenMint.equals(SerumUtils.USDC_MINT) || tokenMint.equals(SerumUtils.USDT_MINT)) {
+            return 6;
+        }
+
+        // 100ms sleep to avoid rate limit
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         // RPC call to get mint's account data into decoded bytes (already base64 decoded)
         byte[] accountData = retrieveAccountData(tokenMint);
 

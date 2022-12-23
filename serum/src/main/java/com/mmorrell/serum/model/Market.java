@@ -64,6 +64,14 @@ public class Market {
         this.eventQueue = eventQueue;
     }
 
+    public Order getBestBid() {
+        return getBidOrderBook().getBestBid();
+    }
+
+    public Order getBestAsk() {
+        return getAskOrderBook().getBestAsk();
+    }
+
     public OrderBook getBidOrderBook() {
         return bidOrderBook;
     }
