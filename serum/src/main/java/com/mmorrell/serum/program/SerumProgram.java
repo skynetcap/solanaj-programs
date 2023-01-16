@@ -345,6 +345,7 @@ public class SerumProgram extends Program {
         accountMetas.add(new AccountMeta(quoteWallet, false, true));
         accountMetas.add(new AccountMeta(SerumUtils.getVaultSigner(market), false, false));
         accountMetas.add(new AccountMeta(TOKEN_PROGRAM_ID, false, false));
+        accountMetas.add(new AccountMeta(quoteWallet, false, true));
 
         byte[] transactionData = encodeSettleOrdersTransactionData();
 
