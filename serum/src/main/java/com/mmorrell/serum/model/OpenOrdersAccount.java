@@ -101,8 +101,8 @@ public class OpenOrdersAccount {
     private static final int QUOTE_TOKEN_FREE_OFFSET = BASE_TOKEN_TOTAL_OFFSET + 8;
     private static final int QUOTE_TOKEN_TOTAL_OFFSET = QUOTE_TOKEN_FREE_OFFSET + 8;
     private static final int FREE_SLOT_BITS_OFFSET = QUOTE_TOKEN_TOTAL_OFFSET + 8;
-    private static final int IS_BID_BITS_OFFSET = FREE_SLOT_BITS_OFFSET + 16;
-    private static final int ORDERS_OFFSET = IS_BID_BITS_OFFSET + 16;
+    private static final int IS_BID_BITS_OFFSET = FREE_SLOT_BITS_OFFSET + 128;
+    private static final int ORDERS_OFFSET = IS_BID_BITS_OFFSET + 128;
     private static final int CLIENT_IDS_OFFSET = ORDERS_OFFSET + 2048;
 
     private AccountFlags accountFlags;
@@ -196,15 +196,13 @@ public class OpenOrdersAccount {
             freeSlots.add(isFreeSlot);
             bidSlots.add(isBid);
 
-            if (!isFreeSlot) {
-                Order order = new Order();
-                order.setOrderIndex(i);
-                order.setBid(isBid);
-                order.setClientOrderId(clientOrderId);
-                order.setPrice(price);
-                order.setClientId(clientId);
-                openOrdersAccountOrders.add(order);
-            }
+            Order order = new Order();
+            order.setOrderIndex(i);
+            order.setBid(isBid);
+            order.setClientOrderId(clientOrderId);
+            order.setPrice(price);
+            order.setClientId(clientId);
+            openOrdersAccountOrders.add(order);
         }
 
         openOrdersAccount.setOrders(openOrdersAccountOrders);

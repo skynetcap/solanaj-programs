@@ -256,7 +256,7 @@ public class MarketBuilder {
                     publicKey,
                     Map.of(
                             "commitment",
-                            Commitment.CONFIRMED,
+                            Commitment.PROCESSED,
                             "encoding",
                             RpcSendTransactionConfig.Encoding.base64.getEncoding(),
                             "minContextSlot",
@@ -298,7 +298,7 @@ public class MarketBuilder {
                         Base64.getDecoder().decode(
                                 client.getApi().getAccountInfo(
                                                 publicKey,
-                                                Map.of("commitment", Commitment.CONFIRMED)
+                                                Map.of("commitment", Commitment.PROCESSED)
                                         )
                                         .getValue()
                                         .getData()
