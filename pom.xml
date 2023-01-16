@@ -6,7 +6,7 @@
     <groupId>com.mmorrell</groupId>
     <artifactId>solanaj-programs</artifactId>
     <packaging>pom</packaging>
-    <version>1.11.3</version>
+    <version>1.11.4</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Program libraries for SolanaJ, a library for Solana RPC</description>
     <url>https://github.com/skynetcap/solanaj-programs</url>
@@ -143,7 +143,8 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
-                            <keyname>0x67A54591</keyname>
+                            <homedir>c:/Users/Michael/.gnupg/</homedir>
+                            <keyname>0x27FAE7D2</keyname>
                         </configuration>
                     </execution>
                 </executions>
