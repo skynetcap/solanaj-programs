@@ -236,7 +236,7 @@ public class MarketBuilder {
         }
 
         // RPC call to get mint's account data into decoded bytes (already base64 decoded)
-        byte[] accountData = retrieveAccountData(tokenMint);
+        byte[] accountData = retrieveAccountDataConfirmed(tokenMint);
 
         // Deserialize accountData into the MINT_LAYOUT enum
         byte decimals = SerumUtils.readDecimalsFromTokenMintData(accountData);
