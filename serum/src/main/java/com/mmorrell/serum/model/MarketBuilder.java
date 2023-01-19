@@ -230,7 +230,7 @@ public class MarketBuilder {
 
         // 100ms sleep to avoid rate limit
         try {
-            Thread.sleep(100);
+            Thread.sleep(250);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -264,6 +264,29 @@ public class MarketBuilder {
                     )
             );
             setMinContextSlot(orderBook.getContext().getSlot());
+
+            final List<String> accountData = orderBook.getValue().getData();
+            return Base64.getDecoder().decode(accountData.get(0));
+        } catch (RpcException e) {
+            e.printStackTrace();
+        }
+
+        return new byte[0];
+    }
+
+    private byte[] retrieveAccountDataConfirmed(PublicKey publicKey) {
+        AccountInfo orderBook = null;
+
+        try {
+            orderBook = client.getApi().getAccountInfo(
+                    publicKey,
+                    Map.of(
+                            "commitment",
+                            Commitment.CONFIRMED,
+                            "encoding",
+                            RpcSendTransactionConfig.Encoding.base64.getEncoding()
+                    )
+            );
 
             final List<String> accountData = orderBook.getValue().getData();
             return Base64.getDecoder().decode(accountData.get(0));
