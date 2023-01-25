@@ -6,7 +6,7 @@
     <groupId>com.mmorrell</groupId>
     <artifactId>solanaj-programs</artifactId>
     <packaging>pom</packaging>
-    <version>1.13.1</version>
+    <version>1.13.2</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Program libraries for SolanaJ, a library for Solana RPC</description>
     <url>https://github.com/skynetcap/solanaj-programs</url>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.mmorrell</groupId>
             <artifactId>solanaj</artifactId>
-            <version>1.15.1</version>
+            <version>1.15.2</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
