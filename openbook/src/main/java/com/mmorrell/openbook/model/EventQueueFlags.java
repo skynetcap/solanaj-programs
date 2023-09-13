@@ -1,4 +1,4 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.openbook.model;
 
 /**
  * Used to represent flags for Event Queue events

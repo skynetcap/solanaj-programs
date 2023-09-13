@@ -1,4 +1,4 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.openbook.model;
 
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;

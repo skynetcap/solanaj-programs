@@ -1,6 +1,6 @@
-package com.mmorrell.serum.manager;
+package com.mmorrell.openbook.manager;
 
-import com.mmorrell.serum.model.OrderBook;
+import com.mmorrell.openbook.model.OrderBook;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

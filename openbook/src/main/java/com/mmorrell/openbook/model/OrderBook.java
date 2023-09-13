@@ -1,4 +1,4 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.openbook.model;
 
 import java.util.ArrayList;
 import java.util.Comparator;

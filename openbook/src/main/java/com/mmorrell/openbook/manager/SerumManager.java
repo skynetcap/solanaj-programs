@@ -1,7 +1,13 @@
-package com.mmorrell.serum.manager;
+package com.mmorrell.openbook.manager;
 
+import com.mmorrell.openbook.model.Market;
+import com.mmorrell.openbook.model.OpenOrdersAccount;
+import com.mmorrell.openbook.model.Order;
+import com.mmorrell.openbook.model.OrderTypeLayout;
+import com.mmorrell.openbook.model.SerumUtils;
+import com.mmorrell.openbook.model.SideLayout;
+import com.mmorrell.openbook.program.OpenbookProgram;
 import com.mmorrell.serum.model.*;
-import com.mmorrell.serum.program.OpenbookProgram;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;

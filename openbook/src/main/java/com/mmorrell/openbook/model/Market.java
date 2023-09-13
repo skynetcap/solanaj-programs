@@ -1,4 +1,4 @@
-package com.mmorrell.serum.model;
+package com.mmorrell.openbook.model;
 
 import lombok.EqualsAndHashCode;
 import org.p2p.solanaj.core.PublicKey;
