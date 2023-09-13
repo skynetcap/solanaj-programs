@@ -36,6 +36,7 @@
         <module>bonfida</module>
         <module>pyth</module>
         <module>magiceden</module>
+        <module>openbook</module>
     </modules>
 
     <properties>
