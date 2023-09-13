@@ -22,6 +22,8 @@ public class OpenbookProgram extends Program {
             PublicKey.valueOf("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
     private static final PublicKey SYSVAR_RENT_PUBKEY =
             PublicKey.valueOf("SysvarRent111111111111111111111111111111111");
+    public static final PublicKey OPENBOOK_V2_PROGRAM_ID = PublicKey.valueOf(
+            "opnbkNkqux64GppQhwbyEVc3axhssFhVYuwar8rDHCu");
 
     private static final int MATCH_ORDERS_METHOD_ID = 2;
     private static final int CONSUME_EVENTS_METHOD_ID = 3;
@@ -29,7 +31,9 @@ public class OpenbookProgram extends Program {
     private static final int CANCEL_ORDER_V2_METHOD_ID = 11;
     private static final int CANCEL_ORDER_BY_CLIENT_ID_V2_METHOD_ID = 12;
 
-    // Open Book
+    // Open Book methods to implement
+    // Deposit
+    // Settle Funds
 
     /**
      * Builds a {@link TransactionInstruction} to match orders for a given Market and limit.
