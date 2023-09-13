@@ -42,6 +42,21 @@ public class OpenbookProgram extends Program {
         keys.add(new AccountMeta(caller.getPublicKey(),true, false));
         keys.add(new AccountMeta(caller.getPublicKey(),true, false));
 
+        // open_orders_indexer
+        try {
+            PublicKey ourKey = PublicKey.findProgramAddress(
+                    List.of(
+                            "OpenOrdersIndexer".getBytes(),
+                            caller.getPublicKey().toByteArray()
+                    ),
+                    OPENBOOK_V2_PROGRAM_ID
+            ).getAddress();
+            keys.add(new AccountMeta(ourKey, false, true));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
         byte[] transactionData = OpenBookUtil.encodeNamespace("global:create_open_orders_indexer");
 
         return createTransactionInstruction(
