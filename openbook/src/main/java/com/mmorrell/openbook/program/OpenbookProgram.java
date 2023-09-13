@@ -1,5 +1,6 @@
 package com.mmorrell.openbook.program;
 
+import com.mmorrell.openbook.OpenBookUtil;
 import com.mmorrell.openbook.model.Market;
 import com.mmorrell.openbook.model.MarketBuilder;
 import com.mmorrell.openbook.model.OpenOrdersAccount;
@@ -37,8 +38,23 @@ public class OpenbookProgram extends Program {
     private static final int CANCEL_ORDER_BY_CLIENT_ID_V2_METHOD_ID = 12;
 
     // Open Book methods to implement
-    // Deposit
-    // Settle Funds
+    // CreateOpenOrdersIndexer
+    // aka create_open_orders_indexer
+    // https://github.com/openbook-dex/openbook-v2/blob/master/programs/openbook-v2/src/accounts_ix/create_open_orders_indexer.rs
+
+    public static TransactionInstruction createOpenOrdersIndexer(Account caller) {
+        final List<AccountMeta> keys = new ArrayList<>();
+        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
+        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
+
+        byte[] transactionData = OpenBookUtil.encodeNamespace("global::create_open_orders_indexer");
+
+        return createTransactionInstruction(
+                OPENBOOK_V2_PROGRAM_ID,
+                keys,
+                transactionData
+        );
+    }
 
     /**
      * Builds a {@link TransactionInstruction} to match orders for a given Market and limit.
