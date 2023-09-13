@@ -42,7 +42,7 @@ public class OpenbookProgram extends Program {
         keys.add(new AccountMeta(caller.getPublicKey(),true, false));
         keys.add(new AccountMeta(caller.getPublicKey(),true, false));
 
-        byte[] transactionData = OpenBookUtil.encodeNamespace("global::create_open_orders_indexer");
+        byte[] transactionData = OpenBookUtil.encodeNamespace("global:create_open_orders_indexer");
 
         return createTransactionInstruction(
                 OPENBOOK_V2_PROGRAM_ID,
