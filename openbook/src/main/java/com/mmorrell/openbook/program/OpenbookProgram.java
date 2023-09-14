@@ -7,6 +7,7 @@ import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 import org.p2p.solanaj.programs.Program;
+import org.p2p.solanaj.programs.SystemProgram;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -55,6 +56,10 @@ public class OpenbookProgram extends Program {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        // TODO change below key to `market`
+        keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
+        keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
 
 
         byte[] transactionData = OpenBookUtil.encodeNamespace("global:create_open_orders_indexer");
