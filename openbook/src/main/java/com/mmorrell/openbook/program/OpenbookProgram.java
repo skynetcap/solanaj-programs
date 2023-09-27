@@ -38,32 +38,24 @@ public class OpenbookProgram extends Program {
     // aka create_open_orders_indexer
     // https://github.com/openbook-dex/openbook-v2/blob/master/programs/openbook-v2/src/accounts_ix/create_open_orders_indexer.rs
 
-    public static TransactionInstruction createOpenOrdersIndexer(Account caller) {
+    public static TransactionInstruction createOpenOrdersIndexer(Account caller, PublicKey market) throws Exception {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
-        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
+        keys.add(new AccountMeta(caller.getPublicKey(), true, false));
+        keys.add(new AccountMeta(caller.getPublicKey(), true, false));
 
-        // open_orders_indexer
-        try {
-            PublicKey ourKey = PublicKey.findProgramAddress(
-                    List.of(
-                            "OpenOrdersIndexer".getBytes(),
-                            caller.getPublicKey().toByteArray()
-                    ),
-                    OPENBOOK_V2_PROGRAM_ID
-            ).getAddress();
-            keys.add(new AccountMeta(ourKey, false, true));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        PublicKey indexerPda = PublicKey.findProgramAddress(
+                List.of(
+                        "OpenOrdersIndexer".getBytes(),
+                        caller.getPublicKey().toByteArray()
+                ),
+                OPENBOOK_V2_PROGRAM_ID
+        ).getAddress();
 
-        // TODO change below key to `market`
+        keys.add(new AccountMeta(indexerPda, false, true));
+        keys.add(new AccountMeta(market, false, false));
         keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
-        keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
-
 
         byte[] transactionData = OpenBookUtil.encodeNamespace("global:create_open_orders_indexer");
-
         return createTransactionInstruction(
                 OPENBOOK_V2_PROGRAM_ID,
                 keys,
