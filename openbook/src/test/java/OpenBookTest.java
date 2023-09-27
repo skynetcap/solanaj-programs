@@ -96,7 +96,7 @@ public class OpenBookTest {
         try {
             String txId = rpcClient.getApi().sendTransaction(
                     baseVaultTx,
-                    List.of(testAccount, baseVault, quoteVault, newMarketAccount),
+                    List.of(testAccount, baseVault, quoteVault),
                     null
             );
             log.info("Vault 1 and 2: " + txId);
