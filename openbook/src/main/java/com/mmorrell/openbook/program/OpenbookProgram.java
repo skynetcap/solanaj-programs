@@ -67,7 +67,6 @@ public class OpenbookProgram extends Program {
      * Create an OpenBook v2 market.
      *
      * @param caller
-     * @param market
      * @param baseMint
      * @param quoteMint
      * @param baseVault

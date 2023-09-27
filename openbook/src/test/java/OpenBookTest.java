@@ -39,12 +39,11 @@ public class OpenBookTest {
         log.info(testAccount.getPublicKey().toBase58());
 
         // create base vault and create quote vault
-        // they have to be token accounts before using them
         Account baseVault = new Account();
         Account quoteVault = new Account();
 
 
-        // init base vault
+        // init base vault (wsol)
         Transaction baseVaultTx = new Transaction();
         baseVaultTx.addInstruction(
                 SystemProgram.createAccount(
@@ -63,26 +62,54 @@ public class OpenBookTest {
                 )
         );
 
+        // init quote vault (usdc)
+        baseVaultTx.addInstruction(
+                SystemProgram.createAccount(
+                        testAccount.getPublicKey(),
+                        quoteVault.getPublicKey(),
+                        2039280L,
+                        165L,
+                        TokenProgram.PROGRAM_ID
+                )
+        );
+        baseVaultTx.addInstruction(
+                TokenProgram.initializeAccount(
+                        quoteVault.getPublicKey(),
+                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+                        testAccount.getPublicKey()
+                )
+        );
+
+//        baseVaultTx.addInstruction(
+//                OpenbookProgram.createMarket(
+//                        testAccount,
+//                        new PublicKey("So11111111111111111111111111111111111111112"),
+//                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+//                        baseVault.getPublicKey(),
+//                        quoteVault.getPublicKey()
+//                )
+//        );
+
         try {
             String txId = rpcClient.getApi().sendTransaction(
                     baseVaultTx,
-                    List.of(testAccount, baseVault),
+                    List.of(testAccount, baseVault, quoteVault),
                     null
             );
-            log.info("Vault 1: " + txId);
+            log.info("Vault 1 and 2: " + txId);
         } catch (RpcException e) {
             throw new RuntimeException(e);
         }
-//
-//
+
+
 //        Transaction tx = new Transaction();
 //        tx.addInstruction(
 //                OpenbookProgram.createMarket(
 //                        testAccount,
 //                        new PublicKey("So11111111111111111111111111111111111111112"),
 //                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-//                        null,
-//                        null
+//                        baseVault.getPublicKey(),
+//                        quoteVault.getPublicKey()
 //                )
 //        );
 //
