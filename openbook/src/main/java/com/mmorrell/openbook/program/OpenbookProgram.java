@@ -140,8 +140,7 @@ public class OpenbookProgram extends Program {
         byte[] name = Borsh.serialize("Skynet's Den");
 
         // for OracleConfigParams, write "0" 64 bits wide, covers 2 i32 or just Borsh.serialize((long) 8)
-        byte[] oracleConfigParams = new byte[8];
-
+        byte[] oracleConfigParams = Borsh.serialize(0L);
         byte[] quoteLotSize = Borsh.serialize(10L);
         byte[] baseLotSize = Borsh.serialize(100L);
         byte[] makerFee = Borsh.serialize(0L);

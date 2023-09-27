@@ -43,6 +43,7 @@ public class OpenBookTest {
         // create base vault and create quote vault
         Account baseVault = new Account();
         Account quoteVault = new Account();
+        final Account newMarketAccount = new Account();
 
 
         // init base vault (wsol)
@@ -60,7 +61,7 @@ public class OpenBookTest {
                 TokenProgram.initializeAccount(
                         baseVault.getPublicKey(),
                         new PublicKey("So11111111111111111111111111111111111111112"),
-                        testAccount.getPublicKey()
+                        newMarketAccount.getPublicKey()
                 )
         );
 
@@ -78,11 +79,10 @@ public class OpenBookTest {
                 TokenProgram.initializeAccount(
                         quoteVault.getPublicKey(),
                         new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-                        testAccount.getPublicKey()
+                        newMarketAccount.getPublicKey()
                 )
         );
 
-        final Account newMarketAccount = new Account();
 //        baseVaultTx.addInstruction(
 //                SystemProgram.createAccount(
 //                        testAccount.getPublicKey(),
@@ -105,6 +105,8 @@ public class OpenBookTest {
         }
 
         /// Market
+
+        Thread.sleep(3000L);
 
         Transaction tx = new Transaction();
         tx.addInstruction(
