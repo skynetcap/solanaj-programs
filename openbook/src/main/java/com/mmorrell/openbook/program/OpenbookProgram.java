@@ -114,6 +114,24 @@ public class OpenbookProgram extends Program {
         // system
         keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
 
+        // Remaining accounts: oracleA, oracleB (stub them)
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+
+        // stub collectFeeAdmin
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+
+        // stub openOrdersAdmin, consumeEventsAdmin, closeMarketAdmin
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+
+        // stub eventAuthority
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+
+        // program
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+
 
         // sighash (first 8 bytes)
         byte[] transactionData = OpenBookUtil.encodeNamespace("global:create_market");
@@ -121,15 +139,14 @@ public class OpenbookProgram extends Program {
         // name (string)
         byte[] name = Borsh.serialize("Skynet's Den");
 
-        // for OracleConfigParams, write "0" 64 bits wide, covers 2 i32
+        // for OracleConfigParams, write "0" 64 bits wide, covers 2 i32 or just Borsh.serialize((long) 8)
         byte[] oracleConfigParams = new byte[8];
 
-        byte[] quoteLotSize = Borsh.serialize((long) 10);
-        byte[] baseLotSize = Borsh.serialize((long) 100);
-        byte[] makerFee = Borsh.serialize((long) 10);
-        byte[] takerFee = Borsh.serialize((long) 20);
-        byte[] timeExpiry = Borsh.serialize((long) 0);
-
+        byte[] quoteLotSize = Borsh.serialize(10L);
+        byte[] baseLotSize = Borsh.serialize(100L);
+        byte[] makerFee = Borsh.serialize(0L);
+        byte[] takerFee = Borsh.serialize(20L);
+        byte[] timeExpiry = Borsh.serialize(0L);
 
         byte[] anchorInstructionData = Bytes.concat(
                 transactionData,

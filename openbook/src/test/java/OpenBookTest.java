@@ -12,10 +12,12 @@ import org.p2p.solanaj.rpc.RpcException;
 
 import java.util.List;
 
+import static com.mmorrell.openbook.program.OpenbookProgram.OPENBOOK_V2_PROGRAM_ID;
+
 @Slf4j
 public class OpenBookTest {
 
-    private final RpcClient rpcClient = new RpcClient(Cluster.BLOCKDAEMON);
+    private final RpcClient rpcClient = new RpcClient(Cluster.MAINNET);
     private final Account testAccount = Account.fromJson("[255,181,248,82,179,247,83,90,145,105,170,35,64,239,41,71,160,49,254,240,122,128,229,155,52,230,53,193,23,246,83,29,11,116,195,237,133,152,251,78,144,10,130,201,91,66,43,143,101,167,69,56,134,4,6,47,31,100,212,108,71,177,73,156]");
 
     @Test
@@ -81,15 +83,15 @@ public class OpenBookTest {
         );
 
         final Account newMarketAccount = new Account();
-        baseVaultTx.addInstruction(
-                SystemProgram.createAccount(
-                        testAccount.getPublicKey(),
-                        newMarketAccount.getPublicKey(),
-                        2039280L,
-                        848L,
-                        TokenProgram.PROGRAM_ID
-                )
-        );
+//        baseVaultTx.addInstruction(
+//                SystemProgram.createAccount(
+//                        testAccount.getPublicKey(),
+//                        newMarketAccount.getPublicKey(),
+//                        8039280L,
+//                        848L,
+//                        OPENBOOK_V2_PROGRAM_ID
+//                )
+//        );
 
         try {
             String txId = rpcClient.getApi().sendTransaction(
