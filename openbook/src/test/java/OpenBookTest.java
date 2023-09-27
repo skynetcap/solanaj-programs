@@ -9,6 +9,8 @@ import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 
+import java.util.List;
+
 @Slf4j
 public class OpenBookTest {
 
@@ -37,25 +39,51 @@ public class OpenBookTest {
 
         // create base vault and create quote vault
         // they have to be token accounts before using them
+        Account baseVault = new Account();
+        Account quoteVault = new Account();
 
 
-        Transaction tx = new Transaction();
-        tx.addInstruction(
-                OpenbookProgram.createMarket(
-                        testAccount,
-                        new PublicKey("So11111111111111111111111111111111111111112"),
-                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-                        null,
-                        null
+        // init base vault
+        Transaction baseVaultTx = new Transaction();
+        baseVaultTx.addInstruction(
+                SystemProgram.createAccount(
+                        testAccount.getPublicKey(),
+                        baseVault.getPublicKey(),
+                        2039280L,
+                        165L,
+                        SystemProgram.PROGRAM_ID
                 )
         );
 
         try {
-            String txId = rpcClient.getApi().sendTransaction(tx, testAccount);
-            log.info(txId);
+            String txId = rpcClient.getApi().sendTransaction(
+                    baseVaultTx,
+                    List.of(testAccount, baseVault),
+                    null
+            );
+            log.info("Vault 1: " + txId);
         } catch (RpcException e) {
             throw new RuntimeException(e);
         }
+//
+//
+//        Transaction tx = new Transaction();
+//        tx.addInstruction(
+//                OpenbookProgram.createMarket(
+//                        testAccount,
+//                        new PublicKey("So11111111111111111111111111111111111111112"),
+//                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+//                        null,
+//                        null
+//                )
+//        );
+//
+//        try {
+//            String txId = rpcClient.getApi().sendTransaction(tx, testAccount);
+//            log.info(txId);
+//        } catch (RpcException e) {
+//            throw new RuntimeException(e);
+//        }
 
     }
 }
