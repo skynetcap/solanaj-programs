@@ -2,6 +2,7 @@ import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.p2p.solanaj.core.Account;
+import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.programs.SystemProgram;
 import org.p2p.solanaj.rpc.Cluster;
@@ -20,6 +21,34 @@ public class OpenBookTest {
 
         Transaction tx = new Transaction();
         tx.addInstruction(OpenbookProgram.createOpenOrdersIndexer(testAccount, SystemProgram.PROGRAM_ID));
+
+        try {
+            String txId = rpcClient.getApi().sendTransaction(tx, testAccount);
+            log.info(txId);
+        } catch (RpcException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Test
+    public void openBookCreateMarketTest() throws Exception {
+        log.info(testAccount.getPublicKey().toBase58());
+
+        // create base vault and create quote vault
+        // they have to be token accounts before using them
+
+
+        Transaction tx = new Transaction();
+        tx.addInstruction(
+                OpenbookProgram.createMarket(
+                        testAccount,
+                        new PublicKey("So11111111111111111111111111111111111111112"),
+                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+                        null,
+                        null
+                )
+        );
 
         try {
             String txId = rpcClient.getApi().sendTransaction(tx, testAccount);

@@ -75,9 +75,9 @@ public class OpenbookProgram extends Program {
      * @return
      * @throws Exception
      */
-    public static TransactionInstruction createMarket(Account caller, PublicKey market,
-                                                      PublicKey baseMint, PublicKey quoteMint,
-                                                      PublicKey baseVault, PublicKey quoteVault) throws Exception {
+    public static TransactionInstruction createMarket(Account caller, PublicKey baseMint,
+                                                      PublicKey quoteMint, PublicKey baseVault,
+                                                      PublicKey quoteVault) throws Exception {
         final List<AccountMeta> keys = new ArrayList<>();
         final Account newMarketAccount = new Account();
         keys.add(new AccountMeta(newMarketAccount.getPublicKey(), true, true));
@@ -91,30 +91,30 @@ public class OpenbookProgram extends Program {
                 OPENBOOK_V2_PROGRAM_ID
         ).getAddress();
 
-        keys.add(new AccountMeta(marketAuthorityPda , false, false)); //marketAuthority
+        keys.add(new AccountMeta(marketAuthorityPda, false, false)); //marketAuthority
 
         Account bidAccount = new Account();
         Account askAccount = new Account();
         Account heapAccount = new Account();
 
-        keys.add(new AccountMeta(bidAccount.getPublicKey() , false, true)); //bids
-        keys.add(new AccountMeta(askAccount.getPublicKey() , false, true)); //asks
-        keys.add(new AccountMeta(heapAccount.getPublicKey() , false, true)); //eventHeap
+        keys.add(new AccountMeta(bidAccount.getPublicKey(), false, true)); //bids
+        keys.add(new AccountMeta(askAccount.getPublicKey(), false, true)); //asks
+        keys.add(new AccountMeta(heapAccount.getPublicKey(), false, true)); //eventHeap
 
         // payer
-        keys.add(new AccountMeta(caller.getPublicKey() , true, true)); // payer
+        keys.add(new AccountMeta(caller.getPublicKey(), true, true)); // payer
 
         // marketBaseVault
-        keys.add(new AccountMeta(baseVault , false, false));
+        keys.add(new AccountMeta(baseVault, false, false));
 
         // marketQuoteVault
-        keys.add(new AccountMeta(quoteVault , false, false));
+        keys.add(new AccountMeta(quoteVault, false, false));
 
         // baseMint
-        keys.add(new AccountMeta(baseMint , false, false));
+        keys.add(new AccountMeta(baseMint, false, false));
 
         // quoteMint
-        keys.add(new AccountMeta(quoteVault , false, false));
+        keys.add(new AccountMeta(quoteMint, false, false));
 
         // system
         keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
