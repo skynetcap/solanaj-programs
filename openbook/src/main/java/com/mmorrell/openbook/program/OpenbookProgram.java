@@ -1,7 +1,9 @@
 package com.mmorrell.openbook.program;
 
+import com.google.common.primitives.Bytes;
 import com.mmorrell.openbook.OpenBookUtil;
 
+import com.syntifi.near.borshj.Borsh;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
@@ -27,11 +29,6 @@ public class OpenbookProgram extends Program {
     public static final PublicKey OPENBOOK_V2_PROGRAM_ID = PublicKey.valueOf(
             "opnbkNkqux64GppQhwbyEVc3axhssFhVYuwar8rDHCu");
 
-    private static final int MATCH_ORDERS_METHOD_ID = 2;
-    private static final int CONSUME_EVENTS_METHOD_ID = 3;
-    private static final int SETTLE_ORDERS_METHOD_ID = 5;
-    private static final int CANCEL_ORDER_V2_METHOD_ID = 11;
-    private static final int CANCEL_ORDER_BY_CLIENT_ID_V2_METHOD_ID = 12;
 
     // Open Book methods to implement
     // CreateOpenOrdersIndexer
@@ -118,11 +115,48 @@ public class OpenbookProgram extends Program {
         keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
 
 
+        // sighash (first 8 bytes)
         byte[] transactionData = OpenBookUtil.encodeNamespace("global:create_market");
+
+        // name (string)
+        byte[] name = Borsh.serialize("Skynet's Den");
+
+        // for OracleConfigParams, write "0" 64 bits wide, covers 2 i32
+        byte[] oracleConfigParams = new byte[8];
+
+        /*
+        {
+          name: 'quoteLotSize';
+          type: 'i64';
+        },
+        {
+          name: 'baseLotSize';
+          type: 'i64';
+        },
+        {
+          name: 'makerFee';
+          type: 'i64';
+        },
+        {
+          name: 'takerFee';
+          type: 'i64';
+        },
+        {
+          name: 'timeExpiry';
+          type: 'i64';
+        },
+         */
+
+        byte[] anchorInstructionData = Bytes.concat(
+                transactionData,
+                name,
+                oracleConfigParams
+        );
+
         return createTransactionInstruction(
                 OPENBOOK_V2_PROGRAM_ID,
                 keys,
-                transactionData
+                anchorInstructionData
         );
     }
 }
