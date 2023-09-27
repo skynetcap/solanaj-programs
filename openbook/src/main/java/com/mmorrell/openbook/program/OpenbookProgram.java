@@ -62,4 +62,42 @@ public class OpenbookProgram extends Program {
                 transactionData
         );
     }
+
+    public static TransactionInstruction createMarket(Account caller, PublicKey market,
+                                                      PublicKey baseMint, PublicKey quoteMint) throws Exception {
+        final List<AccountMeta> keys = new ArrayList<>();
+        final Account newMarketAccount = new Account();
+        keys.add(new AccountMeta(newMarketAccount.getPublicKey(), true, true));
+
+        // marketAuthority
+        PublicKey marketAuthorityPda = PublicKey.findProgramAddress(
+                List.of(
+                        "Market".getBytes(),
+                        newMarketAccount.getPublicKey().toByteArray()
+                ),
+                OPENBOOK_V2_PROGRAM_ID
+        ).getAddress();
+
+        keys.add(new AccountMeta(marketAuthorityPda , false, false)); //marketAuthority
+
+        Account bidAccount = new Account();
+        Account askAccount = new Account();
+        Account heapAccount = new Account();
+
+        keys.add(new AccountMeta(bidAccount.getPublicKey() , false, true)); //bids
+        keys.add(new AccountMeta(askAccount.getPublicKey() , false, true)); //asks
+        keys.add(new AccountMeta(heapAccount.getPublicKey() , false, true)); //eventHeap
+
+        // payer
+        keys.add(new AccountMeta(caller.getPublicKey() , true, true)); // payer
+
+
+
+        byte[] transactionData = OpenBookUtil.encodeNamespace("global:create_open_orders_indexer");
+        return createTransactionInstruction(
+                OPENBOOK_V2_PROGRAM_ID,
+                keys,
+                transactionData
+        );
+    }
 }
