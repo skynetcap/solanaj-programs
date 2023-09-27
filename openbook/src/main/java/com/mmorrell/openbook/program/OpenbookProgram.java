@@ -124,33 +124,22 @@ public class OpenbookProgram extends Program {
         // for OracleConfigParams, write "0" 64 bits wide, covers 2 i32
         byte[] oracleConfigParams = new byte[8];
 
-        /*
-        {
-          name: 'quoteLotSize';
-          type: 'i64';
-        },
-        {
-          name: 'baseLotSize';
-          type: 'i64';
-        },
-        {
-          name: 'makerFee';
-          type: 'i64';
-        },
-        {
-          name: 'takerFee';
-          type: 'i64';
-        },
-        {
-          name: 'timeExpiry';
-          type: 'i64';
-        },
-         */
+        byte[] quoteLotSize = Borsh.serialize((long) 10);
+        byte[] baseLotSize = Borsh.serialize((long) 100);
+        byte[] makerFee = Borsh.serialize((long) 10);
+        byte[] takerFee = Borsh.serialize((long) 20);
+        byte[] timeExpiry = Borsh.serialize((long) 0);
+
 
         byte[] anchorInstructionData = Bytes.concat(
                 transactionData,
                 name,
-                oracleConfigParams
+                oracleConfigParams,
+                quoteLotSize,
+                baseLotSize,
+                makerFee,
+                takerFee,
+                timeExpiry
         );
 
         return createTransactionInstruction(
