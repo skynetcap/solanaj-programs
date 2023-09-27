@@ -5,6 +5,7 @@ import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.programs.SystemProgram;
+import org.p2p.solanaj.programs.TokenProgram;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
@@ -51,7 +52,14 @@ public class OpenBookTest {
                         baseVault.getPublicKey(),
                         2039280L,
                         165L,
-                        SystemProgram.PROGRAM_ID
+                        TokenProgram.PROGRAM_ID
+                )
+        );
+        baseVaultTx.addInstruction(
+                TokenProgram.initializeAccount(
+                        baseVault.getPublicKey(),
+                        new PublicKey("So11111111111111111111111111111111111111112"),
+                        testAccount.getPublicKey()
                 )
         );
 
