@@ -74,18 +74,17 @@ public class OpenbookProgram extends Program {
      * @return
      * @throws Exception
      */
-    public static TransactionInstruction createMarket(Account caller, PublicKey baseMint,
+    public static TransactionInstruction createMarket(Account caller, Account market, PublicKey baseMint,
                                                       PublicKey quoteMint, PublicKey baseVault,
                                                       PublicKey quoteVault) throws Exception {
         final List<AccountMeta> keys = new ArrayList<>();
-        final Account newMarketAccount = new Account();
-        keys.add(new AccountMeta(newMarketAccount.getPublicKey(), true, true));
+        keys.add(new AccountMeta(market.getPublicKey(), true, true));
 
         // marketAuthority
         PublicKey marketAuthorityPda = PublicKey.findProgramAddress(
                 List.of(
                         "Market".getBytes(),
-                        newMarketAccount.getPublicKey().toByteArray()
+                        market.getPublicKey().toByteArray()
                 ),
                 OPENBOOK_V2_PROGRAM_ID
         ).getAddress();

@@ -80,20 +80,21 @@ public class OpenBookTest {
                 )
         );
 
-//        baseVaultTx.addInstruction(
-//                OpenbookProgram.createMarket(
-//                        testAccount,
-//                        new PublicKey("So11111111111111111111111111111111111111112"),
-//                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-//                        baseVault.getPublicKey(),
-//                        quoteVault.getPublicKey()
-//                )
-//        );
+        final Account newMarketAccount = new Account();
+        baseVaultTx.addInstruction(
+                SystemProgram.createAccount(
+                        testAccount.getPublicKey(),
+                        newMarketAccount.getPublicKey(),
+                        2039280L,
+                        848L,
+                        TokenProgram.PROGRAM_ID
+                )
+        );
 
         try {
             String txId = rpcClient.getApi().sendTransaction(
                     baseVaultTx,
-                    List.of(testAccount, baseVault, quoteVault),
+                    List.of(testAccount, baseVault, quoteVault, newMarketAccount),
                     null
             );
             log.info("Vault 1 and 2: " + txId);
@@ -101,24 +102,26 @@ public class OpenBookTest {
             throw new RuntimeException(e);
         }
 
+        /// Market
 
-//        Transaction tx = new Transaction();
-//        tx.addInstruction(
-//                OpenbookProgram.createMarket(
-//                        testAccount,
-//                        new PublicKey("So11111111111111111111111111111111111111112"),
-//                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-//                        baseVault.getPublicKey(),
-//                        quoteVault.getPublicKey()
-//                )
-//        );
-//
-//        try {
-//            String txId = rpcClient.getApi().sendTransaction(tx, testAccount);
-//            log.info(txId);
-//        } catch (RpcException e) {
-//            throw new RuntimeException(e);
-//        }
+        Transaction tx = new Transaction();
+        tx.addInstruction(
+                OpenbookProgram.createMarket(
+                        testAccount,
+                        newMarketAccount,
+                        new PublicKey("So11111111111111111111111111111111111111112"),
+                        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+                        baseVault.getPublicKey(),
+                        quoteVault.getPublicKey()
+                )
+        );
+
+        try {
+            String txId = rpcClient.getApi().sendTransaction(tx, List.of(testAccount, newMarketAccount), null);
+            log.info("Market: " + txId);
+        } catch (RpcException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }
