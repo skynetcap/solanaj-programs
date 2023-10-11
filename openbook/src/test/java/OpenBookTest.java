@@ -25,10 +25,17 @@ public class OpenBookTest {
         log.info(testAccount.getPublicKey().toBase58());
 
         Transaction tx = new Transaction();
-        tx.addInstruction(OpenbookProgram.createOpenOrdersIndexer(testAccount, SystemProgram.PROGRAM_ID));
+        Account indexerAccount = new Account();
+
+//        tx.addInstruction(SystemProgram.createAccount(testAccount.getPublicKey(), indexerAccount.getPublicKey(),
+//                10000L, 32L,
+//                OPENBOOK_V2_PROGRAM_ID));
+
+        tx.addInstruction(OpenbookProgram.createOpenOrdersIndexer(testAccount,
+                OPENBOOK_V2_PROGRAM_ID));
 
         try {
-            String txId = rpcClient.getApi().sendTransaction(tx, testAccount);
+            String txId = rpcClient.getApi().sendTransaction(tx, List.of(testAccount), null);
             log.info(txId);
         } catch (RpcException e) {
             throw new RuntimeException(e);

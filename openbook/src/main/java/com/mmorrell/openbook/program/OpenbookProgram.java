@@ -35,15 +35,15 @@ public class OpenbookProgram extends Program {
     // aka create_open_orders_indexer
     // https://github.com/openbook-dex/openbook-v2/blob/master/programs/openbook-v2/src/accounts_ix/create_open_orders_indexer.rs
 
-    public static TransactionInstruction createOpenOrdersIndexer(Account caller, PublicKey market) throws Exception {
+    public static TransactionInstruction createOpenOrdersIndexer(Account payer, PublicKey market) throws Exception {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(caller.getPublicKey(), true, false));
-        keys.add(new AccountMeta(caller.getPublicKey(), true, false));
+        keys.add(new AccountMeta(payer.getPublicKey(), true, true));
+        keys.add(new AccountMeta(payer.getPublicKey(), false, true));
 
         PublicKey indexerPda = PublicKey.findProgramAddress(
                 List.of(
                         "OpenOrdersIndexer".getBytes(),
-                        caller.getPublicKey().toByteArray()
+                        payer.getPublicKey().toByteArray()
                 ),
                 OPENBOOK_V2_PROGRAM_ID
         ).getAddress();
