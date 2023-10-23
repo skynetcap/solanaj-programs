@@ -6,7 +6,7 @@
     <groupId>com.mmorrell</groupId>
     <artifactId>solanaj-programs</artifactId>
     <packaging>pom</packaging>
-    <version>1.13.2</version>
+    <version>1.16.0</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Program libraries for SolanaJ, a library for Solana RPC</description>
     <url>https://github.com/skynetcap/solanaj-programs</url>
@@ -60,22 +60,22 @@
         <dependency>
             <groupId>com.mmorrell</groupId>
             <artifactId>solanaj</artifactId>
-            <version>1.15.2</version>
+            <version>1.16.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.19.0</version>
+            <version>2.20.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.19.0</version>
+            <version>2.20.0</version>
         </dependency>
         <dependency>
             <groupId>com.syntifi.near</groupId>
