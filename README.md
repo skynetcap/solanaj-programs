@@ -9,7 +9,7 @@ SolanaJ implementations of popular Solana programs, including the Project Serum 
 <dependency>
         <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.12.2</version>
+        <version>1.16.0</version>
 </dependency>
 ```
 
