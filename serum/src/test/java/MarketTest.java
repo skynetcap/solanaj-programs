@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 public class MarketTest {
 
-    private final RpcClient client = new RpcClient(Cluster.MAINNET);
+    private final RpcClient client = new RpcClient("https://rpc.ankr.com/solana");
     private static final Logger LOGGER = LogManager.getLogger(MarketTest.class);
 
     /**
@@ -37,7 +37,7 @@ public class MarketTest {
     @Test
     public void marketBuilderBtcUsdcTest() throws RpcException, InterruptedException {
         // Pubkey of SRM/USDC market
-        final PublicKey publicKey = new PublicKey("ByRys5tuUWDgL73G8JBAEfkdFf8JWBzPBDHsBVQ5vbQA"); //SRM/USDC
+        final PublicKey publicKey = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6"); //SRM/USDC
 
         final Market solUsdcMarket = new MarketBuilder()
                 .setClient(client)
@@ -78,7 +78,7 @@ public class MarketTest {
     @Test
     @Ignore
     public void orderBookCacheTest() throws InterruptedException {
-        final PublicKey marketId = new PublicKey("9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT");
+        final PublicKey marketId = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6");
         final MarketBuilder solUsdcMarketBuilder = new MarketBuilder()
                 .setClient(client)
                 .setPublicKey(marketId)
@@ -167,7 +167,7 @@ public class MarketTest {
      */
     @Test
     public void marketBuilderSolUsdcTest() {
-        final PublicKey solUsdcPublicKey = new PublicKey("9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT");
+        final PublicKey solUsdcPublicKey = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6");
 
         final Market solUsdcMarket = new MarketBuilder()
                 .setClient(client)
@@ -202,7 +202,7 @@ public class MarketTest {
      */
     @Test
     public void marketBuilderwhEthUsdcTest() {
-        final PublicKey solUsdcPublicKey = new PublicKey("8Gmi2HhZmwQPVdCwzS7CM66MGstMXPcTVHA7jF19cLZz");
+        final PublicKey solUsdcPublicKey = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6");
 
         final Market solUsdcMarket = new MarketBuilder()
                 .setClient(client)
@@ -237,7 +237,7 @@ public class MarketTest {
      */
     @Test
     public void marketBuilderEventQueueTest() {
-        final PublicKey solUsdcPublicKey = new PublicKey("2Pbh1CvRVku1TgewMfycemghf6sU9EyuFDcNXqvRmSxc");
+        final PublicKey solUsdcPublicKey = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6");
 
         final MarketBuilder solUsdcMarketBuilder = new MarketBuilder()
                 .setPublicKey(solUsdcPublicKey)

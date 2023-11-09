@@ -6,7 +6,7 @@ A SolanaJ module for interfacing with Pyth.
 <dependency>
         <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.5-SNAPSHOT</version>
+        <version>1.12.2</version>
 </dependency>
 ```
 
@@ -14,7 +14,7 @@ A SolanaJ module for interfacing with Pyth.
 
 ### Iterate all products and get price
 ```java
-private final RpcClient client = new RpcClient(Cluster.MAINNET);
+private final RpcClient client = new RpcClient("https://rpc.ankr.com/solana");
 private final PythManager pythManager = new PythManager(client);
 
 final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);

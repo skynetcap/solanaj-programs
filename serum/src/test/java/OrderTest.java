@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 public class OrderTest {
 
     private static final Logger LOGGER = Logger.getLogger(OrderTest.class.getName());
-    private final RpcClient client = new RpcClient("https://solana-api.projectserum.com");
+    private final RpcClient client = new RpcClient("https://rpc.ankr.com/solana");
     private final SerumManager serumManager = new SerumManager(client);
     private static final PublicKey SOL_USDC_MARKET_V3 = PublicKey.valueOf("9wFFyRfZBsuAha4YcuxcXLKwMxJR43S7fPfQLusDBzvT");
 

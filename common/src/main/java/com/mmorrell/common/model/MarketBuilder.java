@@ -221,8 +221,20 @@ public class MarketBuilder {
             return 9;
         }
 
+        // USDC and USDT cases
+        if (tokenMint.equals(SerumUtils.USDC_MINT) || tokenMint.equals(SerumUtils.USDT_MINT)) {
+            return 6;
+        }
+
+        // 100ms sleep to avoid rate limit
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         // RPC call to get mint's account data into decoded bytes (already base64 decoded)
-        byte[] accountData = retrieveAccountData(tokenMint);
+        byte[] accountData = retrieveAccountDataConfirmed(tokenMint);
 
         // Deserialize accountData into the MINT_LAYOUT enum
         byte decimals = SerumUtils.readDecimalsFromTokenMintData(accountData);
@@ -242,7 +254,7 @@ public class MarketBuilder {
                     publicKey,
                     Map.of(
                             "commitment",
-                            Commitment.CONFIRMED,
+                            Commitment.PROCESSED,
                             "encoding",
                             RpcSendTransactionConfig.Encoding.base64.getEncoding(),
                             "minContextSlot",
@@ -250,6 +262,29 @@ public class MarketBuilder {
                     )
             );
             setMinContextSlot(orderBook.getContext().getSlot());
+
+            final List<String> accountData = orderBook.getValue().getData();
+            return Base64.getDecoder().decode(accountData.get(0));
+        } catch (RpcException e) {
+            e.printStackTrace();
+        }
+
+        return new byte[0];
+    }
+
+    private byte[] retrieveAccountDataConfirmed(PublicKey publicKey) {
+        AccountInfo orderBook = null;
+
+        try {
+            orderBook = client.getApi().getAccountInfo(
+                    publicKey,
+                    Map.of(
+                            "commitment",
+                            Commitment.CONFIRMED,
+                            "encoding",
+                            RpcSendTransactionConfig.Encoding.base64.getEncoding()
+                    )
+            );
 
             final List<String> accountData = orderBook.getValue().getData();
             return Base64.getDecoder().decode(accountData.get(0));
@@ -284,7 +319,7 @@ public class MarketBuilder {
                         Base64.getDecoder().decode(
                                 client.getApi().getAccountInfo(
                                                 publicKey,
-                                                Map.of("commitment", Commitment.CONFIRMED)
+                                                Map.of("commitment", Commitment.PROCESSED)
                                         )
                                         .getValue()
                                         .getData()

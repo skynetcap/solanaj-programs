@@ -39,7 +39,7 @@ public class SerumProgram extends Program {
      * Might not be needed in Serum v3, since request queue handling changed.
      *
      * @param market market to crank
-     * @param limit number of orders to match
+     * @param limit  number of orders to match
      * @return {@link TransactionInstruction} for the matchOrders call
      */
     public static TransactionInstruction matchOrders(Market market, int limit) {
@@ -83,11 +83,11 @@ public class SerumProgram extends Program {
     /**
      * Overloaded version of placeOrder which assumes no SRM fee discount
      *
-     * @param account Account from private key which owns payer and openOrders
-     * @param payer token pubkey funding the order. could be your USDC wallet for example.
+     * @param account    Account from private key which owns payer and openOrders
+     * @param payer      token pubkey funding the order. could be your USDC wallet for example.
      * @param openOrders open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
-     * @param market loaded market that we are trading on. this must be built by a {@link MarketBuilder}
-     * @param order order we are placing
+     * @param market     loaded market that we are trading on. this must be built by a {@link MarketBuilder}
+     * @param order      order we are placing
      * @return {@link TransactionInstruction} for the placeOrder call
      */
     public static TransactionInstruction placeOrder(Account account,
@@ -101,11 +101,11 @@ public class SerumProgram extends Program {
     /**
      * Builds a {@link TransactionInstruction} to place a new v3 Serum order.
      *
-     * @param account Account from private key which owns payer and openOrders
-     * @param payer token pubkey funding the order. could be your USDC wallet for example.
-     * @param openOrders open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
-     * @param market loaded market that we are trading on. this must be built by a {@link MarketBuilder}
-     * @param order order we are placing
+     * @param account        Account from private key which owns payer and openOrders
+     * @param payer          token pubkey funding the order. could be your USDC wallet for example.
+     * @param openOrders     open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
+     * @param market         loaded market that we are trading on. this must be built by a {@link MarketBuilder}
+     * @param order          order we are placing
      * @param srmFeeDiscount pubkey of our SRM wallet for fee discount
      * @return {@link TransactionInstruction} for the placeOrder call
      */
@@ -170,7 +170,7 @@ public class SerumProgram extends Program {
             keys.add(new AccountMeta(srmFeeDiscount, false, false));
         }
 
-        byte[] transactionData =  buildNewOrderv3InstructionData(
+        byte[] transactionData = buildNewOrderv3InstructionData(
                 order
         );
 
@@ -222,10 +222,10 @@ public class SerumProgram extends Program {
     /**
      * Builds a {@link TransactionInstruction} to cancel an existing Serum order by client ID.
      *
-     * @param market loaded market that we are trading on. this must be built by a {@link MarketBuilder}
+     * @param market     loaded market that we are trading on. this must be built by a {@link MarketBuilder}
      * @param openOrders open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
-     * @param owner pubkey of your SOL wallet
-     * @param clientId identifier created before order creation that is associated with this order
+     * @param owner      pubkey of your SOL wallet
+     * @param clientId   identifier created before order creation that is associated with this order
      * @return {@link TransactionInstruction} for the cancelOrderByClientIdV2 call
      */
     public static TransactionInstruction cancelOrderByClientId(Market market,
@@ -271,10 +271,10 @@ public class SerumProgram extends Program {
     /**
      * Builds a {@link TransactionInstruction} to cancel an existing Serum order by client ID.
      *
-     * @param market loaded market that we are trading on. this must be built by a {@link MarketBuilder}
-     * @param openOrders open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
-     * @param owner pubkey of your SOL wallet
-     * @param side side of the order - buy or sell
+     * @param market        loaded market that we are trading on. this must be built by a {@link MarketBuilder}
+     * @param openOrders    open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
+     * @param owner         pubkey of your SOL wallet
+     * @param side          side of the order - buy or sell
      * @param clientOrderId byte array containing the clientOrderId - retrieved from an {@link OpenOrdersAccount}
      * @return {@link TransactionInstruction} for the cancelOrderByClientIdV2 call
      */
@@ -307,17 +307,17 @@ public class SerumProgram extends Program {
     /**
      * Encodes the clientOrderId and SideLayout params used in cancelOrderV2 instructions into a byte array
      *
-     * @param side side of the order - buy or sell
+     * @param side          side of the order - buy or sell
      * @param clientOrderId byte array containing the clientOrderId
      * @return transaction data
      */
     private static byte[] encodeCancelOrderTransactionData(SideLayout side, byte[] clientOrderId) {
-        ByteBuffer result = ByteBuffer.allocate(25);
+        ByteBuffer result = ByteBuffer.allocate(17);
         result.order(ByteOrder.LITTLE_ENDIAN);
 
         result.put(1, (byte) CANCEL_ORDER_V2_METHOD_ID);
         result.put(5, (byte) side.getValue());
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 8; i++) {
             result.put(9 + i, clientOrderId[i]);
         }
 
@@ -327,10 +327,10 @@ public class SerumProgram extends Program {
     /**
      * Builds a {@link TransactionInstruction} used to settle funds on a given Serum {@link Market}
      *
-     * @param market loaded market that we are trading on. this must be built by a {@link MarketBuilder}
-     * @param openOrders open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
-     * @param owner pubkey of your SOL wallet / the signer
-     * @param baseWallet coin fee receivable account
+     * @param market      loaded market that we are trading on. this must be built by a {@link MarketBuilder}
+     * @param openOrders  open orders pubkey associated with this Account and market - look up using {@link SerumUtils}
+     * @param owner       pubkey of your SOL wallet / the signer
+     * @param baseWallet  coin fee receivable account
      * @param quoteWallet pc fee receivable account
      * @return {@link TransactionInstruction} for the settleFunds call
      */
@@ -350,6 +350,7 @@ public class SerumProgram extends Program {
         accountMetas.add(new AccountMeta(quoteWallet, false, true));
         accountMetas.add(new AccountMeta(SerumUtils.getVaultSigner(market), false, false));
         accountMetas.add(new AccountMeta(TOKEN_PROGRAM_ID, false, false));
+        accountMetas.add(new AccountMeta(quoteWallet, false, true));
 
         byte[] transactionData = encodeSettleOrdersTransactionData();
 
@@ -375,11 +376,11 @@ public class SerumProgram extends Program {
     /**
      * Builds a {@link TransactionInstruction} to call Consume Events for a given market and {@link PublicKey}s
      *
-     * @param signer pubkey of account signing the transaction
+     * @param signer             pubkey of account signing the transaction
      * @param openOrdersAccounts list of all open orders accounts to consume in the event queue
-     * @param market market with the event queue we want to process
-     * @param baseWallet coin fee receivable account (?)
-     * @param quoteWallet pc fee receivable account (?)
+     * @param market             market with the event queue we want to process
+     * @param baseWallet         coin fee receivable account (?)
+     * @param quoteWallet        pc fee receivable account (?)
      * @return {@link TransactionInstruction} for the Consume Events call
      */
     public static TransactionInstruction consumeEvents(PublicKey signer,
