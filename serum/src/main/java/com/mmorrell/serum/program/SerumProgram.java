@@ -422,4 +422,28 @@ public class SerumProgram extends Program {
 
         return result.array();
     }
+
+    public static TransactionInstruction initOpenOrders(PublicKey ooa,
+                                                        PublicKey ownerSigner,
+                                                        PublicKey market) {
+        List<AccountMeta> accountMetas = new ArrayList<>();
+
+        accountMetas.add(new AccountMeta(ooa, false, true));
+        accountMetas.add(new AccountMeta(ownerSigner, true, false));
+        accountMetas.add(new AccountMeta(market, false, false));
+        accountMetas.add(new AccountMeta(new PublicKey("SysvarRent111111111111111111111111111111111"), false, false));
+
+
+        ByteBuffer result = ByteBuffer.allocate(5);
+        result.order(ByteOrder.LITTLE_ENDIAN);
+
+        result.put(1, (byte) 15);
+
+        byte[] transactionData = result.array();
+        return createTransactionInstruction(
+                SerumUtils.SERUM_PROGRAM_ID_V3,
+                accountMetas,
+                transactionData
+        );
+    }
 }
