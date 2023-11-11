@@ -1,5 +1,6 @@
 package com.mmorrell.phoenix.program;
 
+import lombok.extern.slf4j.Slf4j;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static com.mmorrell.phoenix.program.PhoenixProgram.PHOENIX_PROGRAM_ID;
 
-
+@Slf4j
 public class PhoenixSeatManagerProgram extends Program {
 
     public static final PublicKey PHOENIX_SEAT_MANAGER_PROGRAM_ID =
@@ -47,14 +48,29 @@ public class PhoenixSeatManagerProgram extends Program {
                                                    PublicKey payer, PublicKey seat) {
         List<AccountMeta> accountMetas = new ArrayList<>();
 
+        PublicKey seatPda = null;
+        try {
+            seatPda = PublicKey.findProgramAddress(
+                    List.of(
+                            "seat".getBytes(),
+                            market.toByteArray(),
+                            trader.toByteArray()
+                    ),
+                    PHOENIX_PROGRAM_ID
+            ).getAddress();
+            log.info("PDA found for Phoenix seat: {}", seatPda);
+        } catch (Exception e) {
+            log.error("Error claiming seat: {}", e.getMessage());
+        }
+
         accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
         accountMetas.add(new AccountMeta(PHOENIX_LOG_AUTHORITY_ID, false, false));
         accountMetas.add(new AccountMeta(market, false, true));
         accountMetas.add(new AccountMeta(marketAuthority, false, true));
         accountMetas.add(new AccountMeta(seatDepositCollector, false, true));
-        accountMetas.add(new AccountMeta(trader, true, false));
+        accountMetas.add(new AccountMeta(trader, false, false));
         accountMetas.add(new AccountMeta(payer, true, true));
-        accountMetas.add(new AccountMeta(seat, false, true));
+        accountMetas.add(new AccountMeta(seatPda, false, true));
         accountMetas.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
 
         ByteBuffer result = ByteBuffer.allocate(1);
