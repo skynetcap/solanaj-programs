@@ -37,6 +37,7 @@
         <module>pyth</module>
         <module>magiceden</module>
         <module>openbook</module>
+        <module>phoenix</module>
     </modules>
 
     <properties>
