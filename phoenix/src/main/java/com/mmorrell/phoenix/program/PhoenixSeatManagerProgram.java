@@ -52,7 +52,6 @@ public class PhoenixSeatManagerProgram extends Program {
         accountMetas.add(new AccountMeta(market, false, true));
         accountMetas.add(new AccountMeta(marketAuthority, false, true));
         accountMetas.add(new AccountMeta(seatDepositCollector, false, true));
-        accountMetas.add(new AccountMeta(seatDepositCollector, false, true));
         accountMetas.add(new AccountMeta(trader, true, false));
         accountMetas.add(new AccountMeta(payer, true, true));
         accountMetas.add(new AccountMeta(seat, false, true));
