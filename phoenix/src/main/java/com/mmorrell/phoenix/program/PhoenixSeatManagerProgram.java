@@ -54,7 +54,7 @@ public class PhoenixSeatManagerProgram extends Program {
         accountMetas.add(new AccountMeta(seatDepositCollector, false, true));
         accountMetas.add(new AccountMeta(trader, true, false));
         accountMetas.add(new AccountMeta(payer, true, true));
-        accountMetas.add(new AccountMeta(seat, true, true));
+        accountMetas.add(new AccountMeta(seat, false, true));
         accountMetas.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
 
         ByteBuffer result = ByteBuffer.allocate(1);

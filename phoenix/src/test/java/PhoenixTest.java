@@ -105,7 +105,7 @@ public class PhoenixTest {
 
         String claimSeatTxId =  client.getApi().sendTransaction(
                 claimSeatTransaction,
-                List.of(tradingAccount, newSeatAccount),
+                List.of(tradingAccount),
                 client.getApi().getRecentBlockhash(Commitment.PROCESSED)
         );
         log.info("Claimed seat in transaction: {}", claimSeatTxId);
