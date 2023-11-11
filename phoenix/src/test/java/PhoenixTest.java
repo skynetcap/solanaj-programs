@@ -1,18 +1,24 @@
+import com.google.common.io.Resources;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
 import com.mmorrell.phoenix.program.PhoenixProgram;
 import com.mmorrell.phoenix.util.Keccak;
+import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.junit.Test;
+import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class PhoenixTest {
 
     private final RpcClient client = new RpcClient("https://mainnet.helius-rpc.com/?api-key=a778b653-bdd6-41bc-8cda-0c7377faf1dd");
@@ -40,6 +46,18 @@ public class PhoenixTest {
             System.out.println(phoenixMarketHeader);
 
         });
+    }
+
+    @Test
+    public void phoenixClaimSeatTest() throws RpcException, IOException {
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(
+                        Resources.getResource(
+                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
+                        Charset.defaultCharset()
+                )
+        );
+        log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
     }
 
     private String getDiscriminator(String input) {
