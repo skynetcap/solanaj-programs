@@ -74,9 +74,6 @@ public class PhoenixTest {
         );
         log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
 
-        // New Seat
-        Account newSeatAccount = new Account();
-
         // Claim Seat
         Transaction claimSeatTransaction = new Transaction();
 
@@ -98,8 +95,7 @@ public class PhoenixTest {
                         SOL_USDC_SEAT_MANAGER,
                         SOL_USDC_SEAT_DEPOSIT_COLLECTOR,
                         tradingAccount.getPublicKey(),
-                        tradingAccount.getPublicKey(),
-                        newSeatAccount.getPublicKey()
+                        tradingAccount.getPublicKey()
                 )
         );
 

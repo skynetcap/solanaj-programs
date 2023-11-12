@@ -39,13 +39,10 @@ public class PhoenixSeatManagerProgram extends Program {
      * #[account(8, name = "system_program", desc = "System program")]
      * ClaimSeat = 1,
      *
-     * @param market          phoenix market
-     * @param marketAuthority phoenix market authority
-     * @return claimSeat instruction
      */
     public static TransactionInstruction claimSeat(PublicKey market, PublicKey marketAuthority,
                                                    PublicKey seatDepositCollector, PublicKey trader,
-                                                   PublicKey payer, PublicKey seat) {
+                                                   PublicKey payer) {
         List<AccountMeta> accountMetas = new ArrayList<>();
 
         PublicKey seatPda = null;
