@@ -7,11 +7,14 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Utils;
+import org.p2p.solanaj.core.PublicKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -40,6 +43,9 @@ public class PhoenixMarket {
     @Getter
     public static List<Pair<FIFOOrderId, FIFORestingOrder>> askListSanitized;
 
+    @Getter
+    public static Map<PublicKey, PhoenixTraderState> traders = new HashMap<>();
+
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
                 .baseLotsPerBaseUnit(Utils.readInt64(data, START_OFFSET))
@@ -64,9 +70,69 @@ public class PhoenixMarket {
 
         readBidBuffer(bidBuffer);
         readAskBuffer(askBuffer);
+        readTraderBuffer(traderBuffer);
 
         return phoenixMarket;
    }
+
+    private static void readTraderBuffer(byte[] traderBuffer) {
+        int offset = 0;
+        offset += 16; // skip rbtree header
+        offset += 8;  // Skip node allocator size
+
+        int bumpIndex = PhoenixUtil.readInt32(traderBuffer, offset);
+        offset += 4;
+
+        int freeListHead = PhoenixUtil.readInt32(traderBuffer, offset);
+        offset += 4;
+
+        List<Pair<Integer, Integer>> freeListPointersList = new ArrayList<>();
+
+        for (int index = 0; offset < traderBuffer.length && index < bumpIndex; index++) {
+            List<Integer> registers = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                registers.add(PhoenixUtil.readInt32(traderBuffer, offset));
+                offset += 4;
+            }
+
+            PublicKey traderPubkey = PublicKey.readPubkey(traderBuffer, offset);
+            offset += 32;
+
+            PhoenixTraderState phoenixTraderState = PhoenixTraderState.readPhoenixTraderState(
+                    Arrays.copyOfRange(traderBuffer, offset, offset + PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE)
+            );
+            offset += PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE;
+
+            traders.put(traderPubkey, phoenixTraderState);
+            freeListPointersList.add(new Pair<>(index, registers.get(0)));
+        }
+
+        Set<Integer> freeNodes = new HashSet<>();
+        int indexToRemove = freeListHead - 1;
+        int counter = 0;
+
+        while (freeListHead != 0) {
+            var next = freeListPointersList.get(freeListHead - 1);
+            indexToRemove = next.component1();
+            freeListHead = next.component2();
+
+            freeNodes.add(indexToRemove);
+            counter += 1;
+
+            if (counter > bumpIndex) {
+                log.error("Infinite Loop Detected");
+            }
+        }
+//
+//        var bidOrdersList = bidList;
+//        for (int i = 0; i < bidList.size(); i++) {
+//            Pair<FIFOOrderId, FIFORestingOrder> entry = bidOrdersList.get(i);
+//            if (!freeNodes.contains(i)) {
+//                // tree.set kv
+//                bidListSanitized.add(entry);
+//            }
+//        }
+    }
 
     private static void readBidBuffer(byte[] bidBuffer) {
         int offset = 0;

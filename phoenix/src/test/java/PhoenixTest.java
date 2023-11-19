@@ -151,6 +151,11 @@ public class PhoenixTest {
                     (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
                     (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
         });
+
+        var traders = phoenixMarket.getTraders();
+        traders.forEach((publicKey, phoenixTraderState) -> {
+            log.info("Trader Pubkey: {}, State: {}", publicKey.toBase58(), phoenixTraderState.toString());
+        });
     }
 
     @Test
