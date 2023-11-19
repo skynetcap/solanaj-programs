@@ -113,7 +113,7 @@ public class PhoenixTest {
         mainnet.accountSubscribe(
                 SOL_USDC_MARKET.toBase58(),
                 data -> {
-                    log.info("Price tick.");
+                    log.info("Top 3 bids:");
                     Map<String, Object> map = (Map<String, Object>) data;
                     String base64 = (String) ((List) map.get("data")).get(0);
                     byte[] bytes = Base64.getDecoder().decode(base64);
@@ -125,7 +125,7 @@ public class PhoenixTest {
                     var bids = phoenixMarket.getBidListSanitized().stream().sorted(
                             (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
                     ).toList();
-                    bids = bids.subList(0, 5);
+                    bids = bids.subList(0, 3);
                     bids.forEach(fifoOrderIdFIFORestingOrderPair -> {
                         log.info(String.format("Bids: $%.4f, Size: %.2f SOL, Trader: %s",
                                 (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getBaseLotsPerBaseUnit(),
