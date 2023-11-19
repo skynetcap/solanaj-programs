@@ -76,8 +76,10 @@ public class PhoenixTest {
 
         // 576 = start of pub _padding: [u64; 32],v for market struct
         int marketStartOffset = 576;
+        int baseLotsPerBaseUnitOffset = 832; // start at base lots to ignore padding
 
         log.info("Market start: " + marketStartOffset);
+        log.info("Base per base unit offset: " + baseLotsPerBaseUnitOffset);
         log.info("Market detail length: {}", marketAccountInfo.getDecodedData().length);
     }
 
