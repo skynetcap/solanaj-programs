@@ -83,8 +83,8 @@ public class PhoenixTest {
                 (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
         ).toList();
         asks.forEach(fifoOrderIdFIFORestingOrderPair -> {
-            log.info(String.format("Ask: $%.2f, Size: %.2f SOL, Trader: %s",
-                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+            log.info(String.format("Ask: %.4f, Size: %.2f SOL, Trader: %s",
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / header.getBaseLotSize(),
                     (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
                     phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
         });
@@ -93,8 +93,8 @@ public class PhoenixTest {
                 (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
         ).toList();
         bids.forEach(fifoOrderIdFIFORestingOrderPair -> {
-            log.info(String.format("Bid: $%.2f, Size: %.2f SOL, Trader: %s",
-                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+            log.info(String.format("Bid: %.4f, Size: %.2f SOL, Trader: %s",
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / header.getBaseLotSize(),
                     (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
                     phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
         });
