@@ -31,20 +31,13 @@ public class PhoenixMarket {
     private long collectedQuoteLotFees;
     private long unclaimedQuoteLotFees;
 
-    @Getter
-    public static List<Pair<FIFOOrderId, FIFORestingOrder>> bidList;
+    private List<Pair<FIFOOrderId, FIFORestingOrder>> bidList;
+    private List<Pair<FIFOOrderId, FIFORestingOrder>> bidListSanitized;
 
-    @Getter
-    public static List<Pair<FIFOOrderId, FIFORestingOrder>> bidListSanitized;
+    private List<Pair<FIFOOrderId, FIFORestingOrder>> askList;
+    private List<Pair<FIFOOrderId, FIFORestingOrder>> askListSanitized;
 
-    @Getter
-    public static List<Pair<FIFOOrderId, FIFORestingOrder>> askList;
-
-    @Getter
-    public static List<Pair<FIFOOrderId, FIFORestingOrder>> askListSanitized;
-
-    @Getter
-    public static Map<PublicKey, PhoenixTraderState> traders = new HashMap<>();
+    private Map<PublicKey, PhoenixTraderState> traders;
 
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
@@ -54,6 +47,11 @@ public class PhoenixMarket {
                 .takerFeeBps(Utils.readInt64(data, START_OFFSET + 24))
                 .collectedQuoteLotFees(Utils.readInt64(data, START_OFFSET + 32))
                 .unclaimedQuoteLotFees(Utils.readInt64(data, START_OFFSET + 40))
+                .bidList(new ArrayList<>())
+                .bidListSanitized(new ArrayList<>())
+                .askList(new ArrayList<>())
+                .askListSanitized(new ArrayList<>())
+                .traders(new HashMap<>())
                 .build();
 
         long bidsSize =
@@ -68,14 +66,14 @@ public class PhoenixMarket {
         byte[] traderBuffer = Arrays.copyOfRange(data, 880 + (int) bidsSize + (int) asksSize,
                 880 + (int) bidsSize + (int) asksSize + (int) tradersSize);
 
-        readBidBuffer(bidBuffer);
-        readAskBuffer(askBuffer);
-        readTraderBuffer(traderBuffer);
+        readBidBuffer(bidBuffer, phoenixMarket);
+        readAskBuffer(askBuffer, phoenixMarket);
+        readTraderBuffer(traderBuffer, phoenixMarket);
 
         return phoenixMarket;
    }
 
-    private static void readTraderBuffer(byte[] traderBuffer) {
+    private static void readTraderBuffer(byte[] traderBuffer, PhoenixMarket market) {
         int offset = 0;
         offset += 16; // skip rbtree header
         offset += 8;  // Skip node allocator size
@@ -103,7 +101,7 @@ public class PhoenixMarket {
             );
             offset += PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE;
 
-            traders.put(traderPubkey, phoenixTraderState);
+            market.getTraders().put(traderPubkey, phoenixTraderState);
             freeListPointersList.add(new Pair<>(index, registers.get(0)));
         }
 
@@ -123,18 +121,9 @@ public class PhoenixMarket {
                 log.error("Infinite Loop Detected");
             }
         }
-//
-//        var bidOrdersList = bidList;
-//        for (int i = 0; i < bidList.size(); i++) {
-//            Pair<FIFOOrderId, FIFORestingOrder> entry = bidOrdersList.get(i);
-//            if (!freeNodes.contains(i)) {
-//                // tree.set kv
-//                bidListSanitized.add(entry);
-//            }
-//        }
     }
 
-    private static void readBidBuffer(byte[] bidBuffer) {
+    private static void readBidBuffer(byte[] bidBuffer, PhoenixMarket market) {
         int offset = 0;
         offset += 16; // skip rbtree header
         offset += 8;  // Skip node allocator size
@@ -144,9 +133,6 @@ public class PhoenixMarket {
 
         int freeListHead = PhoenixUtil.readInt32(bidBuffer, offset);
         offset += 4;
-
-        bidList = new ArrayList<>();
-        bidListSanitized = new ArrayList<>();
 
         List<Pair<Integer, Integer>> freeListPointersList = new ArrayList<>();
 
@@ -167,7 +153,7 @@ public class PhoenixMarket {
             );
             offset += FIFORestingOrder.FIFO_RESTING_ORDER_SIZE;
 
-            bidList.add(new Pair<>(fifoOrderId, fifoRestingOrder));
+            market.getBidList().add(new Pair<>(fifoOrderId, fifoRestingOrder));
             freeListPointersList.add(new Pair<>(index, registers.get(0)));
         }
 
@@ -188,17 +174,17 @@ public class PhoenixMarket {
             }
         }
 
-        var bidOrdersList = bidList;
-        for (int i = 0; i < bidList.size(); i++) {
+        var bidOrdersList = market.getBidList();
+        for (int i = 0; i < bidOrdersList.size(); i++) {
             Pair<FIFOOrderId, FIFORestingOrder> entry = bidOrdersList.get(i);
             if (!freeNodes.contains(i)) {
                 // tree.set kv
-                bidListSanitized.add(entry);
+                market.bidListSanitized.add(entry);
             }
         }
     }
 
-    private static void readAskBuffer(byte[] bidBuffer) {
+    private static void readAskBuffer(byte[] bidBuffer, PhoenixMarket market) {
         int offset = 0;
         offset += 16; // skip rbtree header
         offset += 8;  // Skip node allocator size
@@ -208,9 +194,6 @@ public class PhoenixMarket {
 
         int freeListHead = PhoenixUtil.readInt32(bidBuffer, offset);
         offset += 4;
-
-        askList = new ArrayList<>();
-        askListSanitized = new ArrayList<>();
 
         List<Pair<Integer, Integer>> freeListPointersList = new ArrayList<>();
 
@@ -231,7 +214,7 @@ public class PhoenixMarket {
             );
             offset += FIFORestingOrder.FIFO_RESTING_ORDER_SIZE;
 
-            askList.add(new Pair<>(fifoOrderId, fifoRestingOrder));
+            market.askList.add(new Pair<>(fifoOrderId, fifoRestingOrder));
             freeListPointersList.add(new Pair<>(index, registers.get(0)));
         }
 
@@ -252,12 +235,12 @@ public class PhoenixMarket {
             }
         }
 
-        var askOrdersList = askList;
-        for (int i = 0; i < askList.size(); i++) {
+        var askOrdersList = market.askList;
+        for (int i = 0; i < askOrdersList.size(); i++) {
             Pair<FIFOOrderId, FIFORestingOrder> entry = askOrdersList.get(i);
             if (!freeNodes.contains(i)) {
                 // tree.set kv
-                askListSanitized.add(entry);
+                market.askListSanitized.add(entry);
             }
         }
     }
