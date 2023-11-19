@@ -34,6 +34,12 @@ public class PhoenixMarket {
     @Getter
     public static List<Pair<FIFOOrderId, FIFORestingOrder>> bidListSanitized;
 
+    @Getter
+    public static List<Pair<FIFOOrderId, FIFORestingOrder>> askList;
+
+    @Getter
+    public static List<Pair<FIFOOrderId, FIFORestingOrder>> askListSanitized;
+
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
                 .baseLotsPerBaseUnit(Utils.readInt64(data, START_OFFSET))
@@ -46,9 +52,23 @@ public class PhoenixMarket {
 
         long bidsSize =
                 16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getBidsSize();
-
         byte[] bidBuffer = Arrays.copyOfRange(data, 880, (int) bidsSize);
 
+        var asksSize =
+                16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getAsksSize();
+        byte[] askBuffer = Arrays.copyOfRange(data, 880 + (int) bidsSize, 880 + (int) bidsSize + (int) asksSize);
+
+        var tradersSize = 16 + 16 + (16 + 32 + PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE) * header.getNumSeats();
+        byte[] traderBuffer = Arrays.copyOfRange(data, 880 + (int) bidsSize + (int) asksSize,
+                880 + (int) bidsSize + (int) asksSize + (int) tradersSize);
+
+        readBidBuffer(bidBuffer);
+        readAskBuffer(askBuffer);
+
+        return phoenixMarket;
+   }
+
+    private static void readBidBuffer(byte[] bidBuffer) {
         int offset = 0;
         offset += 16; // skip rbtree header
         offset += 8;  // Skip node allocator size
@@ -110,7 +130,69 @@ public class PhoenixMarket {
                 bidListSanitized.add(entry);
             }
         }
+    }
 
-        return phoenixMarket;
-   }
+    private static void readAskBuffer(byte[] bidBuffer) {
+        int offset = 0;
+        offset += 16; // skip rbtree header
+        offset += 8;  // Skip node allocator size
+
+        int bumpIndex = PhoenixUtil.readInt32(bidBuffer, offset);
+        offset += 4;
+
+        int freeListHead = PhoenixUtil.readInt32(bidBuffer, offset);
+        offset += 4;
+
+        askList = new ArrayList<>();
+        askListSanitized = new ArrayList<>();
+
+        List<Pair<Integer, Integer>> freeListPointersList = new ArrayList<>();
+
+        for (int index = 0; offset < bidBuffer.length && index < bumpIndex; index++) {
+            List<Integer> registers = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                registers.add(PhoenixUtil.readInt32(bidBuffer, offset));
+                offset += 4;
+            }
+
+            FIFOOrderId fifoOrderId = FIFOOrderId.readFifoOrderId(
+                    Arrays.copyOfRange(bidBuffer, offset, offset + 16)
+            );
+            offset += FIFOOrderId.FIFO_ORDER_ID_SIZE;
+
+            FIFORestingOrder fifoRestingOrder = FIFORestingOrder.readFifoRestingOrder(
+                    Arrays.copyOfRange(bidBuffer, offset, offset + 32)
+            );
+            offset += FIFORestingOrder.FIFO_RESTING_ORDER_SIZE;
+
+            askList.add(new Pair<>(fifoOrderId, fifoRestingOrder));
+            freeListPointersList.add(new Pair<>(index, registers.get(0)));
+        }
+
+        Set<Integer> freeNodes = new HashSet<>();
+        int indexToRemove = freeListHead - 1;
+        int counter = 0;
+
+        while (freeListHead != 0) {
+            var next = freeListPointersList.get(freeListHead - 1);
+            indexToRemove = next.component1();
+            freeListHead = next.component2();
+
+            freeNodes.add(indexToRemove);
+            counter += 1;
+
+            if (counter > bumpIndex) {
+                log.error("Infinite Loop Detected");
+            }
+        }
+
+        var askOrdersList = askList;
+        for (int i = 0; i < askList.size(); i++) {
+            Pair<FIFOOrderId, FIFORestingOrder> entry = askOrdersList.get(i);
+            if (!freeNodes.contains(i)) {
+                // tree.set kv
+                askListSanitized.add(entry);
+            }
+        }
+    }
 }

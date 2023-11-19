@@ -142,6 +142,15 @@ public class PhoenixTest {
                     (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
                     (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
         });
+
+        var asks = phoenixMarket.getAskListSanitized().stream().sorted(
+                (o1, o2) -> Math.toIntExact(o1.component1().getPriceInTicks() - o2.getFirst().getPriceInTicks())
+        ).toList();
+        asks.forEach(fifoOrderIdFIFORestingOrderPair -> {
+            log.info(String.format("Ask: $%.2f, Size: %.2f SOL",
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
+        });
     }
 
     @Test
