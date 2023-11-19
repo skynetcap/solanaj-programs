@@ -106,8 +106,8 @@ public class PhoenixTest {
         log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", header.getBidsSize(), header.getAsksSize(),
                 header.getNumSeats());
 
-        log.info("Top Bids: {}", phoenixMarket.getBidOrders().keySet().stream().sorted(
-                (o1, o2) -> Math.toIntExact(o2.getPriceInTicks() - o1.getPriceInTicks())
+        log.info("Top Bids: {}", phoenixMarket.getBidOrders().entrySet().stream().sorted(
+                (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
         )
                 .collect(Collectors.toList()));
 
