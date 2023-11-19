@@ -4,17 +4,14 @@ import com.mmorrell.phoenix.util.PhoenixUtil;
 import kotlin.Pair;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -37,7 +34,8 @@ public class PhoenixMarket {
     private List<Pair<FIFOOrderId, FIFORestingOrder>> askList;
     private List<Pair<FIFOOrderId, FIFORestingOrder>> askListSanitized;
 
-    private Map<PublicKey, PhoenixTraderState> traders;
+    private List<Pair<PublicKey, PhoenixTraderState>> traders;
+    private List<Pair<PublicKey, PhoenixTraderState>> tradersSanitized;
 
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
@@ -51,7 +49,8 @@ public class PhoenixMarket {
                 .bidListSanitized(new ArrayList<>())
                 .askList(new ArrayList<>())
                 .askListSanitized(new ArrayList<>())
-                .traders(new HashMap<>())
+                .traders(new ArrayList<>())
+                .tradersSanitized(new ArrayList<>())
                 .build();
 
         long bidsSize =
@@ -101,7 +100,7 @@ public class PhoenixMarket {
             );
             offset += PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE;
 
-            market.getTraders().put(traderPubkey, phoenixTraderState);
+            market.getTraders().add(new Pair<>(traderPubkey, phoenixTraderState));
             freeListPointersList.add(new Pair<>(index, registers.get(0)));
         }
 
@@ -119,6 +118,15 @@ public class PhoenixMarket {
 
             if (counter > bumpIndex) {
                 log.error("Infinite Loop Detected");
+            }
+        }
+
+        var traderList = market.getTraders();
+        for (int i = 0; i < traderList.size(); i++) {
+            Pair<PublicKey, PhoenixTraderState> entry = traderList.get(i);
+            if (!freeNodes.contains(i)) {
+                // tree.set kv
+                market.tradersSanitized.add(entry);
             }
         }
     }

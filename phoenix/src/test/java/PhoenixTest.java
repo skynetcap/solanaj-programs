@@ -1,7 +1,5 @@
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
-import com.mmorrell.phoenix.model.FIFOOrderId;
-import com.mmorrell.phoenix.model.FIFORestingOrder;
 import com.mmorrell.phoenix.model.PhoenixMarket;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
 import com.mmorrell.phoenix.program.PhoenixProgram;
@@ -15,7 +13,6 @@ import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.programs.ComputeBudgetProgram;
-import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
@@ -30,7 +27,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class PhoenixTest {
@@ -108,60 +104,35 @@ public class PhoenixTest {
         log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", header.getBidsSize(), header.getAsksSize(),
                 header.getNumSeats());
 
-//        var sortedList = phoenixMarket.getBidOrders().entrySet().stream().sorted(
-//                        (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
-//                )
-//                .collect(Collectors.toList());
-//
-//        log.info("Top Bids: {}", sortedList);
-//
-//        sortedList.forEach(fifoOrderIdFIFORestingOrderEntry -> {
-//            log.info(String.format("Price: %.2f, Size: %.2f",
-//                    (double) fifoOrderIdFIFORestingOrderEntry.getKey().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
-//                    (double) fifoOrderIdFIFORestingOrderEntry.getValue().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
-//        });
-//
-//        var sortedListSanitized = phoenixMarket.getBidOrdersSanitized().entrySet().stream().sorted(
-//                        (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
-//                )
-//                .collect(Collectors.toList());
-//
-//        log.info("Top Bids Sanitized: {}", sortedListSanitized);
-//
-//        sortedListSanitized.forEach(fifoOrderIdFIFORestingOrderEntry -> {
-//            log.info(String.format("Price: %.2f, Size: %.2f",
-//                    (double) fifoOrderIdFIFORestingOrderEntry.getKey().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
-//                    (double) fifoOrderIdFIFORestingOrderEntry.getValue().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
-//        });
+        var asks = phoenixMarket.getAskListSanitized().stream().sorted(
+                (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
+        ).toList();
+        asks.forEach(fifoOrderIdFIFORestingOrderPair -> {
+            log.info(String.format("Ask: $%.2f, Size: %.2f SOL, Trader: %s",
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
+                    phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
+        });
 
         var bids = phoenixMarket.getBidListSanitized().stream().sorted(
                 (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
         ).toList();
         bids.forEach(fifoOrderIdFIFORestingOrderPair -> {
-            log.info(String.format("Bid: $%.2f, Size: %.2f SOL",
+            log.info(String.format("Bid: $%.2f, Size: %.2f SOL, Trader: %s",
                     (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
-                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
+                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
+                            phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
         });
 
-        var asks = phoenixMarket.getAskListSanitized().stream().sorted(
-                (o1, o2) -> Math.toIntExact(o1.component1().getPriceInTicks() - o2.getFirst().getPriceInTicks())
-        ).toList();
-        asks.forEach(fifoOrderIdFIFORestingOrderPair -> {
-            log.info(String.format("Ask: $%.2f, Size: %.2f SOL",
-                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
-                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
-        });
-
-        var traders = phoenixMarket.getTraders();
+        var traders = phoenixMarket.getTradersSanitized();
 //        traders.forEach((publicKey, phoenixTraderState) -> {
 //            log.info("Trader Pubkey: {}, State: {}", publicKey.toBase58(), phoenixTraderState.toString());
 //        });
 
-        traders.entrySet().stream().sorted((o1, o2) -> Math.toIntExact((int) o2.getValue().getQuoteLotsLocked() - (int) o1.getValue().getQuoteLotsLocked()))
-                .forEach(publicKeyPhoenixTraderStateEntry -> {
-                    log.info("Trader Pubkey: {}, State: {}", publicKeyPhoenixTraderStateEntry.getKey().toBase58(),
-                            publicKeyPhoenixTraderStateEntry.getValue().toString());
-                });
+        for (int i = 0; i < traders.size(); i++) {
+            log.info("Index: {}, Trader Pubkey: {}, State: {}", i, traders.get(i).component1(),
+                    traders.get(i).component2().toString());
+        }
     }
 
     @Test
