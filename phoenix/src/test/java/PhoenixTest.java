@@ -214,6 +214,9 @@ public class PhoenixTest {
             log.info("Index: {}, Trader Pubkey: {}, State: {}", i, traders.get(i).component1(),
                     traders.get(i).component2().toString());
         }
+
+        log.info("Best Bid: {}", phoenixMarket.getBestBid());
+        log.info("Best Ask: {}", phoenixMarket.getBestAsk());
     }
 
     @Test
@@ -294,17 +297,27 @@ public class PhoenixTest {
             log.error("Error claiming seat: {}", e.getMessage());
         }
 
-        LimitOrderPacketRecord limitOrderPacketRecord = LimitOrderPacketRecord.builder()
-                .clientOrderId(new byte[]{})
-                .matchLimit(0)
-                .numBaseLots(18L)
-                .priceInTicks(60000L)
-                .selfTradeBehavior((byte) 1)
-                .side((byte) 0)
-                .useOnlyDepositedFunds(false)
-                .build();
+        for (int i = 0; i < 100; i++) {
 
-        for (int i = 0; i < 5; i++) {
+            LimitOrderPacketRecord limitOrderPacketRecord = LimitOrderPacketRecord.builder()
+                    .clientOrderId(new byte[]{})
+                    .matchLimit(0)
+                    .numBaseLots(18L)
+                    .priceInTicks((long) (market.getBestBid().getFirst().getPriceInTicks() * .999))
+                    .selfTradeBehavior((byte) 1)
+                    .side((byte) 0)
+                    .useOnlyDepositedFunds(false)
+                    .build();
+
+            LimitOrderPacketRecord limitOrderPacketRecordAsk = LimitOrderPacketRecord.builder()
+                    .clientOrderId(new byte[]{})
+                    .matchLimit(0)
+                    .numBaseLots(18L)
+                    .priceInTicks((long) (market.getBestAsk().getFirst().getPriceInTicks() * 1.0002))
+                    .selfTradeBehavior((byte) 1)
+                    .side((byte) 1)
+                    .useOnlyDepositedFunds(false)
+                    .build();
 
             Transaction limitOrderTx = new Transaction();
             limitOrderTx.addInstruction(
@@ -327,6 +340,18 @@ public class PhoenixTest {
                             tradingAccount.getPublicKey()
                     )
             );
+
+            limitOrderTx.addInstruction(
+                    PhoenixProgram.cancelAllOrders(
+                            SOL_USDC_MARKET,
+                            tradingAccount.getPublicKey(),
+                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                            market.getPhoenixMarketHeader().getBaseVaultKey(),
+                            market.getPhoenixMarketHeader().getQuoteVaultKey()
+                    )
+            );
+
             limitOrderTx.addInstruction(
                     PhoenixProgram.placeLimitOrder(
                             SOL_USDC_MARKET,
@@ -340,47 +365,66 @@ public class PhoenixTest {
                     )
             );
 
+            limitOrderTx.addInstruction(
+                    PhoenixProgram.placeLimitOrder(
+                            SOL_USDC_MARKET,
+                            tradingAccount.getPublicKey(),
+                            seatPda,
+                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                            market.getPhoenixMarketHeader().getBaseVaultKey(),
+                            market.getPhoenixMarketHeader().getQuoteVaultKey(),
+                            limitOrderPacketRecordAsk
+                    )
+            );
+
             String placeLimitOrderTx = client.getApi().sendTransaction(
                     limitOrderTx,
                     List.of(tradingAccount),
                     client.getApi().getRecentBlockhash(Commitment.PROCESSED)
             );
-            log.info("Limit order in transaction: {}", placeLimitOrderTx);
+            log.info("Limit order in transaction: {}, {}",  limitOrderPacketRecord, placeLimitOrderTx);
 
-            Thread.sleep(500L);
-
-            Transaction cancelOrdersTransaction = new Transaction();
-            cancelOrdersTransaction.addInstruction(
-                    ComputeBudgetProgram.setComputeUnitPrice(
-                            1_000_000
-                    )
-            );
-
-            cancelOrdersTransaction.addInstruction(
-                    ComputeBudgetProgram.setComputeUnitLimit(
-                            200_000
-                    )
-            );
-
-            cancelOrdersTransaction.addInstruction(
-                    PhoenixProgram.cancelAllOrders(
+            Thread.sleep(1500L);
+            market = PhoenixMarket.readPhoenixMarket(
+                    client.getApi().getAccountInfo(
                             SOL_USDC_MARKET,
-                            tradingAccount.getPublicKey(),
-                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
-                            market.getPhoenixMarketHeader().getBaseVaultKey(),
-                            market.getPhoenixMarketHeader().getQuoteVaultKey()
-                    )
+                            Map.of("commitment", Commitment.PROCESSED)
+                    ).getDecodedData()
             );
-
-            String cancelAllOrdersTx = client.getApi().sendTransaction(
-                    cancelOrdersTransaction,
-                    List.of(tradingAccount),
-                    client.getApi().getRecentBlockhash(Commitment.PROCESSED)
-            );
-            log.info("Cxl all orders: {}", cancelAllOrdersTx);
-
-            Thread.sleep(1000);
+//
+//            Transaction cancelOrdersTransaction = new Transaction();
+//            cancelOrdersTransaction.addInstruction(
+//                    ComputeBudgetProgram.setComputeUnitPrice(
+//                            1_000_000
+//                    )
+//            );
+//
+//            cancelOrdersTransaction.addInstruction(
+//                    ComputeBudgetProgram.setComputeUnitLimit(
+//                            200_000
+//                    )
+//            );
+//
+//            cancelOrdersTransaction.addInstruction(
+//                    PhoenixProgram.cancelAllOrders(
+//                            SOL_USDC_MARKET,
+//                            tradingAccount.getPublicKey(),
+//                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+//                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+//                            market.getPhoenixMarketHeader().getBaseVaultKey(),
+//                            market.getPhoenixMarketHeader().getQuoteVaultKey()
+//                    )
+//            );
+//
+//            String cancelAllOrdersTx = client.getApi().sendTransaction(
+//                    cancelOrdersTransaction,
+//                    List.of(tradingAccount),
+//                    client.getApi().getRecentBlockhash(Commitment.PROCESSED)
+//            );
+//            log.info("Cxl all orders: {}", cancelAllOrdersTx);
+//
+//            Thread.sleep(1000);
         }
     }
 

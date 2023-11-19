@@ -39,6 +39,20 @@ public class PhoenixMarket {
 
     private PhoenixMarketHeader phoenixMarketHeader;
 
+    public Pair<FIFOOrderId, FIFORestingOrder> getBestBid() {
+        return bidListSanitized.stream()
+                .sorted((o1, o2) -> Math.toIntExact(o2.getFirst().getPriceInTicks() - o1.getFirst().getPriceInTicks()))
+                .toList()
+                .get(0);
+    }
+
+    public Pair<FIFOOrderId, FIFORestingOrder> getBestAsk() {
+        return askListSanitized.stream()
+                .sorted((o1, o2) -> Math.toIntExact(o1.getFirst().getPriceInTicks() - o2.getFirst().getPriceInTicks()))
+                .toList()
+                .get(0);
+    }
+
     public static PhoenixMarket readPhoenixMarket(byte[] data) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
                 .baseLotsPerBaseUnit(Utils.readInt64(data, START_OFFSET))
