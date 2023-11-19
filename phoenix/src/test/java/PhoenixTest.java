@@ -235,13 +235,13 @@ public class PhoenixTest {
 
         claimSeatTransaction.addInstruction(
                 ComputeBudgetProgram.setComputeUnitPrice(
-                        1_000_000
+                        100_000
                 )
         );
 
         claimSeatTransaction.addInstruction(
                 ComputeBudgetProgram.setComputeUnitLimit(
-                        200_000
+                        100_000
                 )
         );
 
@@ -297,13 +297,13 @@ public class PhoenixTest {
             log.error("Error claiming seat: {}", e.getMessage());
         }
 
-        for (int i = 0; i < 100; i++) {
+        while (true) {
 
             LimitOrderPacketRecord limitOrderPacketRecord = LimitOrderPacketRecord.builder()
                     .clientOrderId(new byte[]{})
                     .matchLimit(0)
                     .numBaseLots(18L)
-                    .priceInTicks((long) (market.getBestBid().getFirst().getPriceInTicks() * .999))
+                    .priceInTicks((long) (market.getBestBid().getFirst().getPriceInTicks() * .9995))
                     .selfTradeBehavior((byte) 1)
                     .side((byte) 0)
                     .useOnlyDepositedFunds(false)
@@ -313,7 +313,7 @@ public class PhoenixTest {
                     .clientOrderId(new byte[]{})
                     .matchLimit(0)
                     .numBaseLots(18L)
-                    .priceInTicks((long) (market.getBestAsk().getFirst().getPriceInTicks() * 1.0002))
+                    .priceInTicks((long) (market.getBestAsk().getFirst().getPriceInTicks() * 1.0005))
                     .selfTradeBehavior((byte) 1)
                     .side((byte) 1)
                     .useOnlyDepositedFunds(false)
@@ -322,13 +322,13 @@ public class PhoenixTest {
             Transaction limitOrderTx = new Transaction();
             limitOrderTx.addInstruction(
                     ComputeBudgetProgram.setComputeUnitPrice(
-                            1_000_000
+                            700
                     )
             );
 
             limitOrderTx.addInstruction(
                     ComputeBudgetProgram.setComputeUnitLimit(
-                            200_000
+                            130_000
                     )
             );
             limitOrderTx.addInstruction(
@@ -385,7 +385,7 @@ public class PhoenixTest {
             );
             log.info("Limit order in transaction: {}, {}",  limitOrderPacketRecord, placeLimitOrderTx);
 
-            Thread.sleep(1500L);
+            Thread.sleep(1000L);
             market = PhoenixMarket.readPhoenixMarket(
                     client.getApi().getAccountInfo(
                             SOL_USDC_MARKET,
