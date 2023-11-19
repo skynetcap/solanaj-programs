@@ -39,7 +39,7 @@ public class PhoenixMarket {
 
     private PhoenixMarketHeader phoenixMarketHeader;
 
-    public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
+    public static PhoenixMarket readPhoenixMarket(byte[] data) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
                 .baseLotsPerBaseUnit(Utils.readInt64(data, START_OFFSET))
                 .tickSizeInQuoteLotsPerBaseUnit(Utils.readInt64(data, START_OFFSET + 8))
@@ -53,18 +53,18 @@ public class PhoenixMarket {
                 .askListSanitized(new ArrayList<>())
                 .traders(new ArrayList<>())
                 .tradersSanitized(new ArrayList<>())
-                .phoenixMarketHeader(header)
+                .phoenixMarketHeader(PhoenixMarketHeader.readPhoenixMarketHeader(data))
                 .build();
 
         long bidsSize =
-                16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getBidsSize();
+                16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * phoenixMarket.getPhoenixMarketHeader().getBidsSize();
         byte[] bidBuffer = Arrays.copyOfRange(data, 880, (int) bidsSize);
 
         var asksSize =
-                16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getAsksSize();
+                16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * phoenixMarket.getPhoenixMarketHeader().getAsksSize();
         byte[] askBuffer = Arrays.copyOfRange(data, 880 + (int) bidsSize, 880 + (int) bidsSize + (int) asksSize);
 
-        var tradersSize = 16 + 16 + (16 + 32 + PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE) * header.getNumSeats();
+        var tradersSize = 16 + 16 + (16 + 32 + PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE) * phoenixMarket.getPhoenixMarketHeader().getNumSeats();
         byte[] traderBuffer = Arrays.copyOfRange(data, 880 + (int) bidsSize + (int) asksSize,
                 880 + (int) bidsSize + (int) asksSize + (int) tradersSize);
 

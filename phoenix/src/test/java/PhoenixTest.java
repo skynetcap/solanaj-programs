@@ -80,15 +80,14 @@ public class PhoenixTest {
         );
 
         byte[] data = marketAccountInfo.getDecodedData();
-        PhoenixMarketHeader header = PhoenixMarketHeader.readPhoenixMarketHeader(data);
-        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data, header);
+        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data);
 
         var asks = phoenixMarket.getAskListSanitized().stream().sorted(
                 (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
         ).toList();
         asks.forEach(fifoOrderIdFIFORestingOrderPair -> {
             log.info(String.format("Ask: %.4f, Size: %.2f SOL, Trader: %s",
-                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / header.getBaseLotSize(),
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getPhoenixMarketHeader().getBaseLotSize(),
                     (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
                     phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
         });
@@ -98,14 +97,14 @@ public class PhoenixTest {
         ).toList();
         bids.forEach(fifoOrderIdFIFORestingOrderPair -> {
             log.info(String.format("Bid: %.4f, Size: %.2f SOL, Trader: %s",
-                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / header.getBaseLotSize(),
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getPhoenixMarketHeader().getBaseLotSize(),
                     (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
                     phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
         });
     }
 
     @Test
-    public void phoenixGetMarketDetailStreamingTest() throws RpcException, IOException, InterruptedException {
+    public void phoenixGetMarketDetailStreamingTest() throws InterruptedException {
         final SubscriptionWebSocketClient mainnet = SubscriptionWebSocketClient.getInstance(
                 Cluster.MAINNET.getEndpoint()
         );
@@ -118,8 +117,7 @@ public class PhoenixTest {
                     String base64 = (String) ((List) map.get("data")).get(0);
                     byte[] bytes = Base64.getDecoder().decode(base64);
                     PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(
-                            bytes,
-                            PhoenixMarketHeader.readPhoenixMarketHeader(bytes)
+                            bytes
                     );
 
                     var bids = phoenixMarket.getBidListSanitized().stream().sorted(
@@ -168,13 +166,11 @@ public class PhoenixTest {
         log.info("Base lots per base unit: {}", baseLotsPerBaseUnit);
         log.info("Tick size in quote lots per base unit: {}", tickSizeInQuoteLotsPerBaseUnit);
 
-        PhoenixMarketHeader header = PhoenixMarketHeader.readPhoenixMarketHeader(data);
-
-        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data, header);
+        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data);
         log.info("Phoenix market: {}", phoenixMarket.toString());
-        log.info("Header from market: {}", header.toString());
-        log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", header.getBidsSize(), header.getAsksSize(),
-                header.getNumSeats());
+        log.info("Header from market: {}", phoenixMarket.getPhoenixMarketHeader().toString());
+        log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", phoenixMarket.getPhoenixMarketHeader().getBidsSize(), phoenixMarket.getPhoenixMarketHeader().getAsksSize(),
+                phoenixMarket.getPhoenixMarketHeader().getNumSeats());
 
         var asks = phoenixMarket.getAskListSanitized().stream().sorted(
                 (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
