@@ -10,8 +10,10 @@ import org.bitcoinj.core.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @Builder
@@ -29,6 +31,9 @@ public class PhoenixMarket {
 
     @Getter
     public static Map<FIFOOrderId, FIFORestingOrder> bidOrders;
+
+    @Getter
+    public static Map<FIFOOrderId, FIFORestingOrder> bidOrdersSanitized;
 
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
@@ -59,6 +64,10 @@ public class PhoenixMarket {
 
         // log.info("Bump index: {}, freeListHead: {}", bumpIndex, freeListHead);
         bidOrders = new HashMap<>();
+        bidOrdersSanitized = new HashMap<>();
+
+        Map<Integer, Integer> freeListPointers = new HashMap<>();
+
         for (int index = 0; offset < bidBuffer.length && index < bumpIndex; index++) {
             List<Integer> registers = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
@@ -79,7 +88,59 @@ public class PhoenixMarket {
             offset += FIFORestingOrder.FIFO_RESTING_ORDER_SIZE;
 
             bidOrders.put(fifoOrderId, fifoRestingOrder);
+
+            freeListPointers.put(index, registers.get(0));
         }
+
+        Set<Integer> freeNodes = new HashSet<>();
+        int indexToRemove = freeListHead - 1;
+        int counter = 0;
+
+        while (freeListHead != 0) {
+            var next = freeListPointers.get(freeListHead - 1);
+            indexToRemove = next;
+            freeListHead = next;
+
+            freeNodes.add(indexToRemove);
+            counter += 1;
+
+            if (counter > bumpIndex) {
+                log.error("Infinite Loop Detected");
+            }
+
+        }
+
+        for (int i = 0; i < bidOrders.size(); i++) {
+            Map.Entry<FIFOOrderId, FIFORestingOrder> entry = bidOrders.entrySet().stream().toList().get(i);
+            if (!freeNodes.contains(i)) {
+                // tree.set kv
+                bidOrdersSanitized.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        log.info("Sanitized: " + bidOrdersSanitized.toString());
+        /**
+         *   let freeNodes = new Set<number>();
+         *   let indexToRemove = freeListHead - 1;
+         *   let counter = 0;
+         *   // If there's an infinite loop here, that means that the state is corrupted
+         *   while (freeListHead !== 0) {
+         *     // We need to subtract 1 because the node allocator is 1-indexed
+         *     let next = freeListPointers[freeListHead - 1];
+         *     [indexToRemove, freeListHead] = next;
+         *     freeNodes.add(indexToRemove);
+         *     counter += 1;
+         *     if (counter > bumpIndex) {
+         *       throw new Error("Infinite loop detected");
+         *     }
+         *   }
+         *
+         *   for (let [index, [key, value]] of nodes.entries()) {
+         *     if (!freeNodes.has(index)) {
+         *       tree.set(key, value);
+         *     }
+         *   }
+         */
 
         return phoenixMarket;
    }

@@ -106,10 +106,31 @@ public class PhoenixTest {
         log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", header.getBidsSize(), header.getAsksSize(),
                 header.getNumSeats());
 
-        log.info("Top Bids: {}", phoenixMarket.getBidOrders().entrySet().stream().sorted(
-                (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
-        )
-                .collect(Collectors.toList()));
+        var sortedList = phoenixMarket.getBidOrders().entrySet().stream().sorted(
+                        (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
+                )
+                .collect(Collectors.toList());
+
+        log.info("Top Bids: {}", sortedList);
+
+        sortedList.forEach(fifoOrderIdFIFORestingOrderEntry -> {
+            log.info(String.format("Price: %.2f, Size: %.2f",
+                    (double) fifoOrderIdFIFORestingOrderEntry.getKey().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                    (double) fifoOrderIdFIFORestingOrderEntry.getValue().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
+        });
+
+        var sortedListSanitized = phoenixMarket.getBidOrdersSanitized().entrySet().stream().sorted(
+                        (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
+                )
+                .collect(Collectors.toList());
+
+        log.info("Top Bids Sanitized: {}", sortedListSanitized);
+
+        sortedListSanitized.forEach(fifoOrderIdFIFORestingOrderEntry -> {
+            log.info(String.format("Price: %.2f, Size: %.2f",
+                    (double) fifoOrderIdFIFORestingOrderEntry.getKey().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                    (double) fifoOrderIdFIFORestingOrderEntry.getValue().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
+        });
 
     }
 
