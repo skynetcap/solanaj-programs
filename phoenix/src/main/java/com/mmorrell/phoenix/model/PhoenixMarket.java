@@ -37,6 +37,8 @@ public class PhoenixMarket {
     private List<Pair<PublicKey, PhoenixTraderState>> traders;
     private List<Pair<PublicKey, PhoenixTraderState>> tradersSanitized;
 
+    private PhoenixMarketHeader phoenixMarketHeader;
+
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
                 .baseLotsPerBaseUnit(Utils.readInt64(data, START_OFFSET))
@@ -51,6 +53,7 @@ public class PhoenixMarket {
                 .askListSanitized(new ArrayList<>())
                 .traders(new ArrayList<>())
                 .tradersSanitized(new ArrayList<>())
+                .phoenixMarketHeader(header)
                 .build();
 
         long bidsSize =

@@ -13,11 +13,14 @@ import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.programs.ComputeBudgetProgram;
+import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
+import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
+import org.p2p.solanaj.ws.listeners.AccountNotificationEventListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -101,6 +105,42 @@ public class PhoenixTest {
     }
 
     @Test
+    public void phoenixGetMarketDetailStreamingTest() throws RpcException, IOException, InterruptedException {
+        final SubscriptionWebSocketClient mainnet = SubscriptionWebSocketClient.getInstance(
+                Cluster.MAINNET.getEndpoint()
+        );
+
+        mainnet.accountSubscribe(
+                SOL_USDC_MARKET.toBase58(),
+                data -> {
+                    log.info("Price tick.");
+                    Map<String, Object> map = (Map<String, Object>) data;
+                    String base64 = (String) ((List) map.get("data")).get(0);
+                    byte[] bytes = Base64.getDecoder().decode(base64);
+                    PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(
+                            bytes,
+                            PhoenixMarketHeader.readPhoenixMarketHeader(bytes)
+                    );
+
+                    var bids = phoenixMarket.getBidListSanitized().stream().sorted(
+                            (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
+                    ).toList();
+                    bids = bids.subList(0, 5);
+                    bids.forEach(fifoOrderIdFIFORestingOrderPair -> {
+                        log.info(String.format("Bids: $%.4f, Size: %.2f SOL, Trader: %s",
+                                (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getBaseLotsPerBaseUnit(),
+                                (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                                phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
+                    });
+
+
+                }
+        );
+
+        Thread.sleep(120_000);
+    }
+
+    @Test
     public void phoenixGetMarketDetailTest() throws RpcException, IOException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET,
@@ -153,7 +193,7 @@ public class PhoenixTest {
             log.info(String.format("Bid: $%.2f, Size: %.2f SOL, Trader: %s",
                     (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
                     (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
-                            phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
+                    phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
         });
 
         var traders = phoenixMarket.getTradersSanitized();
