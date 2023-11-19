@@ -1,5 +1,6 @@
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import com.mmorrell.phoenix.model.LimitOrderPacketRecord;
 import com.mmorrell.phoenix.model.PhoenixMarket;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
 import com.mmorrell.phoenix.program.PhoenixProgram;
@@ -31,6 +32,8 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
+import static com.mmorrell.phoenix.program.PhoenixProgram.PHOENIX_PROGRAM_ID;
 
 @Slf4j
 public class PhoenixTest {
@@ -255,6 +258,92 @@ public class PhoenixTest {
                 client.getApi().getRecentBlockhash(Commitment.PROCESSED)
         );
         log.info("Claimed seat in transaction: {}", claimSeatTxId);
+    }
+
+    @Test
+    public void phoenixPlaceLimitOrderTest() throws IOException, RpcException {
+        final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
+                SOL_USDC_MARKET,
+                Map.of("commitment", Commitment.PROCESSED)
+        );
+
+        byte[] data = marketAccountInfo.getDecodedData();
+        PhoenixMarket market = PhoenixMarket.readPhoenixMarket(data);
+
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(
+                        Resources.getResource(
+                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
+                        Charset.defaultCharset()
+                )
+        );
+        log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
+
+        PublicKey seatPda = null;
+        try {
+            seatPda = PublicKey.findProgramAddress(
+                    List.of(
+                            "seat".getBytes(),
+                            SOL_USDC_MARKET.toByteArray(),
+                            tradingAccount.getPublicKey().toByteArray()
+                    ),
+                    PHOENIX_PROGRAM_ID
+            ).getAddress();
+            log.info("PDA found for Phoenix seat: {}", seatPda);
+        } catch (Exception e) {
+            log.error("Error claiming seat: {}", e.getMessage());
+        }
+
+        LimitOrderPacketRecord limitOrderPacketRecord = LimitOrderPacketRecord.builder()
+                .clientOrderId(new byte[]{})
+                .matchLimit(0)
+                .numBaseLots(59100L)
+                .priceInTicks(18L)
+                .selfTradeBehavior((byte) 1)
+                .side((byte) 0)
+                .useOnlyDepositedFunds(false)
+                .build();
+
+        Transaction limitOrderTx = new Transaction();
+        limitOrderTx.addInstruction(
+                ComputeBudgetProgram.setComputeUnitPrice(
+                        1_000_000
+                )
+        );
+
+        limitOrderTx.addInstruction(
+                ComputeBudgetProgram.setComputeUnitLimit(
+                        200_000
+                )
+        );
+        limitOrderTx.addInstruction(
+                PhoenixSeatManagerProgram.claimSeat(
+                        SOL_USDC_MARKET,
+                        SOL_USDC_SEAT_MANAGER,
+                        SOL_USDC_SEAT_DEPOSIT_COLLECTOR,
+                        tradingAccount.getPublicKey(),
+                        tradingAccount.getPublicKey()
+                )
+        );
+        limitOrderTx.addInstruction(
+                PhoenixProgram.placeLimitOrder(
+                        SOL_USDC_MARKET,
+                        tradingAccount.getPublicKey(),
+                        seatPda,
+                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        market.getPhoenixMarketHeader().getBaseVaultKey(),
+                        market.getPhoenixMarketHeader().getQuoteVaultKey(),
+                        limitOrderPacketRecord
+                )
+        );
+
+        String placeLimitOrderTx = client.getApi().sendTransaction(
+                limitOrderTx,
+                List.of(tradingAccount),
+                client.getApi().getRecentBlockhash(Commitment.PROCESSED)
+        );
+        log.info("Limit order in transaction: {}", placeLimitOrderTx);
     }
 
     private String getDiscriminator(String input) {
