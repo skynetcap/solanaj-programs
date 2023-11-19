@@ -10,10 +10,8 @@ import org.bitcoinj.core.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -53,8 +51,7 @@ public class PhoenixMarket {
 
         int offset = 0;
         offset += 16; // skip rbtree header
-        // Skip node allocator size
-        offset += 8;
+        offset += 8;  // Skip node allocator size
 
         int bumpIndex = PhoenixUtil.readInt32(bidBuffer, offset);
         offset += 4;
