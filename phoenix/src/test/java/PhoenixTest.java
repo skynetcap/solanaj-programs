@@ -6,6 +6,7 @@ import com.mmorrell.phoenix.program.PhoenixSeatManagerProgram;
 import com.mmorrell.phoenix.util.Keccak;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
+import org.bitcoinj.core.Utils;
 import org.junit.Test;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
@@ -74,13 +75,25 @@ public class PhoenixTest {
 
         Files.write(marketAccountInfo.getDecodedData(), new File("phoenixMarket.bin"));
 
+        byte[] data = marketAccountInfo.getDecodedData();
         // 576 = start of pub _padding: [u64; 32],v for market struct
         int marketStartOffset = 576;
         int baseLotsPerBaseUnitOffset = 832; // start at base lots to ignore padding
+        // pub tick_size_in_quote_lots_per_base_unit: u64,
+        int tickSizeInQuoteLotsPerBaseUnitOffset = baseLotsPerBaseUnitOffset + 8;
 
         log.info("Market start: " + marketStartOffset);
         log.info("Base per base unit offset: " + baseLotsPerBaseUnitOffset);
         log.info("Market detail length: {}", marketAccountInfo.getDecodedData().length);
+
+        // Deserialization
+
+        long baseLotsPerBaseUnit = Utils.readInt64(data, baseLotsPerBaseUnitOffset);
+        long tickSizeInQuoteLotsPerBaseUnit = Utils.readInt64(data, tickSizeInQuoteLotsPerBaseUnitOffset);
+
+        log.info("Base lots per base unit: {}", baseLotsPerBaseUnit);
+        log.info("Tick size in quote lots per base unit: {}", tickSizeInQuoteLotsPerBaseUnit);
+
     }
 
     @Test
