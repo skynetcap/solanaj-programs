@@ -1,5 +1,6 @@
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import com.mmorrell.phoenix.model.PhoenixMarket;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
 import com.mmorrell.phoenix.program.PhoenixProgram;
 import com.mmorrell.phoenix.program.PhoenixSeatManagerProgram;
@@ -94,6 +95,8 @@ public class PhoenixTest {
         log.info("Base lots per base unit: {}", baseLotsPerBaseUnit);
         log.info("Tick size in quote lots per base unit: {}", tickSizeInQuoteLotsPerBaseUnit);
 
+        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data);
+        log.info("Phoenix market: {}", phoenixMarket.toString());
     }
 
     @Test
