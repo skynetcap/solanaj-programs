@@ -29,6 +29,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -74,7 +75,8 @@ public class PhoenixTest {
     @Test
     public void phoenixGetMarketDetailTest() throws RpcException, IOException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
-                SOL_USDC_MARKET
+                SOL_USDC_MARKET,
+                Map.of("commitment", Commitment.PROCESSED)
         );
 
         Files.write(marketAccountInfo.getDecodedData(), new File("phoenixMarket.bin"));
@@ -118,20 +120,28 @@ public class PhoenixTest {
 //                    (double) fifoOrderIdFIFORestingOrderEntry.getKey().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
 //                    (double) fifoOrderIdFIFORestingOrderEntry.getValue().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
 //        });
+//
+//        var sortedListSanitized = phoenixMarket.getBidOrdersSanitized().entrySet().stream().sorted(
+//                        (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
+//                )
+//                .collect(Collectors.toList());
+//
+//        log.info("Top Bids Sanitized: {}", sortedListSanitized);
+//
+//        sortedListSanitized.forEach(fifoOrderIdFIFORestingOrderEntry -> {
+//            log.info(String.format("Price: %.2f, Size: %.2f",
+//                    (double) fifoOrderIdFIFORestingOrderEntry.getKey().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+//                    (double) fifoOrderIdFIFORestingOrderEntry.getValue().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
+//        });
 
-        var sortedListSanitized = phoenixMarket.getBidOrdersSanitized().entrySet().stream().sorted(
-                        (o1, o2) -> Math.toIntExact(o2.getKey().getPriceInTicks() - o1.getKey().getPriceInTicks())
-                )
-                .collect(Collectors.toList());
-
-        log.info("Top Bids Sanitized: {}", sortedListSanitized);
-
-        sortedListSanitized.forEach(fifoOrderIdFIFORestingOrderEntry -> {
-            log.info(String.format("Price: %.2f, Size: %.2f",
-                    (double) fifoOrderIdFIFORestingOrderEntry.getKey().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
-                    (double) fifoOrderIdFIFORestingOrderEntry.getValue().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
+        var bids = phoenixMarket.getBidListSanitized().stream().sorted(
+                (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
+        ).toList();
+        bids.forEach(fifoOrderIdFIFORestingOrderPair -> {
+            log.info(String.format("Bid: $%.2f, Size: %.2f SOL",
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit()));
         });
-
     }
 
     @Test

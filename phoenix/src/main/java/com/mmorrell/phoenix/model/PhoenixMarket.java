@@ -1,6 +1,7 @@
 package com.mmorrell.phoenix.model;
 
 import com.mmorrell.phoenix.util.PhoenixUtil;
+import kotlin.Pair;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -30,10 +31,10 @@ public class PhoenixMarket {
     private long unclaimedQuoteLotFees;
 
     @Getter
-    public static Map<FIFOOrderId, FIFORestingOrder> bidOrders;
+    public static List<Pair<FIFOOrderId, FIFORestingOrder>> bidList;
 
     @Getter
-    public static Map<FIFOOrderId, FIFORestingOrder> bidOrdersSanitized;
+    public static List<Pair<FIFOOrderId, FIFORestingOrder>> bidListSanitized;
 
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
@@ -48,7 +49,6 @@ public class PhoenixMarket {
         long bidsSize =
                 16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getBidsSize();
 
-        // log.info("Bid size: " + bidsSize);
         byte[] bidBuffer = Arrays.copyOfRange(data, 880, (int) bidsSize);
 
         int offset = 0;
@@ -62,11 +62,10 @@ public class PhoenixMarket {
         int freeListHead = PhoenixUtil.readInt32(bidBuffer, offset);
         offset += 4;
 
-        // log.info("Bump index: {}, freeListHead: {}", bumpIndex, freeListHead);
-        bidOrders = new HashMap<>();
-        bidOrdersSanitized = new HashMap<>();
+        bidList = new ArrayList<>();
+        bidListSanitized = new ArrayList<>();
 
-        Map<Integer, Integer> freeListPointers = new HashMap<>();
+        List<Pair<Integer, Integer>> freeListPointersList = new ArrayList<>();
 
         for (int index = 0; offset < bidBuffer.length && index < bumpIndex; index++) {
             List<Integer> registers = new ArrayList<>();
@@ -78,18 +77,15 @@ public class PhoenixMarket {
             FIFOOrderId fifoOrderId = FIFOOrderId.readFifoOrderId(
                     Arrays.copyOfRange(bidBuffer, offset, offset + 16)
             );
-
             offset += FIFOOrderId.FIFO_ORDER_ID_SIZE;
 
             FIFORestingOrder fifoRestingOrder = FIFORestingOrder.readFifoRestingOrder(
                     Arrays.copyOfRange(bidBuffer, offset, offset + 32)
             );
-
             offset += FIFORestingOrder.FIFO_RESTING_ORDER_SIZE;
 
-            bidOrders.put(fifoOrderId, fifoRestingOrder);
-
-            freeListPointers.put(index, registers.get(0));
+            bidList.add(new Pair<>(fifoOrderId, fifoRestingOrder));
+            freeListPointersList.add(new Pair<>(index, registers.get(0)));
         }
 
         Set<Integer> freeNodes = new HashSet<>();
@@ -97,9 +93,9 @@ public class PhoenixMarket {
         int counter = 0;
 
         while (freeListHead != 0) {
-            var next = freeListPointers.get(freeListHead - 1);
-            indexToRemove = next;
-            freeListHead = next;
+            var next = freeListPointersList.get(freeListHead - 1);
+            indexToRemove = next.component1();
+            freeListHead = next.component2();
 
             freeNodes.add(indexToRemove);
             counter += 1;
@@ -107,40 +103,16 @@ public class PhoenixMarket {
             if (counter > bumpIndex) {
                 log.error("Infinite Loop Detected");
             }
-
         }
 
-        for (int i = 0; i < bidOrders.size(); i++) {
-            Map.Entry<FIFOOrderId, FIFORestingOrder> entry = bidOrders.entrySet().stream().toList().get(i);
+        var bidOrdersList = bidList;
+        for (int i = 0; i < bidList.size(); i++) {
+            Pair<FIFOOrderId, FIFORestingOrder> entry = bidOrdersList.get(i);
             if (!freeNodes.contains(i)) {
                 // tree.set kv
-                bidOrdersSanitized.put(entry.getKey(), entry.getValue());
+                bidListSanitized.add(entry);
             }
         }
-
-        log.info("Sanitized: " + bidOrdersSanitized.toString());
-        /**
-         *   let freeNodes = new Set<number>();
-         *   let indexToRemove = freeListHead - 1;
-         *   let counter = 0;
-         *   // If there's an infinite loop here, that means that the state is corrupted
-         *   while (freeListHead !== 0) {
-         *     // We need to subtract 1 because the node allocator is 1-indexed
-         *     let next = freeListPointers[freeListHead - 1];
-         *     [indexToRemove, freeListHead] = next;
-         *     freeNodes.add(indexToRemove);
-         *     counter += 1;
-         *     if (counter > bumpIndex) {
-         *       throw new Error("Infinite loop detected");
-         *     }
-         *   }
-         *
-         *   for (let [index, [key, value]] of nodes.entries()) {
-         *     if (!freeNodes.has(index)) {
-         *       tree.set(key, value);
-         *     }
-         *   }
-         */
 
         return phoenixMarket;
    }
