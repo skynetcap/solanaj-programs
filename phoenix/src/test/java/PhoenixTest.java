@@ -1,3 +1,4 @@
+import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
 import com.mmorrell.phoenix.program.PhoenixProgram;
@@ -17,6 +18,7 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -65,11 +67,17 @@ public class PhoenixTest {
     }
 
     @Test
-    public void phoenixGetMarketDetailTest() throws RpcException {
+    public void phoenixGetMarketDetailTest() throws RpcException, IOException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET
         );
 
+        Files.write(marketAccountInfo.getDecodedData(), new File("phoenixMarket.bin"));
+
+        // 576 = start of pub _padding: [u64; 32],v for market struct
+        int marketStartOffset = 576;
+
+        log.info("Market start: " + marketStartOffset);
         log.info("Market detail length: {}", marketAccountInfo.getDecodedData().length);
     }
 
