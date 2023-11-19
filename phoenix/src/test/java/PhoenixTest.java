@@ -69,6 +69,38 @@ public class PhoenixTest {
     }
 
     @Test
+    public void phoenixGetJitoSolMarketTest() throws RpcException {
+        final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
+                new PublicKey("2t9TBYyUyovhHQq434uAiBxW6DmJCg7w4xdDoSK6LRjP"),
+                Map.of("commitment", Commitment.PROCESSED)
+        );
+
+        byte[] data = marketAccountInfo.getDecodedData();
+        PhoenixMarketHeader header = PhoenixMarketHeader.readPhoenixMarketHeader(data);
+        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data, header);
+
+        var asks = phoenixMarket.getAskListSanitized().stream().sorted(
+                (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
+        ).toList();
+        asks.forEach(fifoOrderIdFIFORestingOrderPair -> {
+            log.info(String.format("Ask: $%.2f, Size: %.2f SOL, Trader: %s",
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
+                    phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
+        });
+
+        var bids = phoenixMarket.getBidListSanitized().stream().sorted(
+                (o1, o2) -> Math.toIntExact(o2.component1().getPriceInTicks() - o1.getFirst().getPriceInTicks())
+        ).toList();
+        bids.forEach(fifoOrderIdFIFORestingOrderPair -> {
+            log.info(String.format("Bid: $%.2f, Size: %.2f SOL, Trader: %s",
+                    (double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() / phoenixMarket.getTickSizeInQuoteLotsPerBaseUnit(),
+                    (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / phoenixMarket.getBaseLotsPerBaseUnit(),
+                    phoenixMarket.getTradersSanitized().get((int) (fifoOrderIdFIFORestingOrderPair.getSecond().getTraderIndex() - 1)).getFirst().toBase58()));
+        });
+    }
+
+    @Test
     public void phoenixGetMarketDetailTest() throws RpcException, IOException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET,
