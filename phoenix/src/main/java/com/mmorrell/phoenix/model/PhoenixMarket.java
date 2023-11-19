@@ -1,6 +1,7 @@
 package com.mmorrell.phoenix.model;
 
 import com.google.common.io.Files;
+import com.mmorrell.phoenix.util.PhoenixUtil;
 import lombok.Builder;
 import lombok.Data;
 import org.bitcoinj.core.Utils;
@@ -35,7 +36,20 @@ public class PhoenixMarket {
         long bidsSize =
                 16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getBidsSize();
 
+        System.out.println("Bid size: " + bidsSize);
         byte[] bidBuffer = Arrays.copyOfRange(data, 880, (int) bidsSize);
+
+        int offset = 0;
+        offset += 16; // skip rbtree header
+        // Skip node allocator size
+        offset += 8;
+
+        int bumpIndex = PhoenixUtil.readInt32(bidBuffer, offset);
+        offset += 4;
+
+        int freeListHead = PhoenixUtil.readInt32(bidBuffer, offset);
+        offset += 4;
+
 
         return phoenixMarket;
    }
