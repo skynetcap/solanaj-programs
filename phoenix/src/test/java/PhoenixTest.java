@@ -29,6 +29,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class PhoenixTest {
@@ -105,10 +106,10 @@ public class PhoenixTest {
         log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", header.getBidsSize(), header.getAsksSize(),
                 header.getNumSeats());
 
-        long bidsSize =
-                16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getBidsSize();
-
-
+        log.info("Top Bids: {}", phoenixMarket.getBidOrders().keySet().stream().sorted(
+                (o1, o2) -> Math.toIntExact(o2.getPriceInTicks() - o1.getPriceInTicks())
+        )
+                .collect(Collectors.toList()));
 
     }
 

@@ -3,6 +3,7 @@ package com.mmorrell.phoenix.model;
 import com.mmorrell.phoenix.util.PhoenixUtil;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Utils;
 
@@ -26,6 +27,9 @@ public class PhoenixMarket {
     private long collectedQuoteLotFees;
     private long unclaimedQuoteLotFees;
 
+    @Getter
+    public static Map<FIFOOrderId, FIFORestingOrder> bidOrders;
+
     public static PhoenixMarket readPhoenixMarket(byte[] data, PhoenixMarketHeader header) {
         PhoenixMarket phoenixMarket = PhoenixMarket.builder()
                 .baseLotsPerBaseUnit(Utils.readInt64(data, START_OFFSET))
@@ -39,7 +43,7 @@ public class PhoenixMarket {
         long bidsSize =
                 16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getBidsSize();
 
-        log.info("Bid size: " + bidsSize);
+        // log.info("Bid size: " + bidsSize);
         byte[] bidBuffer = Arrays.copyOfRange(data, 880, (int) bidsSize);
 
         int offset = 0;
@@ -53,10 +57,8 @@ public class PhoenixMarket {
         int freeListHead = PhoenixUtil.readInt32(bidBuffer, offset);
         offset += 4;
 
-        log.info("Bump index: {}, freeListHead: {}", bumpIndex, freeListHead);
-
-        Map<FIFOOrderId, FIFORestingOrder> orderMap = new HashMap<>();
-
+        // log.info("Bump index: {}, freeListHead: {}", bumpIndex, freeListHead);
+        bidOrders = new HashMap<>();
         for (int index = 0; offset < bidBuffer.length && index < bumpIndex; index++) {
             List<Integer> registers = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
@@ -76,34 +78,9 @@ public class PhoenixMarket {
 
             offset += FIFORestingOrder.FIFO_RESTING_ORDER_SIZE;
 
-            orderMap.put(fifoOrderId, fifoRestingOrder);
+            bidOrders.put(fifoOrderId, fifoRestingOrder);
         }
-
-        log.info("Order map: {}", orderMap);
-        /**
-         * for (let index = 0; offset < data.length && index < bumpIndex; index++) {
-         *     let registers = new Array<number>();
-         *     for (let i = 0; i < 4; i++) {
-         *       registers.push(data.readInt32LE(offset)); // skip padding
-         *       offset += 4;
-         *     }
-         *     let [key] = keyDeserializer.deserialize(
-         *       data.subarray(offset, offset + keySize)
-         *     );
-         *     offset += keySize;
-         *
-         *     ////
-         *
-         *     let [value] = valueDeserializer.deserialize(
-         *       data.subarray(offset, offset + valueSize)
-         *     );
-         *     offset += valueSize;
-         *     nodes.push([key, value]);
-         *     freeListPointers.push([index, registers[0]]);
-         *   }
-         */
 
         return phoenixMarket;
    }
-
 }
