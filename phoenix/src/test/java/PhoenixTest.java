@@ -261,7 +261,7 @@ public class PhoenixTest {
     }
 
     @Test
-    public void phoenixPlaceLimitOrderTest() throws IOException, RpcException {
+    public void phoenixPlaceLimitOrderTest() throws IOException, RpcException, InterruptedException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET,
                 Map.of("commitment", Commitment.PROCESSED)
@@ -297,53 +297,91 @@ public class PhoenixTest {
         LimitOrderPacketRecord limitOrderPacketRecord = LimitOrderPacketRecord.builder()
                 .clientOrderId(new byte[]{})
                 .matchLimit(0)
-                .numBaseLots(59100L)
-                .priceInTicks(18L)
+                .numBaseLots(18L)
+                .priceInTicks(60000L)
                 .selfTradeBehavior((byte) 1)
                 .side((byte) 0)
                 .useOnlyDepositedFunds(false)
                 .build();
 
-        Transaction limitOrderTx = new Transaction();
-        limitOrderTx.addInstruction(
-                ComputeBudgetProgram.setComputeUnitPrice(
-                        1_000_000
-                )
-        );
+        for (int i = 0; i < 5; i++) {
 
-        limitOrderTx.addInstruction(
-                ComputeBudgetProgram.setComputeUnitLimit(
-                        200_000
-                )
-        );
-        limitOrderTx.addInstruction(
-                PhoenixSeatManagerProgram.claimSeat(
-                        SOL_USDC_MARKET,
-                        SOL_USDC_SEAT_MANAGER,
-                        SOL_USDC_SEAT_DEPOSIT_COLLECTOR,
-                        tradingAccount.getPublicKey(),
-                        tradingAccount.getPublicKey()
-                )
-        );
-        limitOrderTx.addInstruction(
-                PhoenixProgram.placeLimitOrder(
-                        SOL_USDC_MARKET,
-                        tradingAccount.getPublicKey(),
-                        seatPda,
-                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
-                        market.getPhoenixMarketHeader().getBaseVaultKey(),
-                        market.getPhoenixMarketHeader().getQuoteVaultKey(),
-                        limitOrderPacketRecord
-                )
-        );
+            Transaction limitOrderTx = new Transaction();
+            limitOrderTx.addInstruction(
+                    ComputeBudgetProgram.setComputeUnitPrice(
+                            1_000_000
+                    )
+            );
 
-        String placeLimitOrderTx = client.getApi().sendTransaction(
-                limitOrderTx,
-                List.of(tradingAccount),
-                client.getApi().getRecentBlockhash(Commitment.PROCESSED)
-        );
-        log.info("Limit order in transaction: {}", placeLimitOrderTx);
+            limitOrderTx.addInstruction(
+                    ComputeBudgetProgram.setComputeUnitLimit(
+                            200_000
+                    )
+            );
+            limitOrderTx.addInstruction(
+                    PhoenixSeatManagerProgram.claimSeat(
+                            SOL_USDC_MARKET,
+                            SOL_USDC_SEAT_MANAGER,
+                            SOL_USDC_SEAT_DEPOSIT_COLLECTOR,
+                            tradingAccount.getPublicKey(),
+                            tradingAccount.getPublicKey()
+                    )
+            );
+            limitOrderTx.addInstruction(
+                    PhoenixProgram.placeLimitOrder(
+                            SOL_USDC_MARKET,
+                            tradingAccount.getPublicKey(),
+                            seatPda,
+                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                            market.getPhoenixMarketHeader().getBaseVaultKey(),
+                            market.getPhoenixMarketHeader().getQuoteVaultKey(),
+                            limitOrderPacketRecord
+                    )
+            );
+
+            String placeLimitOrderTx = client.getApi().sendTransaction(
+                    limitOrderTx,
+                    List.of(tradingAccount),
+                    client.getApi().getRecentBlockhash(Commitment.PROCESSED)
+            );
+            log.info("Limit order in transaction: {}", placeLimitOrderTx);
+
+            Thread.sleep(500L);
+
+            Transaction cancelOrdersTransaction = new Transaction();
+            cancelOrdersTransaction.addInstruction(
+                    ComputeBudgetProgram.setComputeUnitPrice(
+                            1_000_000
+                    )
+            );
+
+            cancelOrdersTransaction.addInstruction(
+                    ComputeBudgetProgram.setComputeUnitLimit(
+                            200_000
+                    )
+            );
+
+            cancelOrdersTransaction.addInstruction(
+                    PhoenixProgram.cancelAllOrders(
+                            SOL_USDC_MARKET,
+                            tradingAccount.getPublicKey(),
+                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                            market.getPhoenixMarketHeader().getBaseVaultKey(),
+                            market.getPhoenixMarketHeader().getQuoteVaultKey()
+                    )
+            );
+
+            String cancelAllOrdersTx = client.getApi().sendTransaction(
+                    cancelOrdersTransaction,
+                    List.of(tradingAccount),
+                    client.getApi().getRecentBlockhash(Commitment.PROCESSED)
+            );
+            log.info("Cxl all orders: {}", cancelAllOrdersTx);
+
+            Thread.sleep(1000);
+        }
     }
 
     private String getDiscriminator(String input) {

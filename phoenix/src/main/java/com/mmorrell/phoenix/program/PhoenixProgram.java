@@ -60,4 +60,35 @@ public class PhoenixProgram extends Program {
 
         return result.array();
     }
+
+    public static TransactionInstruction cancelAllOrders(PublicKey market, PublicKey trader,
+                                                         PublicKey baseAccount, PublicKey quoteAccount,
+                                                         PublicKey baseVault, PublicKey quoteVault) {
+        List<AccountMeta> accountMetas = new ArrayList<>();
+
+        accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
+        accountMetas.add(new AccountMeta(PhoenixSeatManagerProgram.PHOENIX_LOG_AUTHORITY_ID, false, false));
+        accountMetas.add(new AccountMeta(market, false, true));
+        accountMetas.add(new AccountMeta(trader, true, false));
+        accountMetas.add(new AccountMeta(baseAccount, false, true));
+        accountMetas.add(new AccountMeta(quoteAccount, false, true));
+        accountMetas.add(new AccountMeta(baseVault, false, true));
+        accountMetas.add(new AccountMeta(quoteVault, false, true));
+        accountMetas.add(new AccountMeta(TOKEN_PROGRAM_ID, false, false));
+
+        byte[] transactionData = encodeCancelAllOrdersInstruction();
+
+        return createTransactionInstruction(
+                PHOENIX_PROGRAM_ID,
+                accountMetas,
+                transactionData
+        );
+    }
+
+    private static byte[] encodeCancelAllOrdersInstruction() {
+        ByteBuffer result = ByteBuffer.allocate(1);
+        result.order(ByteOrder.LITTLE_ENDIAN);
+        result.put(0, (byte) 6);
+        return result.array();
+    }
 }

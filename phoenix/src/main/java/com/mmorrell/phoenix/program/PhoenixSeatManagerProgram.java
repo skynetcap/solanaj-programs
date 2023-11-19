@@ -55,7 +55,6 @@ public class PhoenixSeatManagerProgram extends Program {
                     ),
                     PHOENIX_PROGRAM_ID
             ).getAddress();
-            log.info("PDA found for Phoenix seat: {}", seatPda);
         } catch (Exception e) {
             log.error("Error claiming seat: {}", e.getMessage());
         }
