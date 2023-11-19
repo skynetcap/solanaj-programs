@@ -97,6 +97,9 @@ public class PhoenixTest {
 
         PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data);
         log.info("Phoenix market: {}", phoenixMarket.toString());
+
+        PhoenixMarketHeader header = PhoenixMarketHeader.readPhoenixMarketHeader(data);
+        log.info("Header from market: {}", header.toString());
     }
 
     @Test
