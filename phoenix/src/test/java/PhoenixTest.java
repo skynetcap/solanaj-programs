@@ -1,5 +1,7 @@
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import com.mmorrell.phoenix.model.FIFOOrderId;
+import com.mmorrell.phoenix.model.FIFORestingOrder;
 import com.mmorrell.phoenix.model.PhoenixMarket;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
 import com.mmorrell.phoenix.program.PhoenixProgram;
@@ -95,13 +97,19 @@ public class PhoenixTest {
         log.info("Base lots per base unit: {}", baseLotsPerBaseUnit);
         log.info("Tick size in quote lots per base unit: {}", tickSizeInQuoteLotsPerBaseUnit);
 
-        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data);
-        log.info("Phoenix market: {}", phoenixMarket.toString());
-
         PhoenixMarketHeader header = PhoenixMarketHeader.readPhoenixMarketHeader(data);
+
+        PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(data, header);
+        log.info("Phoenix market: {}", phoenixMarket.toString());
         log.info("Header from market: {}", header.toString());
         log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", header.getBidsSize(), header.getAsksSize(),
                 header.getNumSeats());
+
+        long bidsSize =
+                16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * header.getBidsSize();
+
+
+
     }
 
     @Test
@@ -140,7 +148,7 @@ public class PhoenixTest {
                 )
         );
 
-        String claimSeatTxId =  client.getApi().sendTransaction(
+        String claimSeatTxId = client.getApi().sendTransaction(
                 claimSeatTransaction,
                 List.of(tradingAccount),
                 client.getApi().getRecentBlockhash(Commitment.PROCESSED)
