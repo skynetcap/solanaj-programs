@@ -100,6 +100,8 @@ public class PhoenixTest {
 
         PhoenixMarketHeader header = PhoenixMarketHeader.readPhoenixMarketHeader(data);
         log.info("Header from market: {}", header.toString());
+        log.info("Bids size: {}, Asks Size: {}, Number of seats: {}", header.getBidsSize(), header.getAsksSize(),
+                header.getNumSeats());
     }
 
     @Test
