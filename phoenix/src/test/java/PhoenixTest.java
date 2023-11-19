@@ -13,6 +13,7 @@ import org.p2p.solanaj.programs.ComputeBudgetProgram;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
+import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
 
@@ -61,6 +62,15 @@ public class PhoenixTest {
             System.out.println(phoenixMarketHeader);
 
         });
+    }
+
+    @Test
+    public void phoenixGetMarketDetailTest() throws RpcException {
+        final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
+                SOL_USDC_MARKET
+        );
+
+        log.info("Market detail length: {}", marketAccountInfo.getDecodedData().length);
     }
 
     @Test
