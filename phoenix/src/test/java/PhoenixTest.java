@@ -153,9 +153,15 @@ public class PhoenixTest {
         });
 
         var traders = phoenixMarket.getTraders();
-        traders.forEach((publicKey, phoenixTraderState) -> {
-            log.info("Trader Pubkey: {}, State: {}", publicKey.toBase58(), phoenixTraderState.toString());
-        });
+//        traders.forEach((publicKey, phoenixTraderState) -> {
+//            log.info("Trader Pubkey: {}, State: {}", publicKey.toBase58(), phoenixTraderState.toString());
+//        });
+
+        traders.entrySet().stream().sorted((o1, o2) -> Math.toIntExact((int) o2.getValue().getQuoteLotsLocked() - (int) o1.getValue().getQuoteLotsLocked()))
+                .forEach(publicKeyPhoenixTraderStateEntry -> {
+                    log.info("Trader Pubkey: {}, State: {}", publicKeyPhoenixTraderStateEntry.getKey().toBase58(),
+                            publicKeyPhoenixTraderStateEntry.getValue().toString());
+                });
     }
 
     @Test
