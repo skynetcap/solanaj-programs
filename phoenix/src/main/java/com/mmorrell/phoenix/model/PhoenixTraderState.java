@@ -4,18 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.bitcoinj.core.Utils;
 
-/**
- * export const traderStateBeet = new beet.BeetArgsStruct<TraderState>(
- *   [
- *     ["quoteLotsLocked", beet.u64],
- *     ["quoteLotsFree", beet.u64],
- *     ["baseLotsLocked", beet.u64],
- *     ["baseLotsFree", beet.u64],
- *     ["padding", beet.uniformFixedSizeArray(beet.u64, 8)],
- *   ],
- *   "TraderState"
- * );
- */
 @Data
 @Builder
 public class PhoenixTraderState {
