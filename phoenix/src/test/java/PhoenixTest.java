@@ -297,6 +297,21 @@ public class PhoenixTest {
             log.error("Error claiming seat: {}", e.getMessage());
         }
 
+        PublicKey seatDepositCollector = null;
+        try {
+            seatDepositCollector = PublicKey.findProgramAddress(
+                    List.of(
+                            SOL_USDC_MARKET.toByteArray(),
+                            "deposit".getBytes()
+                    ),
+                    PhoenixSeatManagerProgram.PHOENIX_SEAT_MANAGER_PROGRAM_ID
+            ).getAddress();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        log.info("Seat Deposit Collector: " + seatDepositCollector.toBase58());
+
         while (true) {
 
             LimitOrderPacketRecord limitOrderPacketRecord = LimitOrderPacketRecord.builder()
@@ -335,7 +350,7 @@ public class PhoenixTest {
                     PhoenixSeatManagerProgram.claimSeat(
                             SOL_USDC_MARKET,
                             SOL_USDC_SEAT_MANAGER,
-                            SOL_USDC_SEAT_DEPOSIT_COLLECTOR,
+                            seatDepositCollector,
                             tradingAccount.getPublicKey(),
                             tradingAccount.getPublicKey()
                     )
