@@ -322,7 +322,7 @@ public class PhoenixTest {
             Transaction limitOrderTx = new Transaction();
             limitOrderTx.addInstruction(
                     ComputeBudgetProgram.setComputeUnitPrice(
-                            700
+                            123
                     )
             );
 
