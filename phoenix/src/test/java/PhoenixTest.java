@@ -1,5 +1,6 @@
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import com.mmorrell.phoenix.manager.PhoenixManager;
 import com.mmorrell.phoenix.model.LimitOrderPacketRecord;
 import com.mmorrell.phoenix.model.PhoenixMarket;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
@@ -21,7 +22,6 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
 import org.p2p.solanaj.ws.SubscriptionWebSocketClient;
-import org.p2p.solanaj.ws.listeners.AccountNotificationEventListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +33,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import static com.mmorrell.phoenix.program.PhoenixProgram.PHOENIX_PROGRAM_ID;
-
 @Slf4j
 public class PhoenixTest {
 
@@ -44,10 +42,6 @@ public class PhoenixTest {
     );
     private static final PublicKey SOL_USDC_SEAT_MANAGER = new PublicKey(
             "JB3443UaUDA3z47AYdK4AUG8pgFgLfJVyyitHYkqC17L"
-    );
-
-    private static final PublicKey SOL_USDC_SEAT_DEPOSIT_COLLECTOR = new PublicKey(
-            "DXECgdpNTDyXHGbyZfzLLriomtBvkXnBJipX3HgsyKXk"
     );
 
     @Test
@@ -73,6 +67,16 @@ public class PhoenixTest {
             System.out.println(phoenixMarketHeader);
 
         });
+    }
+
+    @Test
+    public void phoenixManagerTest() {
+        PhoenixManager phoenixManager = new PhoenixManager(client);
+        phoenixManager.getPhoenixMarkets().forEach(market -> {
+            log.info("Market: {}", market.getMarketId().toBase58());
+            log.info("Detail: {}", market);
+        });
+
     }
 
     @Test

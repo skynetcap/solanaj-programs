@@ -38,6 +38,7 @@ public class PhoenixMarket {
     private List<Pair<PublicKey, PhoenixTraderState>> tradersSanitized;
 
     private PhoenixMarketHeader phoenixMarketHeader;
+    private PublicKey marketId;
 
     public Pair<FIFOOrderId, FIFORestingOrder> getBestBid() {
         return bidListSanitized.stream()

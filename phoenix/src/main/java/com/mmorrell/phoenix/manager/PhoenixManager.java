@@ -1,9 +1,8 @@
 package com.mmorrell.phoenix.manager;
 
-import com.mmorrell.phoenix.model.PhoenixMarketHeader;
+import com.mmorrell.phoenix.model.PhoenixMarket;
 import com.mmorrell.phoenix.program.PhoenixProgram;
 import com.mmorrell.phoenix.util.PhoenixUtil;
-import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.p2p.solanaj.core.PublicKey;
@@ -13,19 +12,23 @@ import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Data
-@Builder
 @Slf4j
 public class PhoenixManager {
 
     private RpcClient rpcClient;
-    private Set<PhoenixMarketHeader> phoenixMarketHeaders;
-    private Set<PublicKey> marketIds;
+    private Set<PhoenixMarket> phoenixMarkets = new HashSet<>();
 
-    public List<PhoenixMarketHeader> getPhoenixMarketHeaders() {
+    public PhoenixManager(RpcClient rpcClient) {
+        this.rpcClient = rpcClient;
+        cacheMarkets();
+    }
+
+    public void cacheMarkets() {
         List<ProgramAccount> markets = new ArrayList<>();
         try {
             markets = rpcClient.getApi().getProgramAccountsBase64(
@@ -38,19 +41,19 @@ public class PhoenixManager {
         }
 
         markets.forEach(programAccount -> {
-            marketIds.add(new PublicKey(programAccount.getPubkey()));
-            final PhoenixMarketHeader phoenixMarketHeader = PhoenixMarketHeader.readPhoenixMarketHeader(
+            final PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(
                     Arrays.copyOfRange(
                             programAccount.getAccount().getDecodedData(),
                             0,
-                            PhoenixMarketHeader.MARKET_HEADER_SIZE
+                            programAccount.getAccount().getDecodedData().length
                     )
             );
-            phoenixMarketHeaders.add(phoenixMarketHeader);
+            phoenixMarket.setMarketId(new PublicKey(programAccount.getPubkey()));
+            phoenixMarkets.add(phoenixMarket);
         });
-
-        return phoenixMarketHeaders.stream().toList();
     }
 
-
+    public List<PhoenixMarket> getPhoenixMarkets() {
+        return phoenixMarkets.stream().toList();
+    }
 }
