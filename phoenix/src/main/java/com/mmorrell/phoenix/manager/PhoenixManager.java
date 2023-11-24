@@ -56,4 +56,11 @@ public class PhoenixManager {
     public List<PhoenixMarket> getPhoenixMarkets() {
         return phoenixMarkets.stream().toList();
     }
+
+    public PhoenixMarket getMarket(PublicKey marketId) {
+        return phoenixMarkets.stream()
+                .filter(market -> market.getMarketId().equals(marketId))
+                .findFirst()
+                .orElseThrow();
+    }
 }
