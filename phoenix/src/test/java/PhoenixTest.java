@@ -78,7 +78,10 @@ public class PhoenixTest {
             if (market.getBestBid().isPresent() && market.getBestAsk().isPresent()) {
                 float bestBid =
                         ((float) market.getBestBid().get().getFirst().getPriceInTicks() / (float) quoteAtomsPerQuoteUnit) * market.getPhoenixMarketHeader().getQuoteLotSize() * market.getTickSizeInQuoteLotsPerBaseUnit();
-                log.info("Best Bid: {}, Best Ask: {}", bestBid, market.getBestAsk());
+                float bestAsk =
+                        ((float) market.getBestAsk().get().getFirst().getPriceInTicks() / (float) quoteAtomsPerQuoteUnit) * market.getPhoenixMarketHeader().getQuoteLotSize() * market.getTickSizeInQuoteLotsPerBaseUnit();
+
+                log.info(String.format("Bid: %.2f, Ask: %.2f", bestBid, bestAsk));
             }
         });
 
