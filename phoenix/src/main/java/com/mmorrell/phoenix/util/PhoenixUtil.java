@@ -1,5 +1,8 @@
 package com.mmorrell.phoenix.util;
 
+import com.mmorrell.phoenix.program.PhoenixProgram;
+import org.bitcoinj.core.Base58;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -25,5 +28,17 @@ public class PhoenixUtil {
         // read your integers using ByteBuffer's getInt().
         // four bytes converted into an integer!
         return bb.getInt(0);
+    }
+
+    public static String getDiscriminator(String input) {
+        Keccak keccak = new Keccak(256);
+        keccak.update(PhoenixProgram.PHOENIX_PROGRAM_ID.toByteArray());
+        keccak.update(input.getBytes());
+
+        ByteBuffer keccakBuffer = keccak.digest();
+        keccakBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        byte[] keccakBytes = keccakBuffer.array();
+
+        return Base58.encode(Arrays.copyOfRange(keccakBytes, 0, 8));
     }
 }
