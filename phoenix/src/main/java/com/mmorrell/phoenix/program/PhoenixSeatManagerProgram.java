@@ -68,7 +68,7 @@ public class PhoenixSeatManagerProgram extends Program {
                     PhoenixSeatManagerProgram.PHOENIX_SEAT_MANAGER_PROGRAM_ID
             ).getAddress();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Error finding seatDepositCollector: {}", e.getMessage());
         }
 
         accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
