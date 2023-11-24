@@ -74,7 +74,7 @@ public class PhoenixTest {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         phoenixManager.getPhoenixMarkets().forEach(market -> {
             log.info("Market: {}", market.getMarketId().toBase58());
-            log.info("Detail: {}", market);
+            log.info("Best Bid: {}, Best Ask: {}", market.getBestBid(), market.getBestAsk());
         });
 
     }
@@ -291,7 +291,7 @@ public class PhoenixTest {
                     .clientOrderId(new byte[]{})
                     .matchLimit(0)
                     .numBaseLots(18L)
-                    .priceInTicks((long) (market.getBestBid().getFirst().getPriceInTicks() * .9995))
+                    .priceInTicks((long) (market.getBestBid().get().getFirst().getPriceInTicks() * .9995))
                     .selfTradeBehavior((byte) 1)
                     .side((byte) 0)
                     .useOnlyDepositedFunds(false)
@@ -301,7 +301,7 @@ public class PhoenixTest {
                     .clientOrderId(new byte[]{})
                     .matchLimit(0)
                     .numBaseLots(18L)
-                    .priceInTicks((long) (market.getBestAsk().getFirst().getPriceInTicks() * 1.0005))
+                    .priceInTicks((long) (market.getBestAsk().get().getFirst().getPriceInTicks() * 1.0005))
                     .selfTradeBehavior((byte) 1)
                     .side((byte) 1)
                     .useOnlyDepositedFunds(false)

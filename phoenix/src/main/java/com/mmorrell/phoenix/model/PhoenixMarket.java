@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -40,18 +41,26 @@ public class PhoenixMarket {
     private PhoenixMarketHeader phoenixMarketHeader;
     private PublicKey marketId;
 
-    public Pair<FIFOOrderId, FIFORestingOrder> getBestBid() {
-        return bidListSanitized.stream()
+    public Optional<Pair<FIFOOrderId, FIFORestingOrder>> getBestBid() {
+        if (bidListSanitized.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(bidListSanitized.stream()
                 .sorted((o1, o2) -> Math.toIntExact(o2.getFirst().getPriceInTicks() - o1.getFirst().getPriceInTicks()))
                 .toList()
-                .get(0);
+                .get(0));
     }
 
-    public Pair<FIFOOrderId, FIFORestingOrder> getBestAsk() {
-        return askListSanitized.stream()
+    public Optional<Pair<FIFOOrderId, FIFORestingOrder>> getBestAsk() {
+        if (askListSanitized.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(askListSanitized.stream()
                 .sorted((o1, o2) -> Math.toIntExact(o1.getFirst().getPriceInTicks() - o2.getFirst().getPriceInTicks()))
                 .toList()
-                .get(0);
+                .get(0));
     }
 
     public static PhoenixMarket readPhoenixMarket(byte[] data) {
