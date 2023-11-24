@@ -249,7 +249,6 @@ public class PhoenixTest {
                 PhoenixSeatManagerProgram.claimSeat(
                         SOL_USDC_MARKET,
                         SOL_USDC_SEAT_MANAGER,
-                        SOL_USDC_SEAT_DEPOSIT_COLLECTOR,
                         tradingAccount.getPublicKey(),
                         tradingAccount.getPublicKey()
                 )
@@ -281,36 +280,6 @@ public class PhoenixTest {
                 )
         );
         log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
-
-        PublicKey seatPda = null;
-        try {
-            seatPda = PublicKey.findProgramAddress(
-                    List.of(
-                            "seat".getBytes(),
-                            SOL_USDC_MARKET.toByteArray(),
-                            tradingAccount.getPublicKey().toByteArray()
-                    ),
-                    PHOENIX_PROGRAM_ID
-            ).getAddress();
-            log.info("PDA found for Phoenix seat: {}", seatPda);
-        } catch (Exception e) {
-            log.error("Error claiming seat: {}", e.getMessage());
-        }
-
-        PublicKey seatDepositCollector = null;
-        try {
-            seatDepositCollector = PublicKey.findProgramAddress(
-                    List.of(
-                            SOL_USDC_MARKET.toByteArray(),
-                            "deposit".getBytes()
-                    ),
-                    PhoenixSeatManagerProgram.PHOENIX_SEAT_MANAGER_PROGRAM_ID
-            ).getAddress();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        log.info("Seat Deposit Collector: " + seatDepositCollector.toBase58());
 
         while (true) {
 
@@ -350,7 +319,6 @@ public class PhoenixTest {
                     PhoenixSeatManagerProgram.claimSeat(
                             SOL_USDC_MARKET,
                             SOL_USDC_SEAT_MANAGER,
-                            seatDepositCollector,
                             tradingAccount.getPublicKey(),
                             tradingAccount.getPublicKey()
                     )
@@ -371,7 +339,6 @@ public class PhoenixTest {
                     PhoenixProgram.placeLimitOrder(
                             SOL_USDC_MARKET,
                             tradingAccount.getPublicKey(),
-                            seatPda,
                             new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
                             new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
                             market.getPhoenixMarketHeader().getBaseVaultKey(),
@@ -384,7 +351,6 @@ public class PhoenixTest {
                     PhoenixProgram.placeLimitOrder(
                             SOL_USDC_MARKET,
                             tradingAccount.getPublicKey(),
-                            seatPda,
                             new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
                             new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
                             market.getPhoenixMarketHeader().getBaseVaultKey(),

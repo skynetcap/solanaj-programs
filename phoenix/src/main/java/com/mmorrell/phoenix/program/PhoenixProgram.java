@@ -1,6 +1,7 @@
 package com.mmorrell.phoenix.program;
 
 import com.mmorrell.phoenix.model.LimitOrderPacketRecord;
+import lombok.extern.slf4j.Slf4j;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@Slf4j
 public class PhoenixProgram extends Program {
 
     public static final PublicKey PHOENIX_PROGRAM_ID =
@@ -23,16 +25,30 @@ public class PhoenixProgram extends Program {
 
 
     public static TransactionInstruction placeLimitOrder(PublicKey market, PublicKey trader,
-                                                         PublicKey seat, PublicKey baseAccount,
+                                                         PublicKey baseAccount,
                                                          PublicKey quoteAccount, PublicKey baseVault,
                                                          PublicKey quoteVault, LimitOrderPacketRecord limitOrderPacketRecord) {
         List<AccountMeta> accountMetas = new ArrayList<>();
+
+        PublicKey seatPda = null;
+        try {
+            seatPda = PublicKey.findProgramAddress(
+                    List.of(
+                            "seat".getBytes(),
+                            market.toByteArray(),
+                            trader.toByteArray()
+                    ),
+                    PHOENIX_PROGRAM_ID
+            ).getAddress();
+        } catch (Exception e) {
+            log.error("Error claiming seat: {}", e.getMessage());
+        }
 
         accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
         accountMetas.add(new AccountMeta(PhoenixSeatManagerProgram.PHOENIX_LOG_AUTHORITY_ID, false, false));
         accountMetas.add(new AccountMeta(market, false, true));
         accountMetas.add(new AccountMeta(trader, true, false));
-        accountMetas.add(new AccountMeta(seat, false, false));
+        accountMetas.add(new AccountMeta(seatPda, false, false));
         accountMetas.add(new AccountMeta(baseAccount, false, true));
         accountMetas.add(new AccountMeta(quoteAccount, false, true));
         accountMetas.add(new AccountMeta(baseVault, false, true));

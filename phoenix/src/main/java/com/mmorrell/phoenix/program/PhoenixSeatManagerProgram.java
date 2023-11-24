@@ -40,8 +40,7 @@ public class PhoenixSeatManagerProgram extends Program {
      * ClaimSeat = 1,
      *
      */
-    public static TransactionInstruction claimSeat(PublicKey market, PublicKey marketAuthority,
-                                                   PublicKey seatDepositCollector, PublicKey trader,
+    public static TransactionInstruction claimSeat(PublicKey market, PublicKey marketAuthority, PublicKey trader,
                                                    PublicKey payer) {
         List<AccountMeta> accountMetas = new ArrayList<>();
 
@@ -57,6 +56,19 @@ public class PhoenixSeatManagerProgram extends Program {
             ).getAddress();
         } catch (Exception e) {
             log.error("Error claiming seat: {}", e.getMessage());
+        }
+
+        PublicKey seatDepositCollector = null;
+        try {
+            seatDepositCollector = PublicKey.findProgramAddress(
+                    List.of(
+                            market.toByteArray(),
+                            "deposit".getBytes()
+                    ),
+                    PhoenixSeatManagerProgram.PHOENIX_SEAT_MANAGER_PROGRAM_ID
+            ).getAddress();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
