@@ -94,10 +94,12 @@ public class PhoenixTest {
             log.info("Market: {}", market.getMarketId().toBase58());
             // log.info("Detail: {}", market);
             market.getBidListNormalized().forEach(phoenixOrder -> {
-                log.info(String.format("Bid: %.10f x %.4f", phoenixOrder.getPrice(), phoenixOrder.getSize()));
+                log.info(String.format("Bid: %.10f x %.4f, Trader: %s", phoenixOrder.getPrice(),
+                        phoenixOrder.getSize(), phoenixOrder.getTrader().toBase58()));
             });
             market.getAskListNormalized().forEach(phoenixOrder -> {
-                log.info(String.format("Ask: %.10f x %.4f", phoenixOrder.getPrice(), phoenixOrder.getSize()));
+                log.info(String.format("Ask: %.10f x %.4f, Trader: %s", phoenixOrder.getPrice(),
+                        phoenixOrder.getSize(), phoenixOrder.getTrader().toBase58()));
             });
         });
     }

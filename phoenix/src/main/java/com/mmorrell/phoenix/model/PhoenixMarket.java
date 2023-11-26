@@ -123,6 +123,7 @@ public class PhoenixMarket {
                     PhoenixOrder.builder()
                             .price(price)
                             .size(size)
+                            .trader(market.getTraders().get((int) (order.getSecond().getTraderIndex() - 1)).getFirst())
                             .build()
             );
         });
@@ -144,6 +145,7 @@ public class PhoenixMarket {
                     PhoenixOrder.builder()
                             .price(price)
                             .size(size)
+                            .trader(market.getTraders().get((int) (order.getSecond().getTraderIndex() - 1)).getFirst())
                             .build()
             );
         });
