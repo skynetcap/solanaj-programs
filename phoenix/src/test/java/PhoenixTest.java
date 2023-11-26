@@ -93,14 +93,43 @@ public class PhoenixTest {
         phoenixManager.getPhoenixMarkets()
                 .forEach(market -> {
                     log.info("Market: {}", market.getMarketId().toBase58());
-                    log.info("Detail: {}", market);
+                    // log.info("Detail: {}", market);
                     market.getBidListNormalized().forEach(phoenixOrder -> {
-                        log.info(String.format("Bid: %.16f x %.16f", phoenixOrder.getPrice(), phoenixOrder.getSize()));
+                        log.info(String.format("Bid: %.10f x %.4f", phoenixOrder.getPrice(), phoenixOrder.getSize()));
                     });
                     market.getAskListNormalized().forEach(phoenixOrder -> {
-                        log.info(String.format("Ask: %.16f x %.16f", phoenixOrder.getPrice(), phoenixOrder.getSize()));
+                        log.info(String.format("Ask: %.10f x %.4f", phoenixOrder.getPrice(), phoenixOrder.getSize()));
                     });
                 });
+    }
+
+    @Test
+    public void cancelAllOrdersWithFreeFundsTest() throws RpcException, IOException {
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(
+                        Resources.getResource(
+                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
+                        Charset.defaultCharset()
+                )
+        );
+        log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
+
+        // Claim Seat
+        Transaction cancelOrdersWithFreeFundsTx = new Transaction();
+
+        cancelOrdersWithFreeFundsTx.addInstruction(
+                PhoenixProgram.cancelAllOrdersWithFreeFunds(
+                        SOL_USDC_MARKET,
+                        tradingAccount.getPublicKey()
+                )
+        );
+
+        String claimSeatTxId = client.getApi().sendTransaction(
+                cancelOrdersWithFreeFundsTx,
+                List.of(tradingAccount),
+                client.getApi().getRecentBlockhash(Commitment.PROCESSED)
+        );
+        log.info("CXL all orders: {}", claimSeatTxId);
     }
 
     @Test

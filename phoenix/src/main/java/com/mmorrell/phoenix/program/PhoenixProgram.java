@@ -107,4 +107,27 @@ public class PhoenixProgram extends Program {
         result.put(0, (byte) 6);
         return result.array();
     }
+
+    public static TransactionInstruction cancelAllOrdersWithFreeFunds(PublicKey market, PublicKey trader) {
+        List<AccountMeta> accountMetas = new ArrayList<>();
+
+        accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
+        accountMetas.add(new AccountMeta(PhoenixSeatManagerProgram.PHOENIX_LOG_AUTHORITY_ID, false, false));
+        accountMetas.add(new AccountMeta(market, false, true));
+        accountMetas.add(new AccountMeta(trader, true, false));
+
+        byte[] transactionData = encodeCancelAllOrdersWithFreeFundsInstruction();
+        return createTransactionInstruction(
+                PHOENIX_PROGRAM_ID,
+                accountMetas,
+                transactionData
+        );
+    }
+
+    private static byte[] encodeCancelAllOrdersWithFreeFundsInstruction() {
+        ByteBuffer result = ByteBuffer.allocate(1);
+        result.order(ByteOrder.LITTLE_ENDIAN);
+        result.put(0, (byte) 7);
+        return result.array();
+    }
 }
