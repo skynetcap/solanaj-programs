@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 
 public class PythTest {
 
-    private final RpcClient client = new RpcClient("https://rpc.ankr.com/solana");
+    private final RpcClient client = new RpcClient(Cluster.MAINNET);
     private final SubscriptionWebSocketClient webSocketClient = SubscriptionWebSocketClient.getInstance(Cluster.MAINNET.getEndpoint());
     private final PythManager pythManager = new PythManager(client);
     private static final Logger LOGGER = Logger.getLogger(PythTest.class.getName());
