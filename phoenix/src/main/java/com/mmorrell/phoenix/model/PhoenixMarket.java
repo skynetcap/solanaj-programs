@@ -11,6 +11,7 @@ import org.p2p.solanaj.core.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -122,7 +123,7 @@ public class PhoenixMarket {
                             .build()
             );
         });
-        market.getBidListNormalized().sort((o1, o2) -> (int) (o1.getPrice() - o2.getPrice()));
+        market.getBidListNormalized().sort(Comparator.comparingDouble(PhoenixOrder::getPrice));
 
         market.setAskListNormalized(new ArrayList<>());
         market.getAskListSanitized().forEach(fifoOrderIdFIFORestingOrderPair -> {
@@ -140,7 +141,7 @@ public class PhoenixMarket {
                             .build()
             );
         });
-        market.getAskListNormalized().sort((o1, o2) -> (int) (o1.getPrice() - o2.getPrice()));
+        market.getAskListNormalized().sort(Comparator.comparingDouble(PhoenixOrder::getPrice));
     }
 
     private static void readTraderBuffer(byte[] traderBuffer, PhoenixMarket market) {
