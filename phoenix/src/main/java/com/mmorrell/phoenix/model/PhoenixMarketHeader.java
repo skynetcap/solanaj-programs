@@ -39,6 +39,7 @@ public class PhoenixMarketHeader {
     private PublicKey feeDestination;
     private long marketSequenceNumber;
     private PublicKey successor;
+    private long rawBaseUnitsPerBaseUnit;
 
     public static PhoenixMarketHeader readPhoenixMarketHeader(byte[] data) {
         return PhoenixMarketHeader.builder()
@@ -62,6 +63,7 @@ public class PhoenixMarketHeader {
                 .feeDestination(PublicKey.readPubkey(data, 240))
                 .marketSequenceNumber(Utils.readInt64(data, 272))
                 .successor(PublicKey.readPubkey(data, 280))
+                .rawBaseUnitsPerBaseUnit(PhoenixUtil.readInt32(data, 312))
                 .build();
     }
 
