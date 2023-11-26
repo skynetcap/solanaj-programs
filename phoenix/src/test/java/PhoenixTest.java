@@ -92,8 +92,9 @@ public class PhoenixTest {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         phoenixManager.getPhoenixMarkets().forEach(market -> {
             log.info("Market: {}", market.getMarketId().toBase58());
+            log.info("Detail: {}", market);
             market.getBidListNormalized().forEach(phoenixOrder -> {
-                log.info("Bid: {} x {}", phoenixOrder.getPrice(), phoenixOrder.getSize());
+                log.info(String.format("Bid: %.16f x %.16f", phoenixOrder.getPrice(), phoenixOrder.getSize()));
             });
             market.getAskListNormalized().forEach(phoenixOrder -> {
                 log.info("Ask: {} x {}", phoenixOrder.getPrice(), phoenixOrder.getSize());

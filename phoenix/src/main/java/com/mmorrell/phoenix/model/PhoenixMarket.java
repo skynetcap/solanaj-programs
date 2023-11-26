@@ -108,12 +108,12 @@ public class PhoenixMarket {
     private static void normalizeOrders(PhoenixMarket market) {
         market.setBidListNormalized(new ArrayList<>());
         market.getBidListSanitized().forEach(fifoOrderIdFIFORestingOrderPair -> {
-            float price =
-                    ((float) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() /
-                            (float) Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals())) *
+            double price =
+                    ((double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() /
+                            Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals())) *
                             market.getPhoenixMarketHeader().getQuoteLotSize() *
                             market.getTickSizeInQuoteLotsPerBaseUnit();
-            float size = (float) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / market.getBaseLotsPerBaseUnit();
+            double size = (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / market.getBaseLotsPerBaseUnit();
 
             market.getBidListNormalized().add(
                     PhoenixOrder.builder()
@@ -126,12 +126,12 @@ public class PhoenixMarket {
 
         market.setAskListNormalized(new ArrayList<>());
         market.getAskListSanitized().forEach(fifoOrderIdFIFORestingOrderPair -> {
-            float price =
-                    ((float) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() /
-                            (float) Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals())) *
+            double price =
+                    ((double) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() /
+                            Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals())) *
                             market.getPhoenixMarketHeader().getQuoteLotSize() *
                             market.getTickSizeInQuoteLotsPerBaseUnit();
-            float size = (float) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / market.getBaseLotsPerBaseUnit();
+            double size = (double) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / market.getBaseLotsPerBaseUnit();
 
             market.getAskListNormalized().add(
                     PhoenixOrder.builder()
