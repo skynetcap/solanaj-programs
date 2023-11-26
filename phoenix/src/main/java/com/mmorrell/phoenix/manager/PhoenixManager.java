@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -57,10 +58,9 @@ public class PhoenixManager {
         return phoenixMarkets.stream().toList();
     }
 
-    public PhoenixMarket getMarket(PublicKey marketId) {
+    public Optional<PhoenixMarket> getMarket(PublicKey marketId) {
         return phoenixMarkets.stream()
                 .filter(market -> market.getMarketId().equals(marketId))
-                .findFirst()
-                .orElseThrow();
+                .findFirst();
     }
 }

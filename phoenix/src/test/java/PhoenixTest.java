@@ -88,6 +88,20 @@ public class PhoenixTest {
     }
 
     @Test
+    public void orderNormalizedTest() {
+        PhoenixManager phoenixManager = new PhoenixManager(client);
+        phoenixManager.getPhoenixMarkets().forEach(market -> {
+            log.info("Market: {}", market.getMarketId().toBase58());
+            market.getBidListNormalized().forEach(phoenixOrder -> {
+                log.info("Bid: {} x {}", phoenixOrder.getPrice(), phoenixOrder.getSize());
+            });
+            market.getAskListNormalized().forEach(phoenixOrder -> {
+                log.info("Ask: {} x {}", phoenixOrder.getPrice(), phoenixOrder.getSize());
+            });
+        });
+    }
+
+    @Test
     public void phoenixGetJitoSolMarketTest() throws RpcException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 new PublicKey("2t9TBYyUyovhHQq434uAiBxW6DmJCg7w4xdDoSK6LRjP"),

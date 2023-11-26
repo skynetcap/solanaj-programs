@@ -10,6 +10,7 @@ import org.p2p.solanaj.core.PublicKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,12 +32,14 @@ public class PhoenixMarket {
 
     private List<Pair<FIFOOrderId, FIFORestingOrder>> bidList;
     private List<Pair<FIFOOrderId, FIFORestingOrder>> bidListSanitized;
+    private List<PhoenixOrder> bidListNormalized;
 
     private List<Pair<FIFOOrderId, FIFORestingOrder>> askList;
     private List<Pair<FIFOOrderId, FIFORestingOrder>> askListSanitized;
 
     private List<Pair<PublicKey, PhoenixTraderState>> traders;
     private List<Pair<PublicKey, PhoenixTraderState>> tradersSanitized;
+    private List<PhoenixOrder> askListNormalized;
 
     private PhoenixMarketHeader phoenixMarketHeader;
     private PublicKey marketId;
@@ -73,8 +76,10 @@ public class PhoenixMarket {
                 .unclaimedQuoteLotFees(Utils.readInt64(data, START_OFFSET + 40))
                 .bidList(new ArrayList<>())
                 .bidListSanitized(new ArrayList<>())
+                .bidListNormalized(new ArrayList<>())
                 .askList(new ArrayList<>())
                 .askListSanitized(new ArrayList<>())
+                .askListNormalized(new ArrayList<>())
                 .traders(new ArrayList<>())
                 .tradersSanitized(new ArrayList<>())
                 .phoenixMarketHeader(PhoenixMarketHeader.readPhoenixMarketHeader(data))
@@ -95,9 +100,48 @@ public class PhoenixMarket {
         readBidBuffer(bidBuffer, phoenixMarket);
         readAskBuffer(askBuffer, phoenixMarket);
         readTraderBuffer(traderBuffer, phoenixMarket);
+        normalizeOrders(phoenixMarket);
 
         return phoenixMarket;
-   }
+    }
+
+    private static void normalizeOrders(PhoenixMarket market) {
+        market.setBidListNormalized(new ArrayList<>());
+        market.getBidListSanitized().forEach(fifoOrderIdFIFORestingOrderPair -> {
+            float price =
+                    ((float) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() /
+                            (float) Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals())) *
+                            market.getPhoenixMarketHeader().getQuoteLotSize() *
+                            market.getTickSizeInQuoteLotsPerBaseUnit();
+            float size = (float) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / market.getBaseLotsPerBaseUnit();
+
+            market.getBidListNormalized().add(
+                    PhoenixOrder.builder()
+                            .price(price)
+                            .size(size)
+                            .build()
+            );
+        });
+        market.getBidListNormalized().sort((o1, o2) -> (int) (o1.getPrice() - o2.getPrice()));
+
+        market.setAskListNormalized(new ArrayList<>());
+        market.getAskListSanitized().forEach(fifoOrderIdFIFORestingOrderPair -> {
+            float price =
+                    ((float) fifoOrderIdFIFORestingOrderPair.getFirst().getPriceInTicks() /
+                            (float) Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals())) *
+                            market.getPhoenixMarketHeader().getQuoteLotSize() *
+                            market.getTickSizeInQuoteLotsPerBaseUnit();
+            float size = (float) fifoOrderIdFIFORestingOrderPair.getSecond().getNumBaseLots() / market.getBaseLotsPerBaseUnit();
+
+            market.getAskListNormalized().add(
+                    PhoenixOrder.builder()
+                            .price(price)
+                            .size(size)
+                            .build()
+            );
+        });
+        market.getAskListNormalized().sort((o1, o2) -> (int) (o1.getPrice() - o2.getPrice()));
+    }
 
     private static void readTraderBuffer(byte[] traderBuffer, PhoenixMarket market) {
         int offset = 0;
