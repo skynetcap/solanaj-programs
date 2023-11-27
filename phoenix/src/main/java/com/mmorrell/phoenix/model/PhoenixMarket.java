@@ -90,11 +90,12 @@ public class PhoenixMarket {
                 16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * phoenixMarket.getPhoenixMarketHeader().getBidsSize();
         byte[] bidBuffer = Arrays.copyOfRange(data, 880, (int) bidsSize);
 
-        var asksSize =
+        long asksSize =
                 16 + 16 + (16 + FIFOOrderId.FIFO_ORDER_ID_SIZE + FIFORestingOrder.FIFO_RESTING_ORDER_SIZE) * phoenixMarket.getPhoenixMarketHeader().getAsksSize();
         byte[] askBuffer = Arrays.copyOfRange(data, 880 + (int) bidsSize, 880 + (int) bidsSize + (int) asksSize);
 
-        var tradersSize = 16 + 16 + (16 + 32 + PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE) * phoenixMarket.getPhoenixMarketHeader().getNumSeats();
+        long tradersSize =
+                16 + 16 + (16 + 32 + PhoenixTraderState.PHOENIX_TRADER_STATE_SIZE) * phoenixMarket.getPhoenixMarketHeader().getNumSeats();
         byte[] traderBuffer = Arrays.copyOfRange(data, 880 + (int) bidsSize + (int) asksSize,
                 880 + (int) bidsSize + (int) asksSize + (int) tradersSize);
 
@@ -189,7 +190,7 @@ public class PhoenixMarket {
         int counter = 0;
 
         while (freeListHead != 0) {
-            var next = freeListPointersList.get(freeListHead - 1);
+            Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
             indexToRemove = next.component1();
             freeListHead = next.component2();
 
@@ -201,7 +202,7 @@ public class PhoenixMarket {
             }
         }
 
-        var traderList = market.getTraders();
+        List<Pair<PublicKey, PhoenixTraderState>> traderList = market.getTraders();
         for (int i = 0; i < traderList.size(); i++) {
             Pair<PublicKey, PhoenixTraderState> entry = traderList.get(i);
             if (!freeNodes.contains(i)) {
@@ -250,7 +251,7 @@ public class PhoenixMarket {
         int counter = 0;
 
         while (freeListHead != 0) {
-            var next = freeListPointersList.get(freeListHead - 1);
+            Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
             indexToRemove = next.component1();
             freeListHead = next.component2();
 
@@ -262,7 +263,7 @@ public class PhoenixMarket {
             }
         }
 
-        var bidOrdersList = market.getBidList();
+        List<Pair<FIFOOrderId, FIFORestingOrder>> bidOrdersList = market.getBidList();
         for (int i = 0; i < bidOrdersList.size(); i++) {
             Pair<FIFOOrderId, FIFORestingOrder> entry = bidOrdersList.get(i);
             if (!freeNodes.contains(i)) {
@@ -311,7 +312,7 @@ public class PhoenixMarket {
         int counter = 0;
 
         while (freeListHead != 0) {
-            var next = freeListPointersList.get(freeListHead - 1);
+            Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
             indexToRemove = next.component1();
             freeListHead = next.component2();
 
@@ -323,7 +324,7 @@ public class PhoenixMarket {
             }
         }
 
-        var askOrdersList = market.askList;
+        List<Pair<FIFOOrderId, FIFORestingOrder>> askOrdersList = market.getAskList();
         for (int i = 0; i < askOrdersList.size(); i++) {
             Pair<FIFOOrderId, FIFORestingOrder> entry = askOrdersList.get(i);
             if (!freeNodes.contains(i)) {
