@@ -70,24 +70,6 @@ public class PhoenixTest {
     }
 
     @Test
-    public void phoenixManagerTest() {
-        PhoenixManager phoenixManager = new PhoenixManager(client);
-        phoenixManager.getPhoenixMarkets().forEach(market -> {
-            double quoteAtomsPerQuoteUnit = Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals());
-            log.info("Market: {}", market.getMarketId().toBase58());
-            if (market.getBestBid().isPresent() && market.getBestAsk().isPresent()) {
-                float bestBid =
-                        ((float) market.getBestBid().get().getFirst().getPriceInTicks() / (float) quoteAtomsPerQuoteUnit) * market.getPhoenixMarketHeader().getQuoteLotSize() * market.getTickSizeInQuoteLotsPerBaseUnit();
-                float bestAsk =
-                        ((float) market.getBestAsk().get().getFirst().getPriceInTicks() / (float) quoteAtomsPerQuoteUnit) * market.getPhoenixMarketHeader().getQuoteLotSize() * market.getTickSizeInQuoteLotsPerBaseUnit();
-
-                log.info(String.format("Bid: %.2f, Ask: %.2f", bestBid, bestAsk));
-            }
-        });
-
-    }
-
-    @Test
     public void orderNormalizedTest() {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         phoenixManager.getPhoenixMarkets().forEach(market -> {
