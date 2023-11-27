@@ -38,6 +38,7 @@
         <module>magiceden</module>
         <module>openbook</module>
         <module>phoenix</module>
+        <module>metaplex</module>
     </modules>
 
     <properties>
