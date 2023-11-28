@@ -1,5 +1,6 @@
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import com.mmorrell.metaplex.manager.MetaplexManager;
 import com.mmorrell.phoenix.manager.PhoenixManager;
 import com.mmorrell.phoenix.model.LimitOrderPacketRecord;
 import com.mmorrell.phoenix.model.PhoenixMarket;
@@ -72,8 +73,13 @@ public class PhoenixTest {
     @Test
     public void orderNormalizedTest() {
         PhoenixManager phoenixManager = new PhoenixManager(client);
+        MetaplexManager metaplexManager = new MetaplexManager(client);
         phoenixManager.getPhoenixMarkets().forEach(market -> {
             log.info("Market: {}", market.getMarketId().toBase58());
+            metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getBaseMintKey()).ifPresent(metadata -> log.info("Base token: {}", metadata.getSymbol()));
+            metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getQuoteMintKey()).ifPresent(metadata -> log.info(
+                    "Quote token: {}", metadata.getSymbol()));
+
             // log.info("Detail: {}", market);
             market.getBidListNormalized().forEach(phoenixOrder -> {
                 log.info(String.format("Bid: %.10f x %.4f, Trader: %s", phoenixOrder.getPrice(),

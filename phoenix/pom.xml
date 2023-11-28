@@ -23,6 +23,12 @@
             <version>1.19.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.mmorrell</groupId>
+            <artifactId>metaplex</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
