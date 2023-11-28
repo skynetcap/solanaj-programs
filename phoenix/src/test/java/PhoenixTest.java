@@ -76,11 +76,11 @@ public class PhoenixTest {
         MetaplexManager metaplexManager = new MetaplexManager(client);
         phoenixManager.getPhoenixMarkets().forEach(market -> {
             log.info("Market: {}", market.getMarketId().toBase58());
-            metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getBaseMintKey()).ifPresent(metadata -> log.info("Base token: {}", metadata.getSymbol()));
-            metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getQuoteMintKey()).ifPresent(metadata -> log.info(
-                    "Quote token: {}", metadata.getSymbol()));
+            metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getBaseMintKey())
+                    .ifPresent(metadata -> log.info("Base token: {}", metadata.getSymbol()));
+            metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getQuoteMintKey())
+                    .ifPresent(metadata -> log.info("Quote token: {}", metadata.getSymbol()));
 
-            // log.info("Detail: {}", market);
             market.getBidListNormalized().forEach(phoenixOrder -> {
                 log.info(String.format("Bid: %.10f x %.4f, Trader: %s", phoenixOrder.getPrice(),
                         phoenixOrder.getSize(), phoenixOrder.getTrader().toBase58()));
