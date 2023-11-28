@@ -10,7 +10,6 @@ import org.p2p.solanaj.core.PublicKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -332,5 +331,24 @@ public class PhoenixMarket {
                 market.askListSanitized.add(entry);
             }
         }
+    }
+
+    public long convertPriceToPriceInTicks(double price) {
+        // Multiply by denominator
+        double result = price * (Math.pow(10, phoenixMarketHeader.getQuoteDecimals()) *
+                phoenixMarketHeader.getRawBaseUnitsPerBaseUnit());
+
+        // Divide out getTickSizeInQuoteLotsPerBaseUnit and getQuoteLotSize
+        result = result / tickSizeInQuoteLotsPerBaseUnit;
+        result = result / phoenixMarketHeader.getQuoteLotSize();
+
+        return (long) result;
+    }
+
+    public long convertSizeToNumBaseLots(double size) {
+        double result = size * Math.pow(10, phoenixMarketHeader.getBaseDecimals());
+        result = result / phoenixMarketHeader.getBaseLotSize();
+
+        return (long) result;
     }
 }

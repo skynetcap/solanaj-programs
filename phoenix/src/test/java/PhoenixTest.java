@@ -33,6 +33,10 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class PhoenixTest {
@@ -68,6 +72,32 @@ public class PhoenixTest {
             System.out.println(phoenixMarketHeader);
 
         });
+    }
+
+    // Given a marketId, and double values, convert to lots/atoms
+    @Test
+    public void orderLotsConversionTest() {
+        PhoenixManager phoenixManager = new PhoenixManager(client);
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(
+                new PublicKey("4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg")
+        );
+
+        if (marketOptional.isEmpty()) {
+            log.error("Unable to get market for test.");
+            return;
+        }
+
+        PhoenixMarket market = marketOptional.get();
+        log.info("Market: {}", market);
+
+        double price = 58.31;
+        double size = 4;
+        long numBaseLots = market.convertSizeToNumBaseLots(size);
+        long priceInTicks = market.convertPriceToPriceInTicks(price);
+        log.info("Price: {}, Size: {}, numBaseLots: {}, priceInTicks: {}", price, size, numBaseLots, priceInTicks);
+
+        assertEquals(4000, numBaseLots);
+        assertEquals(58310, priceInTicks);
     }
 
     @Test
