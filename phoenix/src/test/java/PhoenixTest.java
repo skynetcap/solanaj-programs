@@ -2,6 +2,7 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.mmorrell.metaplex.manager.MetaplexManager;
 import com.mmorrell.phoenix.manager.PhoenixManager;
+import com.mmorrell.phoenix.model.ImmediateOrCancelOrderPacketRecord;
 import com.mmorrell.phoenix.model.LimitOrderPacketRecord;
 import com.mmorrell.phoenix.model.PhoenixMarket;
 import com.mmorrell.phoenix.model.PhoenixMarketHeader;
@@ -72,6 +73,72 @@ public class PhoenixTest {
             System.out.println(phoenixMarketHeader);
 
         });
+    }
+
+    @Test
+    public void swapTest() throws IOException, RpcException {
+        PhoenixManager phoenixManager = new PhoenixManager(client);
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(
+                        Resources.getResource("mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
+                        Charset.defaultCharset()
+                )
+        );
+
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(
+                new PublicKey("4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg")
+        );
+
+        if (marketOptional.isEmpty()) {
+            log.error("Unable to get market for test.");
+            return;
+        }
+
+        PhoenixMarket market = marketOptional.get();
+        log.info("Market: {}", market);
+
+        double amountUsd = 0.10;
+
+        ImmediateOrCancelOrderPacketRecord iocOrder = ImmediateOrCancelOrderPacketRecord.builder()
+                .side((byte) 0)
+                .numQuoteLots(market.convertSizeToNumQuoteLots(amountUsd))
+                .selfTradeBehavior((byte) 1)
+                .clientOrderId(new byte[]{})
+                .useOnlyDepositedFunds(false)
+                .build();
+
+        Transaction orderTx = new Transaction();
+        orderTx.addInstruction(
+                ComputeBudgetProgram.setComputeUnitPrice(
+                        123
+                )
+        );
+
+        orderTx.addInstruction(
+                ComputeBudgetProgram.setComputeUnitLimit(
+                        130_000
+                )
+        );
+
+        orderTx.addInstruction(
+                PhoenixProgram.swap(
+                        SOL_USDC_MARKET,
+                        tradingAccount.getPublicKey(),
+                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        market.getPhoenixMarketHeader().getBaseVaultKey(),
+                        market.getPhoenixMarketHeader().getQuoteVaultKey(),
+                        iocOrder
+                )
+        );
+
+        String placeLimitOrderTx = client.getApi().sendTransaction(
+                orderTx,
+                List.of(tradingAccount),
+                client.getApi().getRecentBlockhash(Commitment.PROCESSED)
+        );
+        log.info("Swap order in transaction: {}, {}", iocOrder, placeLimitOrderTx);
+
     }
 
     // Given a marketId, and double values, convert to lots/atoms

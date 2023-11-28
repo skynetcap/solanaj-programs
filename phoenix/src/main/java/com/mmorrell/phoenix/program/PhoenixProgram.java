@@ -1,5 +1,6 @@
 package com.mmorrell.phoenix.program;
 
+import com.mmorrell.phoenix.model.ImmediateOrCancelOrderPacketRecord;
 import com.mmorrell.phoenix.model.LimitOrderPacketRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.p2p.solanaj.core.AccountMeta;
@@ -20,9 +21,6 @@ public class PhoenixProgram extends Program {
             PublicKey.valueOf("PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY");
     private static final PublicKey TOKEN_PROGRAM_ID =
             PublicKey.valueOf("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
-    private static final PublicKey SYSVAR_RENT_PUBKEY =
-            PublicKey.valueOf("SysvarRent111111111111111111111111111111111");
-
 
     public static TransactionInstruction placeLimitOrder(PublicKey market, PublicKey trader,
                                                          PublicKey baseAccount,
@@ -128,6 +126,41 @@ public class PhoenixProgram extends Program {
         ByteBuffer result = ByteBuffer.allocate(1);
         result.order(ByteOrder.LITTLE_ENDIAN);
         result.put(0, (byte) 7);
+        return result.array();
+    }
+
+    public static TransactionInstruction swap(PublicKey market, PublicKey trader, PublicKey baseAccount,
+                                              PublicKey quoteAccount, PublicKey baseVault, PublicKey quoteVault,
+                                              ImmediateOrCancelOrderPacketRecord limitOrderPacketRecord) {
+        List<AccountMeta> accountMetas = new ArrayList<>();
+
+        accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
+        accountMetas.add(new AccountMeta(PhoenixSeatManagerProgram.PHOENIX_LOG_AUTHORITY_ID, false, false));
+        accountMetas.add(new AccountMeta(market, false, true));
+        accountMetas.add(new AccountMeta(trader, true, false));
+        accountMetas.add(new AccountMeta(baseAccount, false, true));
+        accountMetas.add(new AccountMeta(quoteAccount, false, true));
+        accountMetas.add(new AccountMeta(baseVault, false, true));
+        accountMetas.add(new AccountMeta(quoteVault, false, true));
+        accountMetas.add(new AccountMeta(TOKEN_PROGRAM_ID, false, false));
+
+        byte[] transactionData = encodeSwapInstruction(limitOrderPacketRecord);
+
+        return createTransactionInstruction(
+                PHOENIX_PROGRAM_ID,
+                accountMetas,
+                transactionData
+        );
+    }
+
+    private static byte[] encodeSwapInstruction(ImmediateOrCancelOrderPacketRecord immediateOrCancelOrderPacketRecord) {
+        ByteBuffer result = ByteBuffer.allocate(65);
+        result.order(ByteOrder.LITTLE_ENDIAN);
+
+        result.put(0, (byte) 0);    // discriminator 0 = swap
+        result.put(1, (byte) 2);    // 1 = limit, 2 = IoC
+        result.put(2, immediateOrCancelOrderPacketRecord.toBytes());
+
         return result.array();
     }
 }

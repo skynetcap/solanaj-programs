@@ -351,4 +351,9 @@ public class PhoenixMarket {
 
         return (long) result;
     }
+
+    public long convertSizeToNumQuoteLots(double size) {
+        return (long) (size * Math.pow(10, phoenixMarketHeader.getQuoteDecimals())) /
+                phoenixMarketHeader.getQuoteLotSize();
+    }
 }
