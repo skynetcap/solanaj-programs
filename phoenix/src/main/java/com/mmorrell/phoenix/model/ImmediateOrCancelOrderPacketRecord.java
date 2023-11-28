@@ -28,7 +28,7 @@ public class ImmediateOrCancelOrderPacketRecord {
         buffer.put(0, side);
         buffer.put(1, (byte) 1);            // coption for present = 1
         buffer.putLong(2, side == 0 ? 4503599627370496L : 0x00);
-        buffer.putLong(10, 0x00);     //numBaseLots
+        buffer.putLong(10, numBaseLots);
         buffer.putLong(18, numQuoteLots);
         buffer.putLong(26, 0x00);     // min base lots to fill
         buffer.putLong(34, 0x00);     // quote lots to Fill
