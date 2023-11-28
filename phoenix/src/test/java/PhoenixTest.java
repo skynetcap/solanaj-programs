@@ -101,6 +101,94 @@ public class PhoenixTest {
     }
 
     @Test
+    public void placeSingleOrderTest() throws IOException, RpcException {
+        PhoenixManager phoenixManager = new PhoenixManager(client);
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(
+                        Resources.getResource(
+                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
+                        Charset.defaultCharset()
+                )
+        );
+
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(
+                new PublicKey("4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg")
+        );
+
+        if (marketOptional.isEmpty()) {
+            log.error("Unable to get market for test.");
+            return;
+        }
+
+        PhoenixMarket market = marketOptional.get();
+        log.info("Market: {}", market);
+
+        double price = 13.37;
+        double size = 0.042;
+
+        LimitOrderPacketRecord limitOrderPacketRecord = LimitOrderPacketRecord.builder()
+                .clientOrderId(new byte[]{})
+                .matchLimit(0)
+                .numBaseLots(market.convertSizeToNumBaseLots(size))
+                .priceInTicks(market.convertPriceToPriceInTicks(price))
+                .selfTradeBehavior((byte) 1)
+                .side((byte) 0)
+                .useOnlyDepositedFunds(false)
+                .build();
+
+        Transaction limitOrderTx = new Transaction();
+        limitOrderTx.addInstruction(
+                ComputeBudgetProgram.setComputeUnitPrice(
+                        123
+                )
+        );
+
+        limitOrderTx.addInstruction(
+                ComputeBudgetProgram.setComputeUnitLimit(
+                        130_000
+                )
+        );
+        limitOrderTx.addInstruction(
+                PhoenixSeatManagerProgram.claimSeat(
+                        SOL_USDC_MARKET,
+                        SOL_USDC_SEAT_MANAGER,
+                        tradingAccount.getPublicKey(),
+                        tradingAccount.getPublicKey()
+                )
+        );
+
+        limitOrderTx.addInstruction(
+                PhoenixProgram.cancelAllOrders(
+                        SOL_USDC_MARKET,
+                        tradingAccount.getPublicKey(),
+                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        market.getPhoenixMarketHeader().getBaseVaultKey(),
+                        market.getPhoenixMarketHeader().getQuoteVaultKey()
+                )
+        );
+
+        limitOrderTx.addInstruction(
+                PhoenixProgram.placeLimitOrder(
+                        SOL_USDC_MARKET,
+                        tradingAccount.getPublicKey(),
+                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
+                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        market.getPhoenixMarketHeader().getBaseVaultKey(),
+                        market.getPhoenixMarketHeader().getQuoteVaultKey(),
+                        limitOrderPacketRecord
+                )
+        );
+
+        String placeLimitOrderTx = client.getApi().sendTransaction(
+                limitOrderTx,
+                List.of(tradingAccount),
+                client.getApi().getRecentBlockhash(Commitment.PROCESSED)
+        );
+        log.info("Single order in transaction: {}, {}", limitOrderPacketRecord, placeLimitOrderTx);
+    }
+
+    @Test
     public void orderNormalizedTest() {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         MetaplexManager metaplexManager = new MetaplexManager(client);
