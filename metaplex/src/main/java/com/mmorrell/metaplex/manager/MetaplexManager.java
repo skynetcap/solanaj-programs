@@ -8,12 +8,15 @@ import org.p2p.solanaj.utils.ByteUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class MetaplexManager {
 
     private final RpcClient client;
+    private final Map<PublicKey, Metadata> metadataCache = new HashMap<>();
     private static final PublicKey METAPLEX = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
     // Offsets (from https://docs.metaplex.com/programs/token-metadata/accounts)
@@ -33,6 +36,10 @@ public class MetaplexManager {
     }
 
     public Optional<Metadata> getTokenMetadata(final PublicKey tokenMint) {
+        if (metadataCache.containsKey(tokenMint)) {
+            return Optional.of(metadataCache.get(tokenMint));
+        }
+
         try {
             final PublicKey.ProgramDerivedAddress metadataPda = PublicKey.findProgramAddress(
                     List.of(
@@ -54,6 +61,7 @@ public class MetaplexManager {
                     .uri(new String(ByteUtils.readBytes(data, URI_OFFSET, URI_SIZE)).trim())
                     .build();
 
+            metadataCache.put(tokenMint, metadata);
             return Optional.ofNullable(metadata);
         } catch (Exception e) {
             return Optional.empty();
