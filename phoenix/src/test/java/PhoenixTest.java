@@ -74,8 +74,10 @@ public class PhoenixTest {
     public void orderNormalizedTest() {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         MetaplexManager metaplexManager = new MetaplexManager(client);
+
         phoenixManager.getPhoenixMarkets().forEach(market -> {
             log.info("Market: {}", market.getMarketId().toBase58());
+
             metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getBaseMintKey())
                     .ifPresent(metadata -> log.info("Base token: {}", metadata.getSymbol()));
             metaplexManager.getTokenMetadata(market.getPhoenixMarketHeader().getQuoteMintKey())
