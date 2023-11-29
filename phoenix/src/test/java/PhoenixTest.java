@@ -100,8 +100,8 @@ public class PhoenixTest {
         PhoenixMarket market = marketOptional.get();
 
         List<CondensedPhoenixOrder> bidsToPlace = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            double price = 13.37 + (i * 0.01);
+        for (int i = 0; i < 20; i++) {
+            double price = 59.00 + (i * 0.01);
             bidsToPlace.add(
                     CondensedPhoenixOrder.builder()
                             .sizeInBaseLots(market.convertSizeToNumBaseLots(0.001))
@@ -110,8 +110,19 @@ public class PhoenixTest {
             );
         }
 
+        List<CondensedPhoenixOrder> asksToPlace = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            double price = 60 + (i * 0.01);
+            asksToPlace.add(
+                    CondensedPhoenixOrder.builder()
+                            .sizeInBaseLots(market.convertSizeToNumBaseLots(0.001))
+                            .priceInTicks(market.convertPriceToPriceInTicks(price))
+                            .build()
+            );
+        }
+
         MultipleOrderPacketRecord multipleOrderPacketRecord = MultipleOrderPacketRecord.builder()
-                .asks(Collections.emptyList())
+                .asks(asksToPlace)
                 .bids(bidsToPlace)
                 .build();
 
@@ -124,7 +135,7 @@ public class PhoenixTest {
 
         orderTx.addInstruction(
                 ComputeBudgetProgram.setComputeUnitLimit(
-                        130_000
+                        530_000
                 )
         );
 
