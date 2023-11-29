@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
@@ -96,18 +97,22 @@ public class PhoenixTest {
             log.error("Unable to get market for test.");
             return;
         }
-
         PhoenixMarket market = marketOptional.get();
+
+        List<CondensedPhoenixOrder> bidsToPlace = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            double price = 13.37 + (i * 0.01);
+            bidsToPlace.add(
+                    CondensedPhoenixOrder.builder()
+                            .sizeInBaseLots(market.convertSizeToNumBaseLots(0.001))
+                            .priceInTicks(market.convertPriceToPriceInTicks(price))
+                            .build()
+            );
+        }
+
         MultipleOrderPacketRecord multipleOrderPacketRecord = MultipleOrderPacketRecord.builder()
                 .asks(Collections.emptyList())
-                .bids(
-                        List.of(
-                                CondensedPhoenixOrder.builder()
-                                        .sizeInBaseLots(market.convertSizeToNumBaseLots(0.001))
-                                        .priceInTicks(market.convertPriceToPriceInTicks(13.37))
-                                        .build()
-                        )
-                )
+                .bids(bidsToPlace)
                 .build();
 
         Transaction orderTx = new Transaction();
