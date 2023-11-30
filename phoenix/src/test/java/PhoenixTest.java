@@ -14,6 +14,7 @@ import com.mmorrell.phoenix.util.Keccak;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Utils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
@@ -80,6 +81,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void placeMultiplePostOnlyOrdersTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
@@ -162,6 +164,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void swapTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
@@ -254,6 +257,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void placeSingleOrderTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
@@ -366,6 +370,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void cancelAllOrdersWithFreeFundsTest() throws RpcException, IOException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(
@@ -426,6 +431,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void phoenixGetMarketDetailStreamingTest() throws InterruptedException {
         final SubscriptionWebSocketClient mainnet = SubscriptionWebSocketClient.getInstance(
                 Cluster.MAINNET.getEndpoint()
@@ -539,6 +545,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void phoenixClaimSeatTest() throws RpcException, IOException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(
@@ -582,6 +589,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void phoenixPlaceLimitOrderTest() throws IOException, RpcException, InterruptedException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET,

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 public class MarketTest {
 
-    private final RpcClient client = new RpcClient("https://rpc.ankr.com/solana");
+    private final RpcClient client = new RpcClient(Cluster.MAINNET);
     private static final Logger LOGGER = LogManager.getLogger(MarketTest.class);
 
     /**
