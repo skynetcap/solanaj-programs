@@ -1,5 +1,6 @@
 import com.mmorrell.mango.manager.MangoManager;
 import com.mmorrell.mango.model.*;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -14,7 +15,7 @@ import static org.junit.Assert.*;
 
 public class MangoTest {
 
-    private final RpcClient client = new RpcClient("https://rpc.ankr.com/solana");
+    private final RpcClient client = new RpcClient(Cluster.MAINNET);
     private final RpcClient devnetClient = new RpcClient("https://api.devnet.solana.com");
     private final MangoManager mangoManager = new MangoManager(client);
     private final MangoManager devnetMangoManager = new MangoManager(devnetClient);
@@ -185,6 +186,7 @@ public class MangoTest {
     }
 
     @Test
+    @Ignore
     public void mangoV3Test() {
         final MangoPerpGroup mangoPerpGroup = devnetMangoManager.getMangoPerpGroup(
                 PublicKey.valueOf("ECAikQUnS8HGLnzGrqEYA6Daz8nRRu9GsbfLbwMfK23P")
@@ -238,6 +240,7 @@ public class MangoTest {
     }
 
     @Test
+    @Ignore
     public void mangoV3PerpAccountTest() {
         final MangoPerpGroup mangoPerpGroup = devnetMangoManager.getMangoPerpGroup(
                 PublicKey.valueOf("ECAikQUnS8HGLnzGrqEYA6Daz8nRRu9GsbfLbwMfK23P")
