@@ -36,13 +36,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class PhoenixTest {
@@ -55,6 +53,10 @@ public class PhoenixTest {
             "JB3443UaUDA3z47AYdK4AUG8pgFgLfJVyyitHYkqC17L"
     );
 
+    private static final PublicKey BASE_WSOL_WALLET = new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS");
+    private static final PublicKey QUOTE_USDC_WALLET = new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe");
+    private static final String PRIVATE_KEY_FILE = "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json";
+
     @Test
     public void phoenixGetMarketsTest() throws RpcException {
         // GPA for all markets
@@ -64,9 +66,9 @@ public class PhoenixTest {
                 getDiscriminator("phoenix::program::accounts::MarketHeader")
         );
 
-        System.out.println("Number of markets: " + markets.size());
+        log.info("Number of markets: " + markets.size());
         markets.forEach(programAccount -> {
-            System.out.println("Market: " + programAccount.getPubkey());
+            log.info("Market: " + programAccount.getPubkey());
 
             final PhoenixMarketHeader phoenixMarketHeader = PhoenixMarketHeader.readPhoenixMarketHeader(
                     Arrays.copyOfRange(
@@ -75,8 +77,7 @@ public class PhoenixTest {
                             PhoenixMarketHeader.MARKET_HEADER_SIZE
                     )
             );
-            System.out.println(phoenixMarketHeader);
-
+            log.info(phoenixMarketHeader.toString());
         });
     }
 
@@ -85,15 +86,10 @@ public class PhoenixTest {
     public void placeMultiplePostOnlyOrdersTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
-                Resources.toString(
-                        Resources.getResource("mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
-                        Charset.defaultCharset()
-                )
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
 
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(
-                new PublicKey("4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg")
-        );
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
@@ -145,8 +141,8 @@ public class PhoenixTest {
                 PhoenixProgram.placeMultiplePostOnlyOrders(
                         SOL_USDC_MARKET,
                         tradingAccount.getPublicKey(),
-                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        BASE_WSOL_WALLET,
+                        QUOTE_USDC_WALLET,
                         market.getPhoenixMarketHeader().getBaseVaultKey(),
                         market.getPhoenixMarketHeader().getQuoteVaultKey(),
                         multipleOrderPacketRecord
@@ -168,15 +164,10 @@ public class PhoenixTest {
     public void swapTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
-                Resources.toString(
-                        Resources.getResource("mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
-                        Charset.defaultCharset()
-                )
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
 
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(
-                new PublicKey("4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg")
-        );
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
@@ -213,8 +204,8 @@ public class PhoenixTest {
                 PhoenixProgram.swap(
                         SOL_USDC_MARKET,
                         tradingAccount.getPublicKey(),
-                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        BASE_WSOL_WALLET,
+                        QUOTE_USDC_WALLET,
                         market.getPhoenixMarketHeader().getBaseVaultKey(),
                         market.getPhoenixMarketHeader().getQuoteVaultKey(),
                         iocOrder
@@ -234,9 +225,7 @@ public class PhoenixTest {
     @Test
     public void orderLotsConversionTest() {
         PhoenixManager phoenixManager = new PhoenixManager(client);
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(
-                new PublicKey("4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg")
-        );
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
@@ -261,16 +250,10 @@ public class PhoenixTest {
     public void placeSingleOrderTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
-                Resources.toString(
-                        Resources.getResource(
-                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
-                        Charset.defaultCharset()
-                )
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
 
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(
-                new PublicKey("4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg")
-        );
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
@@ -318,8 +301,8 @@ public class PhoenixTest {
                 PhoenixProgram.cancelAllOrders(
                         SOL_USDC_MARKET,
                         tradingAccount.getPublicKey(),
-                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        BASE_WSOL_WALLET,
+                        QUOTE_USDC_WALLET,
                         market.getPhoenixMarketHeader().getBaseVaultKey(),
                         market.getPhoenixMarketHeader().getQuoteVaultKey()
                 )
@@ -329,8 +312,8 @@ public class PhoenixTest {
                 PhoenixProgram.placeLimitOrder(
                         SOL_USDC_MARKET,
                         tradingAccount.getPublicKey(),
-                        new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                        new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                        BASE_WSOL_WALLET,
+                        QUOTE_USDC_WALLET,
                         market.getPhoenixMarketHeader().getBaseVaultKey(),
                         market.getPhoenixMarketHeader().getQuoteVaultKey(),
                         limitOrderPacketRecord
@@ -373,11 +356,7 @@ public class PhoenixTest {
     @Ignore
     public void cancelAllOrdersWithFreeFundsTest() throws RpcException, IOException {
         Account tradingAccount = Account.fromJson(
-                Resources.toString(
-                        Resources.getResource(
-                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
-                        Charset.defaultCharset()
-                )
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
         log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
 
@@ -548,11 +527,7 @@ public class PhoenixTest {
     @Ignore
     public void phoenixClaimSeatTest() throws RpcException, IOException {
         Account tradingAccount = Account.fromJson(
-                Resources.toString(
-                        Resources.getResource(
-                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
-                        Charset.defaultCharset()
-                )
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
         log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
 
@@ -600,11 +575,7 @@ public class PhoenixTest {
         PhoenixMarket market = PhoenixMarket.readPhoenixMarket(data);
 
         Account tradingAccount = Account.fromJson(
-                Resources.toString(
-                        Resources.getResource(
-                                "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json"),
-                        Charset.defaultCharset()
-                )
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
         log.info("Trading account: {}", tradingAccount.getPublicKey().toBase58());
 
@@ -655,8 +626,8 @@ public class PhoenixTest {
                     PhoenixProgram.cancelAllOrders(
                             SOL_USDC_MARKET,
                             tradingAccount.getPublicKey(),
-                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                            BASE_WSOL_WALLET,
+                            QUOTE_USDC_WALLET,
                             market.getPhoenixMarketHeader().getBaseVaultKey(),
                             market.getPhoenixMarketHeader().getQuoteVaultKey()
                     )
@@ -666,8 +637,8 @@ public class PhoenixTest {
                     PhoenixProgram.placeLimitOrder(
                             SOL_USDC_MARKET,
                             tradingAccount.getPublicKey(),
-                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                            BASE_WSOL_WALLET,
+                            QUOTE_USDC_WALLET,
                             market.getPhoenixMarketHeader().getBaseVaultKey(),
                             market.getPhoenixMarketHeader().getQuoteVaultKey(),
                             limitOrderPacketRecord
@@ -678,8 +649,8 @@ public class PhoenixTest {
                     PhoenixProgram.placeLimitOrder(
                             SOL_USDC_MARKET,
                             tradingAccount.getPublicKey(),
-                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
+                            BASE_WSOL_WALLET,
+                            QUOTE_USDC_WALLET,
                             market.getPhoenixMarketHeader().getBaseVaultKey(),
                             market.getPhoenixMarketHeader().getQuoteVaultKey(),
                             limitOrderPacketRecordAsk
@@ -700,39 +671,6 @@ public class PhoenixTest {
                             Map.of("commitment", Commitment.PROCESSED)
                     ).getDecodedData()
             );
-//
-//            Transaction cancelOrdersTransaction = new Transaction();
-//            cancelOrdersTransaction.addInstruction(
-//                    ComputeBudgetProgram.setComputeUnitPrice(
-//                            1_000_000
-//                    )
-//            );
-//
-//            cancelOrdersTransaction.addInstruction(
-//                    ComputeBudgetProgram.setComputeUnitLimit(
-//                            200_000
-//                    )
-//            );
-//
-//            cancelOrdersTransaction.addInstruction(
-//                    PhoenixProgram.cancelAllOrders(
-//                            SOL_USDC_MARKET,
-//                            tradingAccount.getPublicKey(),
-//                            new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS"),
-//                            new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe"),
-//                            market.getPhoenixMarketHeader().getBaseVaultKey(),
-//                            market.getPhoenixMarketHeader().getQuoteVaultKey()
-//                    )
-//            );
-//
-//            String cancelAllOrdersTx = client.getApi().sendTransaction(
-//                    cancelOrdersTransaction,
-//                    List.of(tradingAccount),
-//                    client.getApi().getRecentBlockhash(Commitment.PROCESSED)
-//            );
-//            log.info("Cxl all orders: {}", cancelAllOrdersTx);
-//
-//            Thread.sleep(1000);
         }
     }
 
