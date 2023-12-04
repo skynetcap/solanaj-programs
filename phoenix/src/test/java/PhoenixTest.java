@@ -201,15 +201,15 @@ public class PhoenixTest {
         );
 
         orderTx.addInstruction(
-                PhoenixProgram.swap(
-                        SOL_USDC_MARKET,
-                        tradingAccount.getPublicKey(),
-                        BASE_WSOL_WALLET,
-                        QUOTE_USDC_WALLET,
-                        market.getPhoenixMarketHeader().getBaseVaultKey(),
-                        market.getPhoenixMarketHeader().getQuoteVaultKey(),
-                        iocOrder
-                )
+                    PhoenixProgram.swap(
+                            SOL_USDC_MARKET,
+                            tradingAccount.getPublicKey(),
+                            BASE_WSOL_WALLET,
+                            QUOTE_USDC_WALLET,
+                            market.getPhoenixMarketHeader().getBaseVaultKey(),
+                            market.getPhoenixMarketHeader().getQuoteVaultKey(),
+                            iocOrder
+                    )
         );
 
         String placeLimitOrderTx = client.getApi().sendTransaction(
