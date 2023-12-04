@@ -17,6 +17,7 @@ public class LimitOrderPacketRecord {
     private long matchLimit;
     private byte[] clientOrderId;
     private boolean useOnlyDepositedFunds;
+    private byte orderType;
 
     public byte[] toBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(26);

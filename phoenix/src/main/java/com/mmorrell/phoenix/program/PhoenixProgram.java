@@ -68,7 +68,7 @@ public class PhoenixProgram extends Program {
         result.order(ByteOrder.LITTLE_ENDIAN);
 
         result.put(0, (byte) 2);
-        result.put(1, (byte) 1);
+        result.put(1, limitOrderPacketRecord.getOrderType());
 
         // index 2 = 0 for bid, 1 for ask
         result.put(2, limitOrderPacketRecord.toBytes());
