@@ -89,7 +89,7 @@ public class PhoenixTest {
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
 
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET, true);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
@@ -167,7 +167,7 @@ public class PhoenixTest {
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
 
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET, true);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
@@ -225,7 +225,7 @@ public class PhoenixTest {
     @Test
     public void orderLotsConversionTest() {
         PhoenixManager phoenixManager = new PhoenixManager(client);
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET, true);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
@@ -253,7 +253,7 @@ public class PhoenixTest {
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
 
-        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET);
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET, true);
 
         if (marketOptional.isEmpty()) {
             log.error("Unable to get market for test.");
