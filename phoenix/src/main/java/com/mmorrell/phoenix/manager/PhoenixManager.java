@@ -9,11 +9,13 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
+import org.p2p.solanaj.rpc.types.config.Commitment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -66,7 +68,9 @@ public class PhoenixManager {
         } else {
             try {
                 PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(
-                        rpcClient.getApi().getAccountInfo(marketId).getDecodedData()
+                        rpcClient.getApi()
+                                .getAccountInfo(marketId, Map.of("commitment", Commitment.PROCESSED))
+                                .getDecodedData()
                 );
 
                 return Optional.of(phoenixMarket);
