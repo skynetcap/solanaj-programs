@@ -58,9 +58,22 @@ public class PhoenixManager {
         return phoenixMarkets.stream().toList();
     }
 
-    public Optional<PhoenixMarket> getMarket(PublicKey marketId) {
-        return phoenixMarkets.stream()
-                .filter(market -> market.getMarketId().equals(marketId))
-                .findFirst();
+    public Optional<PhoenixMarket> getMarket(PublicKey marketId, boolean useCache) {
+        if (useCache) {
+            return phoenixMarkets.stream()
+                    .filter(market -> market.getMarketId().equals(marketId))
+                    .findFirst();
+        } else {
+            try {
+                PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(
+                        rpcClient.getApi().getAccountInfo(marketId).getDecodedData()
+                );
+
+                return Optional.of(phoenixMarket);
+            } catch (RpcException e) {
+                log.error("Unable to retrieve phoenix market {}", marketId);
+                return Optional.empty();
+            }
+        }
     }
 }
