@@ -1,18 +1,12 @@
 import com.mmorrell.openbook.model.OpenBookMarket;
-import com.mmorrell.openbook.util.Keccak;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.junit.Test;
-import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
-import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -49,17 +43,5 @@ public class OpenBookTest {
     @Test
     public void openBookGetMarketsTest() {
 
-    }
-
-    public static String getDiscriminator(String input) {
-        Keccak keccak = new Keccak(256);
-        keccak.update(new PublicKey("opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb").toByteArray());
-        keccak.update(input.getBytes());
-
-        ByteBuffer keccakBuffer = keccak.digest();
-        keccakBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        byte[] keccakBytes = keccakBuffer.array();
-
-        return Base58.encode(Arrays.copyOfRange(keccakBytes, 0, 8));
     }
 }
