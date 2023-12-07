@@ -25,7 +25,7 @@ public class OpenbookProgram extends Program {
     private static final PublicKey SYSVAR_RENT_PUBKEY =
             PublicKey.valueOf("SysvarRent111111111111111111111111111111111");
     public static final PublicKey OPENBOOK_V2_PROGRAM_ID = PublicKey.valueOf(
-            "opnbkNkqux64GppQhwbyEVc3axhssFhVYuwar8rDHCu");
+            "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb");
 
     private static final int MATCH_ORDERS_METHOD_ID = 2;
     private static final int CONSUME_EVENTS_METHOD_ID = 3;
