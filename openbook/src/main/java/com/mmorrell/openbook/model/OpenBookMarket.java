@@ -36,7 +36,7 @@ public class OpenBookMarket {
                 .openOrdersAdmin(PublicKey.readPubkey(data, 88))
                 .consumeEventsAdmin(PublicKey.readPubkey(data, 120))
                 .closeMarketAdmin(PublicKey.readPubkey(data, 152))
-                .name(new String(Arrays.copyOfRange(data, 184, 200), StandardCharsets.UTF_8))
+                .name(new String(Arrays.copyOfRange(data, 184, 200), StandardCharsets.UTF_8).trim())
                 .build();
     }
 
