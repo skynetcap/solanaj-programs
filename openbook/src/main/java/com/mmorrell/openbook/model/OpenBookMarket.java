@@ -23,6 +23,11 @@ public class OpenBookMarket {
     private PublicKey consumeEventsAdmin;
     private PublicKey closeMarketAdmin;
     private String name;
+    private PublicKey bids;
+    private PublicKey asks;
+    private PublicKey eventHeap;
+    private PublicKey oracleA;
+    private PublicKey oracleB;
 
     public static OpenBookMarket readOpenBookMarket(byte[] data, PublicKey marketId) {
         return OpenBookMarket.builder()
@@ -37,6 +42,11 @@ public class OpenBookMarket {
                 .consumeEventsAdmin(PublicKey.readPubkey(data, 120))
                 .closeMarketAdmin(PublicKey.readPubkey(data, 152))
                 .name(new String(Arrays.copyOfRange(data, 184, 200), StandardCharsets.UTF_8).trim())
+                .bids(PublicKey.readPubkey(data, 200))
+                .asks(PublicKey.readPubkey(data, 232))
+                .eventHeap(PublicKey.readPubkey(data, 264))
+                .oracleA(PublicKey.readPubkey(data, 296))
+                .oracleB(PublicKey.readPubkey(data, 328))
                 .build();
     }
 
