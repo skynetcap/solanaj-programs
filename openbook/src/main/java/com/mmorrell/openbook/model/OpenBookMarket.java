@@ -6,7 +6,6 @@ import lombok.Data;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
