@@ -35,6 +35,10 @@ public class OpenBookMarket {
     private long maxStalenessSlots;
     private long quoteLotSize;
     private long baseLotSize;
+    private long seqNum;
+    private long registrationTime;
+    private long makerFee;
+    private long takerFee;
 
     public static OpenBookMarket readOpenBookMarket(byte[] data, PublicKey marketId) {
         ByteBuffer buffer = ByteBuffer.wrap(data);
@@ -61,6 +65,10 @@ public class OpenBookMarket {
                 .maxStalenessSlots(buffer.getLong(368)) // 8 bytes + 72 padding
                 .quoteLotSize(Utils.readInt64(data, 448))
                 .baseLotSize(Utils.readInt64(data, 456))
+                .seqNum(Utils.readInt64(data, 464))
+                .registrationTime(Utils.readInt64(data, 472))
+                .makerFee(Utils.readInt64(data, 480))
+                .takerFee(Utils.readInt64(data, 488))
                 .build();
     }
 
