@@ -11,6 +11,11 @@ import static org.p2p.solanaj.utils.ByteUtils.readBytes;
 
 public class OpenBookUtil {
 
+    public final static byte[] MARKET_DISCRIMINATOR = {
+            (byte) 0xDB, (byte) 0xBE, (byte) 0xD5, (byte) 0x37, (byte) 0x00, (byte) 0xE3,
+            (byte) 0xC6, (byte) 0x9A
+    };
+
     /**
      * Encodes the "global::initialize" sighash
      * @return byte array containing sighash for "global::initialize"

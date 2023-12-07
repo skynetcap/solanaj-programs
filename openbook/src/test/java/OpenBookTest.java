@@ -1,3 +1,4 @@
+import com.mmorrell.openbook.manager.OpenBookManager;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ public class OpenBookTest {
             (byte) 0xDB, (byte) 0xBE, (byte) 0xD5, (byte) 0x37, (byte) 0x00, (byte) 0xE3,
             (byte) 0xC6, (byte) 0x9A
     };
+    private final OpenBookManager openBookManager = new OpenBookManager(client);
 
     @Test
     public void openBookV2Test() throws RpcException {
@@ -33,12 +35,12 @@ public class OpenBookTest {
                     programAccount.getAccount().getDecodedData(),
                     new PublicKey(programAccount.getPubkey())
             );
-            log.info("Market: {}, Detail: {}", openBookMarket.getMarketId(), openBookMarket);
+            log.info("Market: {}", openBookMarket);
         });
     }
 
     @Test
     public void openBookGetMarketsTest() {
-
+        log.info("Market cache: {}", openBookManager.getMarketCache());
     }
 }
