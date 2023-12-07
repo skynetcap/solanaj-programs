@@ -35,7 +35,8 @@ public class OpenBookTest {
                     programAccount.getAccount().getDecodedData(),
                     new PublicKey(programAccount.getPubkey())
             );
-            log.info("Market: {}", openBookMarket);
+            // log.info("Market: {}", openBookMarket);
+            log.info("Market: {}, Name: {}", openBookMarket.getMarketId().toBase58(), openBookMarket.getName());
         });
     }
 

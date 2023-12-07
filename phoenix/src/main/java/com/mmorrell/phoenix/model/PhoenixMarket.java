@@ -342,18 +342,18 @@ public class PhoenixMarket {
         result = result / tickSizeInQuoteLotsPerBaseUnit;
         result = result / phoenixMarketHeader.getQuoteLotSize();
 
-        return (long) result;
+        return (long) Math.ceil(result);
     }
 
     public long convertSizeToNumBaseLots(double size) {
         double result = size * Math.pow(10, phoenixMarketHeader.getBaseDecimals());
         result = result / phoenixMarketHeader.getBaseLotSize();
 
-        return (long) result;
+        return (long) Math.ceil(result);
     }
 
     public long convertSizeToNumQuoteLots(double size) {
-        return (long) (size * Math.pow(10, phoenixMarketHeader.getQuoteDecimals())) /
-                phoenixMarketHeader.getQuoteLotSize();
+        return (long) Math.ceil(size * Math.pow(10, phoenixMarketHeader.getQuoteDecimals()) /
+                phoenixMarketHeader.getQuoteLotSize());
     }
 }
