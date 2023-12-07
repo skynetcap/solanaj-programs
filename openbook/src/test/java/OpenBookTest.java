@@ -1,3 +1,4 @@
+import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.util.Keccak;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
@@ -17,7 +18,7 @@ import java.util.List;
 @Slf4j
 public class OpenBookTest {
 
-    private final RpcClient client = new RpcClient(Cluster.BLOCKDAEMON);
+    private final RpcClient client = new RpcClient("https://mainnet.helius-rpc.com/?api-key=a778b653-bdd6-41bc-8cda-0c7377faf1dd");
 
     @Test
     public void openBookV2Test() throws RpcException {
@@ -35,8 +36,19 @@ public class OpenBookTest {
         log.info("Number of markets: " + markets.size());
         markets.forEach(programAccount -> {
             log.info("Market: " + programAccount.getPubkey());
+            OpenBookMarket openBookMarket = OpenBookMarket.readOpenBookMarket(
+                    programAccount.getAccount().getDecodedData(),
+                    new PublicKey(programAccount.getPubkey())
+            );
+
+            log.info("Deserialized: {}", openBookMarket);
 
         });
+    }
+
+    @Test
+    public void openBookGetMarketsTest() {
+
     }
 
     public static String getDiscriminator(String input) {
