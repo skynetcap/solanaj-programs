@@ -6,6 +6,9 @@ import lombok.Data;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -28,8 +31,15 @@ public class OpenBookMarket {
     private PublicKey eventHeap;
     private PublicKey oracleA;
     private PublicKey oracleB;
+    private double confFilter;
+    private long maxStalenessSlots;
+    private long quoteLotSize;
+    private long baseLotSize;
 
     public static OpenBookMarket readOpenBookMarket(byte[] data, PublicKey marketId) {
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+
         return OpenBookMarket.builder()
                 .marketId(marketId)
                 .bump(data[8])
@@ -47,6 +57,10 @@ public class OpenBookMarket {
                 .eventHeap(PublicKey.readPubkey(data, 264))
                 .oracleA(PublicKey.readPubkey(data, 296))
                 .oracleB(PublicKey.readPubkey(data, 328))
+                .confFilter(buffer.getDouble(360)) // 8 bytes
+                .maxStalenessSlots(buffer.getLong(368)) // 8 bytes + 72 padding
+                .quoteLotSize(Utils.readInt64(data, 448))
+                .baseLotSize(Utils.readInt64(data, 456))
                 .build();
     }
 
