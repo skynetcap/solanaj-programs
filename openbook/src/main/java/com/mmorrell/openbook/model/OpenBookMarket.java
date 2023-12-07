@@ -1,12 +1,12 @@
 package com.mmorrell.openbook.model;
 
-import com.google.common.primitives.Bytes;
+import com.mmorrell.openbook.OpenBookUtil;
 import lombok.Builder;
 import lombok.Data;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +39,18 @@ public class OpenBookMarket {
     private long registrationTime;
     private long makerFee;
     private long takerFee;
+    private long feesAccrued;
+    private long feesToReferrers;
+    private long referrerRebatesAccrued;
+    private long feesAvailable;
+    private long makerVolume;
+    private long takerVolume;
+    private PublicKey baseMint;
+    private PublicKey quoteMint;
+    private PublicKey marketBaseVault;
+    private long baseDepositTotal;
+    private PublicKey marketQuoteVault;
+    private long quoteDepositTotal;
 
     public static OpenBookMarket readOpenBookMarket(byte[] data, PublicKey marketId) {
         ByteBuffer buffer = ByteBuffer.wrap(data);
@@ -69,6 +81,18 @@ public class OpenBookMarket {
                 .registrationTime(Utils.readInt64(data, 472))
                 .makerFee(Utils.readInt64(data, 480))
                 .takerFee(Utils.readInt64(data, 488))
+                .feesAccrued(OpenBookUtil.readUint128(data, 496).longValue())
+                .feesToReferrers(OpenBookUtil.readUint128(data, 512).longValue())
+                .referrerRebatesAccrued(Utils.readInt64(data, 528))
+                .feesAvailable(Utils.readInt64(data, 536))
+                .makerVolume(OpenBookUtil.readUint128(data, 544).longValue())
+                .takerVolume(OpenBookUtil.readUint128(data, 560).longValue())
+                .baseMint(PublicKey.readPubkey(data, 576))
+                .quoteMint(PublicKey.readPubkey(data, 608))
+                .marketBaseVault(PublicKey.readPubkey(data, 640))
+                .baseDepositTotal(Utils.readInt64(data, 672))
+                .marketQuoteVault(PublicKey.readPubkey(data, 680))
+                .quoteDepositTotal(Utils.readInt64(data, 712))
                 .build();
     }
 

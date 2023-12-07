@@ -1,9 +1,13 @@
 package com.mmorrell.openbook;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import static org.bitcoinj.core.Utils.reverseBytes;
+import static org.p2p.solanaj.utils.ByteUtils.readBytes;
 
 public class OpenBookUtil {
 
@@ -33,6 +37,10 @@ public class OpenBookUtil {
         }
 
         return encodedHash;
+    }
+
+    public static BigInteger readUint128(byte[] buf, int offset) {
+        return new BigInteger(reverseBytes(readBytes(buf, offset, 16)));
     }
 
 }
