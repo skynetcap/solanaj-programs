@@ -28,7 +28,7 @@ public class OpenBookManager {
         cacheMarkets();
     }
 
-    private void cacheMarkets() {
+    public void cacheMarkets() {
         final List<ProgramAccount> markets;
         try {
             markets = client.getApi().getProgramAccountsBase64(
