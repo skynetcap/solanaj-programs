@@ -1,5 +1,6 @@
 import com.mmorrell.openbook.manager.OpenBookManager;
 import com.mmorrell.openbook.model.BookSide;
+import com.mmorrell.openbook.model.LeafNode;
 import com.mmorrell.openbook.model.NodeTag;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.program.OpenbookProgram;
@@ -13,6 +14,7 @@ import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.utils.ByteUtils;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -64,7 +66,7 @@ public class OpenBookTest {
                     log.info("Leaf node: {}", anyNode);
                 });
         log.info("Bids:");
-        bookSide.getLeafNodes().forEach(leafNode -> {
+        bookSide.getLeafNodes().stream().sorted(Comparator.comparingDouble(LeafNode::getPrice).reversed()).forEach(leafNode -> {
 //            log.info("Leaf: {}", leafNode);
 //            log.info("Hex: {}", ByteUtils.bytesToHex(leafNode.getKey()));
             log.info("Price: {}, Size: {}, Trader: {}", leafNode.getPrice(), leafNode.getQuantity(),
