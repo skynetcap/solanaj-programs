@@ -63,9 +63,12 @@ public class OpenBookTest {
                 .forEach(anyNode -> {
                     log.info("Leaf node: {}", anyNode);
                 });
+        log.info("Bids:");
         bookSide.getLeafNodes().forEach(leafNode -> {
-            log.info("Leaf: {}", leafNode);
+//            log.info("Leaf: {}", leafNode);
 //            log.info("Hex: {}", ByteUtils.bytesToHex(leafNode.getKey()));
+            log.info("Price: {}, Size: {}, Trader: {}", leafNode.getPrice(), leafNode.getQuantity(),
+                    leafNode.getOwner());
         });
     }
 }
