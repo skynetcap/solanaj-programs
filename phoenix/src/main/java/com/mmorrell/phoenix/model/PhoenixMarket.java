@@ -11,8 +11,10 @@ import org.p2p.solanaj.core.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,10 +38,11 @@ public class PhoenixMarket {
 
     private List<Pair<FIFOOrderId, FIFORestingOrder>> askList;
     private List<Pair<FIFOOrderId, FIFORestingOrder>> askListSanitized;
+    private List<PhoenixOrder> askListNormalized;
 
     private List<Pair<PublicKey, PhoenixTraderState>> traders;
     private List<Pair<PublicKey, PhoenixTraderState>> tradersSanitized;
-    private List<PhoenixOrder> askListNormalized;
+    private Map<PublicKey, PhoenixTraderState> tradersNormalized;
 
     private PhoenixMarketHeader phoenixMarketHeader;
     private PublicKey marketId;
@@ -82,6 +85,7 @@ public class PhoenixMarket {
                 .askListNormalized(new ArrayList<>())
                 .traders(new ArrayList<>())
                 .tradersSanitized(new ArrayList<>())
+                .tradersNormalized(new HashMap<>())
                 .phoenixMarketHeader(PhoenixMarketHeader.readPhoenixMarketHeader(data))
                 .build();
 
@@ -102,8 +106,16 @@ public class PhoenixMarket {
         readAskBuffer(askBuffer, phoenixMarket);
         readTraderBuffer(traderBuffer, phoenixMarket);
         normalizeOrders(phoenixMarket);
+        normalizeTraders(phoenixMarket);
 
         return phoenixMarket;
+    }
+
+    private static void normalizeTraders(PhoenixMarket market) {
+        Map<PublicKey, PhoenixTraderState> stateMap = market.getTradersNormalized();
+        market.getTradersSanitized().forEach(traderStatePair -> {
+            stateMap.put(traderStatePair.getFirst(), traderStatePair.getSecond());
+        });
     }
 
     private static void normalizeOrders(PhoenixMarket market) {
