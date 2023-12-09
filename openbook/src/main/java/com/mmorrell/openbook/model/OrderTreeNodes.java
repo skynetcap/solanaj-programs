@@ -30,7 +30,7 @@ public class OrderTreeNodes {
                 .freeListHead(OpenBookUtil.readInt32(data, 12))
                 .nodes(
                         AnyNode.readAnyNodes(
-                                Arrays.copyOfRange(data, 16, data.length)
+                                Arrays.copyOfRange(data, 16 + 512, data.length)
                         )
                 )
                 .build();

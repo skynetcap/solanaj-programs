@@ -22,8 +22,8 @@ public class AnyNode {
             byte newTag = data[offset];
             offset += 1;
 
-            byte[] newData = Arrays.copyOfRange(data, offset, offset + 7);
-            offset += 7;
+            byte[] newData = Arrays.copyOfRange(data, offset, offset + 87);
+            offset += 87;
 
             nodes.add(
                     AnyNode.builder()
