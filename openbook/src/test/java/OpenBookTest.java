@@ -1,6 +1,6 @@
-import com.google.common.io.Files;
 import com.mmorrell.openbook.manager.OpenBookManager;
 import com.mmorrell.openbook.model.BookSide;
+import com.mmorrell.openbook.model.NodeTag;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,6 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -55,8 +54,13 @@ public class OpenBookTest {
                 .getDecodedData();
 
         BookSide bookSide = BookSide.readBookSide(data);
-
-        Files.write(data, new File("fMeta.bin"));
         log.info("fMETA Bids: {}", bookSide);
+
+//        Files.write(data, new File("fMeta.bin"));
+        bookSide.getOrderTreeNodes().getNodes().stream()
+                .filter(anyNode -> anyNode.getNodeTag() == NodeTag.LeafNode)
+                .forEach(anyNode -> {
+                    log.info("Leaf node: {}", anyNode);
+                });
     }
 }

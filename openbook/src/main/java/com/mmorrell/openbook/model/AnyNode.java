@@ -13,6 +13,7 @@ public class AnyNode {
 
     private byte tag;
     private byte[] data; // 87 bytes
+    private NodeTag nodeTag;
 
     public static List<AnyNode> readAnyNodes(byte[] data) {
         List<AnyNode> nodes = new ArrayList<>();
@@ -28,6 +29,7 @@ public class AnyNode {
             nodes.add(
                     AnyNode.builder()
                             .tag(newTag)
+                            .nodeTag(NodeTag.getNodeTag(newTag))
                             .data(newData)
                             .build()
             );
