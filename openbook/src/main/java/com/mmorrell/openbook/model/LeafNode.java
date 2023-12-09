@@ -5,6 +5,7 @@ import lombok.Data;
 import org.bitcoinj.core.Utils;
 import org.p2p.solanaj.core.PublicKey;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 @Data
@@ -22,6 +23,8 @@ public class LeafNode {
     private long pegLimit;
     private long clientOrderId;
 
+    private long price;
+
     public static LeafNode readLeafNode(AnyNode anyNode) {
         byte[] data = anyNode.getData(); // starts at offset 1 of 88
         byte tag = anyNode.getTag(); // ignore offset 0
@@ -33,6 +36,7 @@ public class LeafNode {
         long timeStamp = Utils.readInt64(data, 63);
         long pegLimit = Utils.readInt64(data, 71);
         long clientOrderId = Utils.readInt64(data, 79);
+        long price = Utils.readInt64(ByteBuffer.allocate(17).put(key).array(), 9);
 
         return LeafNode.builder()
                 .tag(tag)
@@ -44,6 +48,7 @@ public class LeafNode {
                 .timestamp(timeStamp)
                 .pegLimit(pegLimit)
                 .clientOrderId(clientOrderId)
+                .price(price)
                 .build();
     }
 }

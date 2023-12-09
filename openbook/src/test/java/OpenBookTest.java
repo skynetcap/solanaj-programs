@@ -10,6 +10,7 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
+import org.p2p.solanaj.utils.ByteUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -64,6 +65,7 @@ public class OpenBookTest {
                 });
         bookSide.getLeafNodes().forEach(leafNode -> {
             log.info("Leaf: {}", leafNode);
+//            log.info("Hex: {}", ByteUtils.bytesToHex(leafNode.getKey()));
         });
     }
 }
