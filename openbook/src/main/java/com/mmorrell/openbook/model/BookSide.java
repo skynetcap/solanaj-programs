@@ -43,6 +43,15 @@ public class BookSide {
                                 NUM_RESERVED_ROOTS
                         )
                 )
+                .orderTreeNodes(
+                        OrderTreeNodes.readOrderTreeNodes(
+                                Arrays.copyOfRange(
+                                        data,
+                                        256 + 8 + ((NUM_ROOTS * OrderTreeRoot.SIZE) + (NUM_RESERVED_ROOTS * OrderTreeRoot.SIZE)),
+                                        data.length
+                                )
+                        )
+                )
                 .build();
     }
 }
