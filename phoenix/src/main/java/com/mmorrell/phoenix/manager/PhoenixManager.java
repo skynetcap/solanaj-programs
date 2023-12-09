@@ -74,7 +74,7 @@ public class PhoenixManager {
                 );
 
                 return Optional.of(phoenixMarket);
-            } catch (RpcException e) {
+            } catch (Exception e) {
                 log.error("Unable to retrieve phoenix market {}", marketId);
                 return Optional.empty();
             }
