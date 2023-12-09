@@ -13,18 +13,17 @@ import org.p2p.solanaj.rpc.types.config.Commitment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Data
 @Slf4j
 public class PhoenixManager {
 
-    private RpcClient rpcClient;
-    private Set<PhoenixMarket> phoenixMarkets = new HashSet<>();
+    private final RpcClient rpcClient;
+    private final Map<PublicKey, PhoenixMarket> marketCache = new HashMap<>();
 
     public PhoenixManager(RpcClient rpcClient) {
         this.rpcClient = rpcClient;
@@ -52,19 +51,21 @@ public class PhoenixManager {
                     )
             );
             phoenixMarket.setMarketId(new PublicKey(programAccount.getPubkey()));
-            phoenixMarkets.add(phoenixMarket);
+            marketCache.put(phoenixMarket.getMarketId(), phoenixMarket);
         });
     }
 
     public List<PhoenixMarket> getPhoenixMarkets() {
-        return phoenixMarkets.stream().toList();
+        return marketCache.values().stream().toList();
     }
 
     public Optional<PhoenixMarket> getMarket(PublicKey marketId, boolean useCache) {
         if (useCache) {
-            return phoenixMarkets.stream()
-                    .filter(market -> market.getMarketId().equals(marketId))
-                    .findFirst();
+            if (marketCache.containsKey(marketId)) {
+                return Optional.of(marketCache.get(marketId));
+            } else {
+                return Optional.empty();
+            }
         } else {
             try {
                 PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(

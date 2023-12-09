@@ -48,7 +48,7 @@ public class OpenBookTest {
 
     @Test
     public void openBookGetMarketsTest() {
-        log.info("Market cache: {}", openBookManager.getMarketCache());
+        log.info("Market cache: {}", openBookManager.getOpenBookMarkets());
     }
 
     @Test
