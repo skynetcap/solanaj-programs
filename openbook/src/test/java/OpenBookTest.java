@@ -1,4 +1,6 @@
+import com.google.common.io.Files;
 import com.mmorrell.openbook.manager.OpenBookManager;
+import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,8 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -43,5 +47,16 @@ public class OpenBookTest {
     @Test
     public void openBookGetMarketsTest() {
         log.info("Market cache: {}", openBookManager.getMarketCache());
+    }
+
+    @Test
+    public void orderBookTest() throws RpcException, IOException {
+        byte[] data = client.getApi().getAccountInfo(new PublicKey("7fPxRDvtPWaDMLy8R8Jhr3mLuc32JbxVf98YZ1ogk5cH"))
+                .getDecodedData();
+
+        BookSide bookSide = BookSide.readBookSide(data);
+
+        Files.write(data, new File("fMeta.bin"));
+        log.info("fMETA Bids: {}", bookSide);
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 public class OrderTreeRoot {
 
-    public static final int SIZE = 8 + 8;
+    public static final int SIZE = 4 + 4;
 
     private int maybeNode;
     private int leafCount;
@@ -23,8 +23,8 @@ public class OrderTreeRoot {
         for (int i = 0; i < numRoots; i++) {
             results.add(
                     OrderTreeRoot.builder()
-                            .maybeNode(OpenBookUtil.readInt32(data, offset += 8))
-                            .leafCount(OpenBookUtil.readInt32(data, offset += 8))
+                            .maybeNode(OpenBookUtil.readInt32(data, offset += 4))
+                            .leafCount(OpenBookUtil.readInt32(data, offset += 4))
                             .build()
             );
         }
