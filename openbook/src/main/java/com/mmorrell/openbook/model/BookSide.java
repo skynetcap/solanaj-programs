@@ -24,6 +24,7 @@ public class BookSide {
     private List<OrderTreeRoot> roots;
     private List<OrderTreeRoot> reservedRoots;
     private OrderTreeNodes orderTreeNodes;
+    private List<LeafNode> leafNodes;
 
     public static BookSide readBookSide(byte[] data) {
         return BookSide.builder()
