@@ -16,7 +16,7 @@ public class AnyNode {
     private NodeTag nodeTag;
 
     public static List<AnyNode> readAnyNodes(byte[] data) {
-        List<AnyNode> nodes = new ArrayList<>();
+        List<AnyNode> nodes = new ArrayList<>(1024);
 
         int offset = 0;
         for (int i = 0; i < 1024; i++) {

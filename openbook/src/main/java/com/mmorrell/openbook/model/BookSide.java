@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents an OpenBook v2 order book, stored in the `bid` and `asks` accounts separately.
@@ -24,7 +25,6 @@ public class BookSide {
     private List<OrderTreeRoot> roots;
     private List<OrderTreeRoot> reservedRoots;
     private OrderTreeNodes orderTreeNodes;
-    private List<LeafNode> leafNodes;
 
     public static BookSide readBookSide(byte[] data) {
         return BookSide.builder()
@@ -54,5 +54,12 @@ public class BookSide {
                         )
                 )
                 .build();
+    }
+
+    public List<LeafNode> getLeafNodes() {
+        return orderTreeNodes.getNodes().stream()
+                .filter(anyNode -> anyNode.getNodeTag() == NodeTag.LeafNode)
+                .map(LeafNode::readLeafNode)
+                .collect(Collectors.toList());
     }
 }

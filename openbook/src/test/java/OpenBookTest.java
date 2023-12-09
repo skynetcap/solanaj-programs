@@ -62,5 +62,8 @@ public class OpenBookTest {
                 .forEach(anyNode -> {
                     log.info("Leaf node: {}", anyNode);
                 });
+        bookSide.getLeafNodes().forEach(leafNode -> {
+            log.info("Leaf: {}", leafNode);
+        });
     }
 }

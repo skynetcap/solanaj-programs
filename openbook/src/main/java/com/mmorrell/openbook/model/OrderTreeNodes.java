@@ -28,11 +28,7 @@ public class OrderTreeNodes {
                 .bumpIndex(OpenBookUtil.readInt32(data, 4))
                 .freeListLen(OpenBookUtil.readInt32(data, 8))
                 .freeListHead(OpenBookUtil.readInt32(data, 12))
-                .nodes(
-                        AnyNode.readAnyNodes(
-                                Arrays.copyOfRange(data, 16 + 512, data.length)
-                        )
-                )
+                .nodes(AnyNode.readAnyNodes(Arrays.copyOfRange(data, 16 + 512, data.length)))
                 .build();
     }
 }
