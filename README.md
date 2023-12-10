@@ -10,7 +10,7 @@ Bonfida.
 <dependency>
         <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.19.18</version>
+        <version>1.19.19</version>
 </dependency>
 ```
 Or just one dependency:
@@ -18,7 +18,7 @@ Or just one dependency:
 <dependency>
     <groupId>com.mmorrell</groupId>
     <artifactId>phoenix</artifactId>
-    <version>1.19.18</version>
+    <version>1.19.19</version>
 </dependency>
 ```
 

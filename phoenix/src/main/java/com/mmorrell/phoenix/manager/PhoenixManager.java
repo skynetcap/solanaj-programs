@@ -73,6 +73,7 @@ public class PhoenixManager {
                                 .getAccountInfo(marketId, Map.of("commitment", Commitment.PROCESSED))
                                 .getDecodedData()
                 );
+                phoenixMarket.setMarketId(marketId);
 
                 return Optional.of(phoenixMarket);
             } catch (Exception e) {
