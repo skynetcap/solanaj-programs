@@ -262,7 +262,7 @@ public class SerumUtils {
     public static long priceNumberToLots(float price, byte quoteDecimals, long baseLotSize, byte baseDecimals, long quoteLotSize) {
         double top = (price * Math.pow(10, quoteDecimals) * baseLotSize);
         double bottom = Math.pow(10, baseDecimals) * quoteLotSize;
-        return (long) Math.ceil(top / bottom);
+        return Math.round(top / bottom);
     }
 
     public static float baseSizeLotsToNumber(long size, long baseLotSize, long baseMultiplier) {
@@ -272,7 +272,7 @@ public class SerumUtils {
 
     public static long baseSizeNumberToLots(float size, byte baseDecimals, long baseLotSize) {
         double top = Math.round(size * Math.pow(10, baseDecimals));
-        return (long) Math.ceil(top / baseLotSize);
+        return Math.round(top / baseLotSize);
     }
 
     public static OpenOrdersAccount findOpenOrdersAccountForOwner(RpcClient client, PublicKey marketAddress, PublicKey ownerAddress) {
