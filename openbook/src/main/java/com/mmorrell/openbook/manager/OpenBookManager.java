@@ -80,28 +80,23 @@ public class OpenBookManager {
                                     .getAccountInfo(openBookMarket.getBids(), Map.of("commitment", Commitment.PROCESSED))
                                     .getDecodedData()
                     );
+                    bids.setBaseDecimals(openBookMarket.getBaseDecimals());
+                    bids.setQuoteDecimals(openBookMarket.getQuoteDecimals());
+                    bids.setBaseLotSize(openBookMarket.getBaseLotSize());
+                    bids.setQuoteLotSize(openBookMarket.getQuoteLotSize());
 
                     BookSide asks = BookSide.readBookSide(
                             client.getApi()
                                     .getAccountInfo(openBookMarket.getAsks(), Map.of("commitment", Commitment.PROCESSED))
                                     .getDecodedData()
                     );
+                    asks.setBaseDecimals(openBookMarket.getBaseDecimals());
+                    asks.setQuoteDecimals(openBookMarket.getQuoteDecimals());
+                    asks.setBaseLotSize(openBookMarket.getBaseLotSize());
+                    asks.setQuoteLotSize(openBookMarket.getQuoteLotSize());
 
-                    openBookMarket.setBidOrders(
-                            bids.getLeafNodes().stream()
-                                    .sorted(Comparator.comparingDouble(LeafNode::getPrice).reversed())
-                                    .map(leafNode -> new OpenBookOrder(leafNode.getPrice(), leafNode.getQuantity(),
-                                            leafNode.getOwner()))
-                                    .collect(Collectors.toList())
-                    );
-
-                    openBookMarket.setAskOrders(
-                            asks.getLeafNodes().stream()
-                                    .sorted(Comparator.comparingDouble(LeafNode::getPrice).reversed())
-                                    .map(leafNode -> new OpenBookOrder(leafNode.getPrice(), leafNode.getQuantity(),
-                                            leafNode.getOwner()))
-                                    .collect(Collectors.toList())
-                    );
+                    openBookMarket.setBidOrders(bids.getOrders());
+                    openBookMarket.setAskOrders(asks.getOrders());
                 }
 
                 return Optional.of(openBookMarket);

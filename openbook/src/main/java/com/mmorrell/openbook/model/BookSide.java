@@ -1,5 +1,6 @@
 package com.mmorrell.openbook.model;
 
+import com.mmorrell.openbook.OpenBookUtil;
 import lombok.Builder;
 import lombok.Data;
 
@@ -25,6 +26,12 @@ public class BookSide {
     private List<OrderTreeRoot> roots;
     private List<OrderTreeRoot> reservedRoots;
     private OrderTreeNodes orderTreeNodes;
+
+    // From the parent Market
+    private byte baseDecimals;
+    private byte quoteDecimals;
+    private long baseLotSize;
+    private long quoteLotSize;
 
     public static BookSide readBookSide(byte[] data) {
         return BookSide.builder()
@@ -61,5 +68,16 @@ public class BookSide {
                 .filter(anyNode -> anyNode.getNodeTag() == NodeTag.LeafNode)
                 .map(LeafNode::readLeafNode)
                 .collect(Collectors.toList());
+    }
+
+    public List<OpenBookOrder> getOrders() {
+        return getLeafNodes().stream()
+                .map(leafNode -> OpenBookOrder.builder()
+                        .price(OpenBookUtil.priceLotsToNumber(leafNode.getPrice(), baseDecimals, quoteDecimals,
+                                baseLotSize, quoteLotSize))
+                        .size((leafNode.getQuantity() * baseLotSize) / OpenBookUtil.getBaseSplTokenMultiplier(baseDecimals))
+                        .trader(leafNode.getOwner())
+                        .build())
+                .toList();
     }
 }

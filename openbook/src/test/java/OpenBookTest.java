@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @Slf4j
 public class OpenBookTest {
 
@@ -77,10 +80,14 @@ public class OpenBookTest {
     @Test
     public void getOBv2MarketWithBooksTest() {
         // SOL/USDC
-        log.info("Manager: {}", openBookManager.getMarket(
+        OpenBookMarket solUsdc = openBookManager.getMarket(
                 PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q"),
                 false,
                 true
-        ));
+        ).get();
+
+        log.info("Manager: {}", solUsdc);
+
+        assertFalse(solUsdc.getBidOrders().isEmpty());
     }
 }

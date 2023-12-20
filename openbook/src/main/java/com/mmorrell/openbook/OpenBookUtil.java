@@ -71,4 +71,20 @@ public class OpenBookUtil {
         return bb.getInt(0);
     }
 
+    public static double priceLotsToNumber(long price, byte baseDecimals, byte quoteDecimals, long baseLotSize,
+                                      long quoteLotSize) {
+        double top = (price * quoteLotSize * getBaseSplTokenMultiplier(baseDecimals));
+        double bottom = (baseLotSize * getQuoteSplTokenMultiplier(quoteDecimals));
+
+        return (top / bottom);
+    }
+
+    public static double getBaseSplTokenMultiplier(byte baseDecimals) {
+        return Math.pow(10, baseDecimals);
+    }
+
+    public static double getQuoteSplTokenMultiplier(byte quoteDecimals) {
+        return Math.pow(10, quoteDecimals);
+    }
+
 }
