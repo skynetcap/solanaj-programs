@@ -1,11 +1,16 @@
 package com.mmorrell.serum.program;
 
+import com.mmorrell.serum.model.Market;
+import com.mmorrell.serum.model.MarketBuilder;
+import com.mmorrell.serum.model.OpenOrdersAccount;
+import com.mmorrell.serum.model.Order;
+import com.mmorrell.serum.model.SerumUtils;
+import com.mmorrell.serum.model.SideLayout;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 import org.p2p.solanaj.programs.Program;
-import com.mmorrell.serum.model.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -365,6 +370,58 @@ public class SerumProgram extends Program {
         ByteBuffer result = ByteBuffer.allocate(5);
         result.order(ByteOrder.LITTLE_ENDIAN);
         result.put(1, (byte) SETTLE_ORDERS_METHOD_ID);
+        return result.array();
+    }
+
+    public static TransactionInstruction sendTake(Market market,
+                                                  PublicKey owner,
+                                                  PublicKey baseWallet,
+                                                  PublicKey quoteWallet,
+                                                  Order order,
+                                                  long minBaseQuantity,
+                                                  long minQuoteQuantity) {
+        List<AccountMeta> accountMetas = new ArrayList<>();
+
+        accountMetas.add(new AccountMeta(market.getOwnAddress(), false, true));
+        accountMetas.add(new AccountMeta(market.getRequestQueue(), false, true));
+        accountMetas.add(new AccountMeta(market.getEventQueueKey(), false, true));
+        accountMetas.add(new AccountMeta(market.getBids(), false, true));
+        accountMetas.add(new AccountMeta(market.getAsks(), false, true));
+        accountMetas.add(new AccountMeta(baseWallet, false, true));
+        accountMetas.add(new AccountMeta(quoteWallet, false, true));
+        accountMetas.add(new AccountMeta(owner, true, false));
+        accountMetas.add(new AccountMeta(market.getBaseVault(), false, true));
+        accountMetas.add(new AccountMeta(market.getQuoteVault(), false, true));
+        accountMetas.add(new AccountMeta(TOKEN_PROGRAM_ID, false, false));
+        accountMetas.add(new AccountMeta(SerumUtils.getVaultSigner(market), false, false));
+
+        byte[] transactionData = encodeSendTakeTransactionData(order, minBaseQuantity, minQuoteQuantity);
+
+        return createTransactionInstruction(
+                SerumUtils.SERUM_PROGRAM_ID_V3,
+                accountMetas,
+                transactionData
+        );
+    }
+
+    /**
+     * Encodes the default SettleFunds transaction data
+     *
+     * @return transaction data
+     */
+    private static byte[] encodeSendTakeTransactionData(Order order, long minBaseQuantity, long minQuoteQuantity) {
+        ByteBuffer result = ByteBuffer.allocate(48);
+        result.order(ByteOrder.LITTLE_ENDIAN);
+        result.put(1, (byte) 13);
+        result.put(5, (byte) (order.isBuy() ? SideLayout.BUY.getValue() : SideLayout.SELL.getValue()));
+        result.putLong(6, order.getPrice());
+        result.putLong(14, order.getQuantity());
+        result.putLong(22, order.getMaxQuoteQuantity());
+
+        result.putLong(30, minBaseQuantity);
+        result.putLong(38, minQuoteQuantity);
+        // limit (u16)
+        result.putShort(46, (short) 65535);
         return result.array();
     }
 
