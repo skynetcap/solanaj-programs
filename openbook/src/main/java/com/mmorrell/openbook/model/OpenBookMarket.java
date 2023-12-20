@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 
 @Data
 @Builder
@@ -50,6 +51,10 @@ public class OpenBookMarket {
     private long baseDepositTotal;
     private PublicKey marketQuoteVault;
     private long quoteDepositTotal;
+
+    // Added after deserialization
+    private List<OpenBookOrder> bidOrders;
+    private List<OpenBookOrder> askOrders;
 
     public static OpenBookMarket readOpenBookMarket(byte[] data, PublicKey marketId) {
         ByteBuffer buffer = ByteBuffer.wrap(data);

@@ -53,11 +53,11 @@ public class OpenBookTest {
 
     @Test
     public void orderBookTest() throws RpcException, IOException {
-        byte[] data = client.getApi().getAccountInfo(new PublicKey("7fPxRDvtPWaDMLy8R8Jhr3mLuc32JbxVf98YZ1ogk5cH"))
+        byte[] data = client.getApi().getAccountInfo(new PublicKey("DJY185dSMyF6TJZ61Gz1XhoQPWCEkpGAG5dmJmgUjhnQ"))
                 .getDecodedData();
 
         BookSide bookSide = BookSide.readBookSide(data);
-        log.info("fMETA Bids: {}", bookSide);
+        log.info("SOL/USDC Bids: {}", bookSide);
 
 //        Files.write(data, new File("fMeta.bin"));
         bookSide.getOrderTreeNodes().getNodes().stream()
@@ -72,5 +72,15 @@ public class OpenBookTest {
             log.info("Price: {}, Size: {}, Trader: {}", leafNode.getPrice(), leafNode.getQuantity(),
                     leafNode.getOwner());
         });
+    }
+
+    @Test
+    public void getOBv2MarketWithBooksTest() {
+        // SOL/USDC
+        log.info("Manager: {}", openBookManager.getMarket(
+                PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q"),
+                false,
+                true
+        ));
     }
 }
