@@ -1,5 +1,12 @@
 # solanaj-programs - OpenBook v2
 A SolanaJ module for interfacing with the OpenBook v2 DEX.
+```xml
+<dependency>
+    <groupId>com.mmorrell</groupId>
+    <artifactId>openbook</artifactId>
+    <version>1.20.0</version>
+</dependency>
+```
 ## Code Examples
 
 ### Get SOL/USDC Orderbook
