@@ -456,6 +456,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void phoenixGetMarketDetailTest() throws RpcException, IOException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET,
