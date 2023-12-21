@@ -3,6 +3,7 @@ import com.mmorrell.openbook.manager.OpenBookManager;
 import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.LeafNode;
 import com.mmorrell.openbook.model.NodeTag;
+import com.mmorrell.openbook.model.OpenBookEventHeap;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 
@@ -99,5 +101,11 @@ public class OpenBookTest {
         byte[] data = client.getApi().getAccountInfo(new PublicKey("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"))
                 .getDecodedData();
         Files.write(data, new File("eventHeap.bin"));
+    }
+
+    @Test
+    public void openBookEventHeapTest(){
+        Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"));
+        eventHeap.ifPresent(heap -> log.info("Event Heap: {}", heap));
     }
 }
