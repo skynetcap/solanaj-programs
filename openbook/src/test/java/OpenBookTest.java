@@ -1,3 +1,4 @@
+import com.google.common.io.Files;
 import com.mmorrell.openbook.manager.OpenBookManager;
 import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.LeafNode;
@@ -6,19 +7,19 @@ import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
-import org.p2p.solanaj.utils.ByteUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class OpenBookTest {
@@ -90,5 +91,13 @@ public class OpenBookTest {
         log.info("Asks: {}", solUsdc.getAskOrders());
 
         assertFalse(solUsdc.getBidOrders().isEmpty());
+    }
+
+    @Test
+    @Ignore
+    public void eventHeapTest() throws RpcException, IOException {
+        byte[] data = client.getApi().getAccountInfo(new PublicKey("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"))
+                .getDecodedData();
+        Files.write(data, new File("eventHeap.bin"));
     }
 }

@@ -3,6 +3,7 @@ package com.mmorrell.openbook.manager;
 import com.mmorrell.openbook.OpenBookUtil;
 import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.LeafNode;
+import com.mmorrell.openbook.model.OpenBookEventHeap;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.model.OpenBookOrder;
 import com.mmorrell.openbook.program.OpenbookProgram;
@@ -104,6 +105,21 @@ public class OpenBookManager {
                 log.error("Unable to retrieve OpenBook v2 market {}", marketId);
                 return Optional.empty();
             }
+        }
+    }
+
+    public Optional<OpenBookEventHeap> getEventHeap(PublicKey eventHeap) {
+        try {
+            OpenBookEventHeap openBookEventHeap = OpenBookEventHeap.readOpenBookEventHeap(
+                    client.getApi()
+                            .getAccountInfo(eventHeap, Map.of("commitment", Commitment.PROCESSED))
+                            .getDecodedData()
+            );
+
+            return Optional.of(openBookEventHeap);
+        } catch (RpcException e) {
+            log.error(e.getMessage());
+            return Optional.empty();
         }
     }
 

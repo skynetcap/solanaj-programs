@@ -18,6 +18,12 @@ public class OpenBookUtil {
             (byte) 0xC6, (byte) 0x9A
     };
 
+    public final static byte[] EVENT_HEAP_DISCRIMINATOR = {
+            (byte)0x77, (byte)0x3B, (byte)0x3D, (byte)0x13, (byte)0xA5, (byte)0x54,
+            (byte)0x39, (byte)0xAF
+    };
+
+
     /**
      * Encodes the "global::initialize" sighash
      * @return byte array containing sighash for "global::initialize"
