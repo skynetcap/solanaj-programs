@@ -86,7 +86,8 @@ public class OpenBookTest {
                 true
         ).get();
 
-        log.info("Manager: {}", solUsdc);
+        log.info("Bids: {}", solUsdc.getBidOrders());
+        log.info("Asks: {}", solUsdc.getAskOrders());
 
         assertFalse(solUsdc.getBidOrders().isEmpty());
     }
