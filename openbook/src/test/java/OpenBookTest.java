@@ -105,7 +105,8 @@ public class OpenBookTest {
 
     @Test
     public void openBookEventHeapTest(){
-        Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"));
+        // 2pMETA
+        Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("5DviyqH9is6EwSjUETEh5XUe6xP9cpJu17cwiCuiGYQq"));
         eventHeap.ifPresent(heap -> log.info("Event Heap: {}", heap));
     }
 }
