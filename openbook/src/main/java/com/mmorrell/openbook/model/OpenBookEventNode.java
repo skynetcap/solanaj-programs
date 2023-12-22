@@ -2,8 +2,8 @@ package com.mmorrell.openbook.model;
 
 import lombok.Builder;
 import lombok.Data;
+import org.bitcoinj.core.Utils;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,18 +31,18 @@ public class OpenBookEventNode {
         int numNodes = bytes.length / SIZE;
         for (int i = 0; i < numNodes; i++) {
             byte[] nodeBytes = Arrays.copyOfRange(bytes, i * SIZE, (i + 1) * SIZE);
-            OpenBookEventNode node = OpenBookEventNode.builder()
-                    .next(ByteBuffer.wrap(nodeBytes, NEXT_OFFSET, 2).getShort())
-                    .prev(ByteBuffer.wrap(nodeBytes, PREV_OFFSET, 2).getShort())
-                    .event(
-                            OpenBookAnyEvent.readOpenBookAnyEvent(
-                                    Arrays.copyOfRange(
-                                            nodeBytes,
-                                            EVENT_OFFSET,
-                                            nodeBytes.length
-                                    )
-                            )
+            OpenBookAnyEvent anyEvent = OpenBookAnyEvent.readOpenBookAnyEvent(
+                    Arrays.copyOfRange(
+                            nodeBytes,
+                            EVENT_OFFSET,
+                            nodeBytes.length
                     )
+            );
+
+            OpenBookEventNode node = OpenBookEventNode.builder()
+                    .next((short) Utils.readUint16(nodeBytes, NEXT_OFFSET))
+                    .prev((short) Utils.readUint16(nodeBytes, PREV_OFFSET))
+                    .event(anyEvent)
                     .build();
             results.add(node);
         }

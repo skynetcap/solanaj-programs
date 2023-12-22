@@ -4,6 +4,7 @@ import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.LeafNode;
 import com.mmorrell.openbook.model.NodeTag;
 import com.mmorrell.openbook.model.OpenBookEventHeap;
+import com.mmorrell.openbook.model.OpenBookFillEvent;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
@@ -107,6 +108,9 @@ public class OpenBookTest {
     public void openBookEventHeapTest(){
         // 2pMETA
         Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("5DviyqH9is6EwSjUETEh5XUe6xP9cpJu17cwiCuiGYQq"));
-        eventHeap.ifPresent(heap -> log.info("Event Heap: {}", heap));
+        //eventHeap.ifPresent(heap -> log.info("Event Heap: {}", heap));
+        eventHeap.get().getFillEvents().forEach(openBookFillEvent -> {
+            log.info("Fill: {}", openBookFillEvent.toString());
+        });
     }
 }

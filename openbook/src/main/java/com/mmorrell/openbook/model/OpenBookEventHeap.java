@@ -1,9 +1,9 @@
 package com.mmorrell.openbook.model;
 
-import com.mmorrell.openbook.OpenBookUtil;
 import lombok.Builder;
 import lombok.Data;
 import org.bitcoinj.core.Utils;
+import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.utils.ByteUtils;
 
 import java.util.Arrays;
@@ -30,6 +30,7 @@ public class OpenBookEventHeap {
     // + EventNode x 600 (starts at offset 24)
     private static final int NUM_EVENT_NODES = 600;
     private List<OpenBookEventNode> eventNodes;
+    private List<OpenBookFillEvent> fillEvents;
 
     // + 64 bytes reserved
 
@@ -50,5 +51,21 @@ public class OpenBookEventHeap {
                         )
                 )
                 .build();
+    }
+
+    public List<OpenBookFillEvent> getFillEvents() {
+        byte[] eventType = {0x00};
+        return eventNodes.stream()
+                .filter(openBookEventNode -> openBookEventNode.getEvent().getEventType() == (byte) 0)
+                .map(openBookEventNode -> {
+                    byte[] combined = new byte[eventType.length + openBookEventNode.getEvent().getPadding().length];
+                    System.arraycopy(eventType, 0, combined, 0, eventType.length);
+                    System.arraycopy(openBookEventNode.getEvent().getPadding(), 0, combined, eventType.length, openBookEventNode.getEvent().getPadding().length);
+                    return OpenBookFillEvent.readOpenBookFillEvent(combined);
+                })
+                .filter(openBookFillEvent -> !openBookFillEvent.getMaker().equals(new PublicKey(
+                        "11111111111111111111111111111111")))
+                .toList();
+
     }
 }

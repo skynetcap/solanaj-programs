@@ -1,12 +1,12 @@
 package com.mmorrell.openbook.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.Arrays;
 
 @Data
-@Builder
 public class OpenBookAnyEvent {
 
     public static final int SIZE = 144;
@@ -16,9 +16,9 @@ public class OpenBookAnyEvent {
     private byte[] padding;
 
     public static OpenBookAnyEvent readOpenBookAnyEvent(byte[] data) {
-        return OpenBookAnyEvent.builder()
-                .eventType(data[0])
-                .padding(Arrays.copyOfRange(data, 1, SIZE))
-                .build();
+        OpenBookAnyEvent openBookAnyEvent = new OpenBookAnyEvent();
+        openBookAnyEvent.setEventType(data[0]);
+        openBookAnyEvent.setPadding(Arrays.copyOfRange(data, 1, SIZE));
+        return openBookAnyEvent;
     }
 }
