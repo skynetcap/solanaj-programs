@@ -27,6 +27,10 @@ public class OpenBookFillEvent {
     private long makerClientOrderId;
     // 8 bytes reserved padding
 
+    // Custom
+    private PublicKey makerOwner;
+    private PublicKey takerOwner;
+
     public static OpenBookFillEvent readOpenBookFillEvent(byte[] data) {
         return OpenBookFillEvent.builder()
                 .eventType((byte) 0)
