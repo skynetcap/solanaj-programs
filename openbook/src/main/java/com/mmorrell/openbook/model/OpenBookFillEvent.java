@@ -30,6 +30,8 @@ public class OpenBookFillEvent {
     // Custom
     private PublicKey makerOwner;
     private PublicKey takerOwner;
+    private double priceDouble;
+    private double quantityDouble;
 
     public static OpenBookFillEvent readOpenBookFillEvent(byte[] data) {
         return OpenBookFillEvent.builder()
