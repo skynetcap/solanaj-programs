@@ -117,6 +117,15 @@ public class OpenBookTest {
     }
 
     @Test
+    public void openBookEventHeapOutEventsTest(){
+        // 2pMETA
+        Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"));
+        eventHeap.get().getOutEvents().forEach(openBookOutEvent -> {
+            log.info("Out Event: {}", openBookOutEvent.toString());
+        });
+    }
+
+    @Test
     public void openBookOpenOrdersAccountTest() throws RpcException, IOException {
         Optional<OpenBookOpenOrdersAccount> openBookOpenOrdersAccount = openBookManager.getOpenOrdersAccount(
                 new PublicKey("G1hKFxyM3qNCd1nnjnuvydw6VjCowVp5Jm6w1mwyWH4r")
