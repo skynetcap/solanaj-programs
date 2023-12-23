@@ -4,8 +4,8 @@ import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.LeafNode;
 import com.mmorrell.openbook.model.NodeTag;
 import com.mmorrell.openbook.model.OpenBookEventHeap;
-import com.mmorrell.openbook.model.OpenBookFillEvent;
 import com.mmorrell.openbook.model.OpenBookMarket;
+import com.mmorrell.openbook.model.OpenBookOpenOrdersAccount;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
@@ -22,7 +22,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class OpenBookTest {
@@ -112,5 +114,19 @@ public class OpenBookTest {
         eventHeap.get().getFillEvents().forEach(openBookFillEvent -> {
             log.info("Fill: {}", openBookFillEvent.toString());
         });
+    }
+
+    @Test
+    public void openBookOpenOrdersAccountTest() throws RpcException, IOException {
+        Optional<OpenBookOpenOrdersAccount> openBookOpenOrdersAccount = openBookManager.getOpenOrdersAccount(
+                new PublicKey("G1hKFxyM3qNCd1nnjnuvydw6VjCowVp5Jm6w1mwyWH4r")
+        );
+        assertTrue(openBookOpenOrdersAccount.isPresent());
+        OpenBookOpenOrdersAccount account = openBookOpenOrdersAccount.get();
+        assertEquals(new PublicKey("7uixr2n3aawRYFKu5L6Wjwf37Fe6Twh6Ns3upAPq9H7k"), account.getOwner());
+
+        byte[] data = client.getApi().getAccountInfo(new PublicKey("G1hKFxyM3qNCd1nnjnuvydw6VjCowVp5Jm6w1mwyWH4r"))
+                .getDecodedData();
+        Files.write(data, new File("ooa.bin"));
     }
 }

@@ -5,6 +5,7 @@ import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.LeafNode;
 import com.mmorrell.openbook.model.OpenBookEventHeap;
 import com.mmorrell.openbook.model.OpenBookMarket;
+import com.mmorrell.openbook.model.OpenBookOpenOrdersAccount;
 import com.mmorrell.openbook.model.OpenBookOrder;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
@@ -124,4 +125,18 @@ public class OpenBookManager {
     }
 
 
+    public Optional<OpenBookOpenOrdersAccount> getOpenOrdersAccount(PublicKey ooa) {
+        try {
+            OpenBookOpenOrdersAccount openBookOoa = OpenBookOpenOrdersAccount.readOpenBookOpenOrdersAccount(
+                    client.getApi()
+                            .getAccountInfo(ooa, Map.of("commitment", Commitment.PROCESSED))
+                            .getDecodedData()
+            );
+
+            return Optional.of(openBookOoa);
+        } catch (RpcException e) {
+            log.error("Error getting OOA: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
 }
