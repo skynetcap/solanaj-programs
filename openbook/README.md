@@ -38,3 +38,12 @@ RpcClient client = new RpcClient("YOUR_RPC_HOST");
 OpenBookManager openBookManager = new OpenBookManager(client);
 log.info("Market cache: {}", openBookManager.getOpenBookMarkets());
 ```
+
+### Get Order Book
+```java
+// 2pMETA
+Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"));
+eventHeap.get().getOutEvents().forEach(openBookOutEvent -> {
+    log.info("Out Event: {}", openBookOutEvent.toString());
+});
+```
