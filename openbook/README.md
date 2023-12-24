@@ -39,7 +39,7 @@ OpenBookManager openBookManager = new OpenBookManager(client);
 log.info("Market cache: {}", openBookManager.getOpenBookMarkets());
 ```
 
-### Get Order Book
+### Get Event Heap
 ```java
 // 2pMETA
 Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"));
