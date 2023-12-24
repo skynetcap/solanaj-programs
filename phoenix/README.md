@@ -11,6 +11,7 @@ A SolanaJ module for interfacing with the Ellipsis Phoenix DEX.
 
 ### Get All Markets and Orderbooks
 ```java
+RpcClient client = new RpcClient(Cluster.MAINNET);
 PhoenixManager phoenixManager = new PhoenixManager(client);
 MetaplexManager metaplexManager = new MetaplexManager(client);
 
@@ -58,4 +59,25 @@ tx.addInstruction(
 );
 
 // submit TX
+```
+
+### Manually deserialize a Market
+```java
+final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
+                SOL_USDC_MARKET,
+                Map.of("commitment", Commitment.PROCESSED)
+        );
+
+byte[] data = marketAccountInfo.getDecodedData();
+PhoenixMarket market = PhoenixMarket.readPhoenixMarket(data);
+```
+
+### Get a single Market
+```java
+PhoenixManager phoenixManager = new PhoenixManager(client);
+
+Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET, false);
+marketOptional.ifPresent(market -> {
+    log.info("Market: {}", market);
+});
 ```

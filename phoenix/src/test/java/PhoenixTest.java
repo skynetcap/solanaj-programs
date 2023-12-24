@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class PhoenixTest {
@@ -78,6 +80,16 @@ public class PhoenixTest {
                     )
             );
             log.info(phoenixMarketHeader.toString());
+        });
+    }
+
+    @Test
+    public void phoenixSingleMarketManagerTest() {
+        PhoenixManager phoenixManager = new PhoenixManager(client);
+
+        Optional<PhoenixMarket> marketOptional = phoenixManager.getMarket(SOL_USDC_MARKET, false);
+        marketOptional.ifPresent(market -> {
+            log.info("Market: {}", market);
         });
     }
 
