@@ -1,7 +1,13 @@
 # SolanaJ-programs - Phoenix
 A SolanaJ module for interfacing with the Ellipsis Phoenix DEX.
 ## Code Examples
-(See PhoenixTest.java)
+```xml
+<dependency>
+    <groupId>com.mmorrell</groupId>
+    <artifactId>openbook</artifactId>
+    <version>1.20.5</version>
+</dependency>
+```
 
 ### Get All Markets and Orderbooks
 ```java
