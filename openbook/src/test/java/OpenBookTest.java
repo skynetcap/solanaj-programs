@@ -1,4 +1,5 @@
 import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.mmorrell.openbook.manager.OpenBookManager;
 import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.LeafNode;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -19,6 +21,7 @@ import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +39,7 @@ public class OpenBookTest {
             (byte) 0xC6, (byte) 0x9A
     };
     private final OpenBookManager openBookManager = new OpenBookManager(client);
+    private static final String PRIVATE_KEY_FILE = "mikeDBaJgkicqhZcoYDBB4dRwZFFJCThtWCYD7A9FAH.json";
 
     @Test
     public void openBookV2Test() throws RpcException {
@@ -141,11 +145,17 @@ public class OpenBookTest {
     }
 
     @Test
-    public void consumeEventsTest() {
+    public void consumeEventsTest() throws IOException {
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
+        );
+
+        log.info("Account: {}", tradingAccount.getPublicKey().toBase58());
+
         OpenBookMarket solUsdc = openBookManager.getMarket(
                 PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q"),
-                false,
-                true
+                true,
+                false
         ).get();
 
 

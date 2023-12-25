@@ -6,7 +6,7 @@
     <groupId>com.mmorrell</groupId>
     <artifactId>solanaj-programs</artifactId>
     <packaging>pom</packaging>
-    <version>1.20.6</version>
+    <version>1.20.7</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Program libraries for SolanaJ, a library for Solana RPC</description>
     <url>https://github.com/skynetcap/solanaj-programs</url>
@@ -156,6 +156,20 @@
                 <version>3.10.1</version>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>openbook/src/test/resources</directory>
+                <excludes>
+                    <exclude>**/*.json</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>phoenix/src/test/resources</directory>
+                <excludes>
+                    <exclude>**/*.json</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
     <repositories>
         <repository>
