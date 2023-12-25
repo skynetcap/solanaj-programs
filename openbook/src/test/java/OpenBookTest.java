@@ -206,6 +206,7 @@ public class OpenBookTest {
             OpenBookEventHeap eventHeap = openBookManager.getEventHeap(
                     solUsdc.getEventHeap()
             ).get();
+            Thread.sleep(400);
 
             log.info("Market [Heap = {}]: {}", eventHeap.getCount(), solUsdc.getName());
             if (eventHeap.getCount() == 0) {
