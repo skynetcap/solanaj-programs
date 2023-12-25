@@ -18,6 +18,7 @@ import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
+import org.p2p.solanaj.rpc.types.config.Commitment;
 
 import java.io.File;
 import java.io.IOException;
@@ -145,7 +146,7 @@ public class OpenBookTest {
     }
 
     @Test
-    public void consumeEventsTest() throws IOException {
+    public void consumeEventsTest() throws IOException, RpcException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
@@ -162,10 +163,18 @@ public class OpenBookTest {
         Transaction tx = new Transaction();
         tx.addInstruction(
                 OpenbookProgram.consumeEvents(
+                        tradingAccount,
                         solUsdc.getMarketId(),
                         solUsdc.getEventHeap(),
                         100
                 )
         );
+
+        String consumeEventsTx = client.getApi().sendTransaction(
+                tx,
+                List.of(tradingAccount),
+                null
+        );
+        log.info("Consumed events in TX: {}", consumeEventsTx);
     }
 }

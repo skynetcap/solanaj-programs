@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.mmorrell.openbook.OpenBookUtil.CONSUME_EVENTS_DISCRIMINATOR;
+
 /**
  * Class for creating Serum v3 {@link TransactionInstruction}s
  */
@@ -71,15 +73,18 @@ public class OpenbookProgram extends Program {
         );
     }
 
-    public static TransactionInstruction consumeEvents(PublicKey market, PublicKey eventHeap, long limit) {
+    public static TransactionInstruction consumeEvents(Account caller, PublicKey market, PublicKey eventHeap,
+                                                       long limit) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(market,true, false));
-        keys.add(new AccountMeta(eventHeap,true, false));
+        keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
+        keys.add(new AccountMeta(market,false, true));
+        keys.add(new AccountMeta(eventHeap,false, true));
+        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
 
-        byte[] transactionData = OpenBookUtil.encodeNamespace("global:consume_events");
-        ByteBuffer byteBuffer = ByteBuffer.wrap(transactionData);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(16);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        byteBuffer.putLong(limit);
+        byteBuffer.put(CONSUME_EVENTS_DISCRIMINATOR);
+        byteBuffer.putLong(8, limit);
 
         return createTransactionInstruction(
                 OPENBOOK_V2_PROGRAM_ID,

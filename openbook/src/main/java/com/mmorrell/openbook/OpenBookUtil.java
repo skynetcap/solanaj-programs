@@ -19,13 +19,19 @@ public class OpenBookUtil {
     };
 
     public final static byte[] EVENT_HEAP_DISCRIMINATOR = {
-            (byte)0x77, (byte)0x3B, (byte)0x3D, (byte)0x13, (byte)0xA5, (byte)0x54,
-            (byte)0x39, (byte)0xAF
+            (byte) 0x77, (byte) 0x3B, (byte) 0x3D, (byte) 0x13, (byte) 0xA5, (byte) 0x54,
+            (byte) 0x39, (byte) 0xAF
+    };
+
+    public final static byte[] CONSUME_EVENTS_DISCRIMINATOR = {
+            (byte) 0xDD, (byte) 0x91, (byte) 0xB1, (byte) 0x34, (byte) 0x1F, (byte) 0x2F,
+            (byte) 0x3F, (byte) 0xC9
     };
 
 
     /**
      * Encodes the "global::initialize" sighash
+     *
      * @return byte array containing sighash for "global::initialize"
      */
     public static byte[] encodeNamespace(String namespace) {
@@ -78,7 +84,7 @@ public class OpenBookUtil {
     }
 
     public static double priceLotsToNumber(long price, byte baseDecimals, byte quoteDecimals, long baseLotSize,
-                                      long quoteLotSize) {
+                                           long quoteLotSize) {
         double top = (price * quoteLotSize * getBaseSplTokenMultiplier(baseDecimals));
         double bottom = (baseLotSize * getQuoteSplTokenMultiplier(quoteDecimals));
 
