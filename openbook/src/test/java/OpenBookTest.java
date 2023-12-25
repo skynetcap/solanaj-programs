@@ -147,7 +147,7 @@ public class OpenBookTest {
     }
 
     @Test
-    public void consumeEventsTest() throws IOException, RpcException, InterruptedException {
+    public void consumeEventsTest() throws IOException, RpcException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
