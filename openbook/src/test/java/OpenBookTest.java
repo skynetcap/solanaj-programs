@@ -15,6 +15,8 @@ import org.junit.Test;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
+import org.p2p.solanaj.programs.SystemProgram;
+import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
@@ -23,6 +25,7 @@ import org.p2p.solanaj.rpc.types.config.Commitment;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -153,28 +156,37 @@ public class OpenBookTest {
 
         log.info("Account: {}", tradingAccount.getPublicKey().toBase58());
 
-        OpenBookMarket solUsdc = openBookManager.getMarket(
-                PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q"),
-                true,
-                false
-        ).get();
+        for (OpenBookMarket market : openBookManager.getOpenBookMarkets()) {
+            OpenBookEventHeap eventHeap = openBookManager.getEventHeap(
+                    market.getEventHeap()
+            ).get();
+
+            List<PublicKey> peopleToCrank = new ArrayList<>();
+            eventHeap.getOutEvents()
+                    .forEach(openBookFillEvent -> {
+                        peopleToCrank.add(openBookFillEvent.getOwner());
+                    });
+
+            log.info("Cranking {}: {}", market.getName(), peopleToCrank);
+
+            Transaction tx = new Transaction();
+            tx.addInstruction(
+                    OpenbookProgram.consumeEvents(
+                            tradingAccount,
+                            market.getMarketId(),
+                            market.getEventHeap(),
+                            peopleToCrank,
+                            8
+                    )
+            );
 
 
-        Transaction tx = new Transaction();
-        tx.addInstruction(
-                OpenbookProgram.consumeEvents(
-                        tradingAccount,
-                        solUsdc.getMarketId(),
-                        solUsdc.getEventHeap(),
-                        100
-                )
-        );
-
-        String consumeEventsTx = client.getApi().sendTransaction(
-                tx,
-                List.of(tradingAccount),
-                null
-        );
-        log.info("Consumed events in TX: {}", consumeEventsTx);
+            String consumeEventsTx = new RpcClient(Cluster.MAINNET).getApi().sendTransaction(
+                    tx,
+                    List.of(tradingAccount),
+                    null
+            );
+            log.info("Consumed events in TX: {}", consumeEventsTx);
+        }
     }
 }

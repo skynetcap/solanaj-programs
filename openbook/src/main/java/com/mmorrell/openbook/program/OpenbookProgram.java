@@ -74,12 +74,16 @@ public class OpenbookProgram extends Program {
     }
 
     public static TransactionInstruction consumeEvents(Account caller, PublicKey market, PublicKey eventHeap,
-                                                       long limit) {
+                                                       List<PublicKey> openOrdersAccounts, long limit) {
         final List<AccountMeta> keys = new ArrayList<>();
         keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
         keys.add(new AccountMeta(market,false, true));
         keys.add(new AccountMeta(eventHeap,false, true));
         keys.add(new AccountMeta(caller.getPublicKey(),true, false));
+        keys.addAll(openOrdersAccounts.stream()
+                .map(publicKey -> new AccountMeta(publicKey, false, true))
+                .toList()
+        );
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(16);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
