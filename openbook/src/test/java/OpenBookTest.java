@@ -194,4 +194,52 @@ public class OpenBookTest {
         );
         log.info("Consumed events in TX: {}", consumeEventsTx);
     }
+
+    @Test
+    public void consumeEventsAllMarketsTest() throws IOException, RpcException, InterruptedException {
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
+        );
+        log.info("Account: {}", tradingAccount.getPublicKey().toBase58());
+
+        for (OpenBookMarket solUsdc : openBookManager.getOpenBookMarkets()) {
+            OpenBookEventHeap eventHeap = openBookManager.getEventHeap(
+                    solUsdc.getEventHeap()
+            ).get();
+
+            log.info("Market [Heap = {}]: {}", eventHeap.getCount(), solUsdc.getName());
+            if (eventHeap.getCount() == 0) {
+                continue;
+            }
+
+            List<PublicKey> peopleToCrank = new ArrayList<>();
+            eventHeap.getFillEvents()
+                    .forEach(openBookFillEvent -> {
+                        peopleToCrank.add(openBookFillEvent.getMaker());
+                    });
+
+            log.info("Cranking {}: {}", solUsdc.getName(), peopleToCrank);
+
+            Transaction tx = new Transaction();
+            tx.addInstruction(
+                    OpenbookProgram.consumeEvents(
+                            tradingAccount,
+                            solUsdc.getMarketId(),
+                            solUsdc.getEventHeap(),
+                            peopleToCrank,
+                            8
+                    )
+            );
+
+
+            String consumeEventsTx = new RpcClient(Cluster.MAINNET).getApi().sendTransaction(
+                    tx,
+                    List.of(tradingAccount),
+                    null
+            );
+            log.info("Consumed events in TX: {}", consumeEventsTx);
+
+            Thread.sleep(2000);
+        }
+    }
 }
