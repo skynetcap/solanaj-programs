@@ -79,11 +79,11 @@ public class OpenbookProgram extends Program {
         keys.add(new AccountMeta(OPENBOOK_V2_PROGRAM_ID, false, false));
         keys.add(new AccountMeta(market,false, true));
         keys.add(new AccountMeta(eventHeap,false, true));
-        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
         keys.addAll(openOrdersAccounts.stream()
                 .map(publicKey -> new AccountMeta(publicKey, false, true))
                 .toList()
         );
+        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(16);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
