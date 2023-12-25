@@ -4,7 +4,7 @@ A SolanaJ module for interfacing with the OpenBook v2 DEX.
 <dependency>
     <groupId>com.mmorrell</groupId>
     <artifactId>openbook</artifactId>
-    <version>1.20.5</version>
+    <version>1.20.6</version>
 </dependency>
 ```
 ## Code Examples
