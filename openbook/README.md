@@ -47,3 +47,42 @@ eventHeap.get().getOutEvents().forEach(openBookOutEvent -> {
     log.info("Out Event: {}", openBookOutEvent.toString());
 });
 ```
+
+### Crank A Market
+```java
+Account tradingAccount = Account.fromJson(
+        Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
+);
+OpenBookMarket solUsdc = openBookManager.getMarket(
+        PublicKey.valueOf("5hYMkB5nAz9aJA33GizyPVH3VkqfkG7V4S2B5ykHxsiM"),
+        true,
+        false
+).get();
+
+OpenBookEventHeap eventHeap = openBookManager.getEventHeap(
+        solUsdc.getEventHeap()
+).get();
+
+List<PublicKey> peopleToCrank = new ArrayList<>();
+eventHeap.getFillEvents()
+        .forEach(openBookFillEvent -> {
+            peopleToCrank.add(openBookFillEvent.getMaker());
+        });
+
+Transaction tx = new Transaction();
+tx.addInstruction(
+        OpenbookProgram.consumeEvents(
+                tradingAccount,
+                solUsdc.getMarketId(),
+                solUsdc.getEventHeap(),
+                peopleToCrank,
+                8
+        )
+);
+
+String consumeEventsTx = new RpcClient(Cluster.MAINNET).getApi().sendTransaction(
+        tx,
+        List.of(tradingAccount),
+        null
+);
+```
