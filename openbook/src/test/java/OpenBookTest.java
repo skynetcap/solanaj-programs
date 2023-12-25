@@ -12,6 +12,7 @@ import org.bitcoinj.core.Base58;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.PublicKey;
+import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
@@ -107,7 +108,7 @@ public class OpenBookTest {
     }
 
     @Test
-    public void openBookEventHeapTest(){
+    public void openBookEventHeapTest() {
         // 2pMETA
         Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("5DviyqH9is6EwSjUETEh5XUe6xP9cpJu17cwiCuiGYQq"));
         //eventHeap.ifPresent(heap -> log.info("Event Heap: {}", heap));
@@ -117,7 +118,7 @@ public class OpenBookTest {
     }
 
     @Test
-    public void openBookEventHeapOutEventsTest(){
+    public void openBookEventHeapOutEventsTest() {
         // 2pMETA
         Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(PublicKey.valueOf("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"));
         eventHeap.get().getOutEvents().forEach(openBookOutEvent -> {
@@ -137,5 +138,24 @@ public class OpenBookTest {
         byte[] data = client.getApi().getAccountInfo(new PublicKey("G1hKFxyM3qNCd1nnjnuvydw6VjCowVp5Jm6w1mwyWH4r"))
                 .getDecodedData();
         Files.write(data, new File("ooa.bin"));
+    }
+
+    @Test
+    public void consumeEventsTest() {
+        OpenBookMarket solUsdc = openBookManager.getMarket(
+                PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q"),
+                false,
+                true
+        ).get();
+
+
+        Transaction tx = new Transaction();
+        tx.addInstruction(
+                OpenbookProgram.consumeEvents(
+                        solUsdc.getMarketId(),
+                        solUsdc.getEventHeap(),
+                        100
+                )
+        );
     }
 }

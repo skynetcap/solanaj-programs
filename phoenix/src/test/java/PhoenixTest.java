@@ -41,8 +41,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class PhoenixTest {
@@ -57,7 +55,7 @@ public class PhoenixTest {
 
     private static final PublicKey BASE_WSOL_WALLET = new PublicKey("Avs5RSYyecvLnt9iFYNQX5EMUun3egh3UNPw8P6ULbNS");
     private static final PublicKey QUOTE_USDC_WALLET = new PublicKey("A6Jcj1XV6QqDpdimmL7jm1gQtSP62j8BWbyqkdhe4eLe");
-    private static final String PRIVATE_KEY_FILE = "mikefsWLEcNYHgsiwSRr6PVd7yVcoKeaURQqeDE1tXN.json";
+    private static final String PRIVATE_KEY_FILE = "private_key.json";
 
     @Test
     public void phoenixGetMarketsTest() throws RpcException {

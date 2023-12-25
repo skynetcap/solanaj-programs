@@ -70,4 +70,21 @@ public class OpenbookProgram extends Program {
                 transactionData
         );
     }
+
+    public static TransactionInstruction consumeEvents(PublicKey market, PublicKey eventHeap, long limit) {
+        final List<AccountMeta> keys = new ArrayList<>();
+        keys.add(new AccountMeta(market,true, false));
+        keys.add(new AccountMeta(eventHeap,true, false));
+
+        byte[] transactionData = OpenBookUtil.encodeNamespace("global:consume_events");
+        ByteBuffer byteBuffer = ByteBuffer.wrap(transactionData);
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        byteBuffer.putLong(limit);
+
+        return createTransactionInstruction(
+                OPENBOOK_V2_PROGRAM_ID,
+                keys,
+                byteBuffer.array()
+        );
+    }
 }
