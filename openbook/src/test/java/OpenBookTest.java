@@ -15,12 +15,10 @@ import org.junit.Test;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
-import org.p2p.solanaj.programs.SystemProgram;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
-import org.p2p.solanaj.rpc.types.config.Commitment;
 
 import java.io.File;
 import java.io.IOException;
@@ -149,44 +147,51 @@ public class OpenBookTest {
     }
 
     @Test
-    public void consumeEventsTest() throws IOException, RpcException {
+    public void consumeEventsTest() throws IOException, RpcException, InterruptedException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
         );
-
         log.info("Account: {}", tradingAccount.getPublicKey().toBase58());
 
-        for (OpenBookMarket market : openBookManager.getOpenBookMarkets()) {
-            OpenBookEventHeap eventHeap = openBookManager.getEventHeap(
-                    market.getEventHeap()
-            ).get();
-
-            List<PublicKey> peopleToCrank = new ArrayList<>();
-            eventHeap.getOutEvents()
-                    .forEach(openBookFillEvent -> {
-                        peopleToCrank.add(openBookFillEvent.getOwner());
-                    });
-
-            log.info("Cranking {}: {}", market.getName(), peopleToCrank);
-
-            Transaction tx = new Transaction();
-            tx.addInstruction(
-                    OpenbookProgram.consumeEvents(
-                            tradingAccount,
-                            market.getMarketId(),
-                            market.getEventHeap(),
-                            peopleToCrank,
-                            8
-                    )
-            );
+        OpenBookMarket solUsdc = openBookManager.getMarket(
+                PublicKey.valueOf("5hYMkB5nAz9aJA33GizyPVH3VkqfkG7V4S2B5ykHxsiM"),
+                true,
+                false
+        ).get();
+//        for (OpenBookMarket solUsdc : openBookManager.getOpenBookMarkets()) {
 
 
-            String consumeEventsTx = new RpcClient(Cluster.MAINNET).getApi().sendTransaction(
-                    tx,
-                    List.of(tradingAccount),
-                    null
-            );
-            log.info("Consumed events in TX: {}", consumeEventsTx);
-        }
+        OpenBookEventHeap eventHeap = openBookManager.getEventHeap(
+                solUsdc.getEventHeap()
+        ).get();
+        log.info("Market: {}", solUsdc.getName());
+        log.info("Heap count: {}", eventHeap.getCount());
+
+        List<PublicKey> peopleToCrank = new ArrayList<>();
+        eventHeap.getFillEvents()
+                .forEach(openBookFillEvent -> {
+                    peopleToCrank.add(openBookFillEvent.getMaker());
+                });
+
+        log.info("Cranking {}: {}", solUsdc.getName(), peopleToCrank);
+
+        Transaction tx = new Transaction();
+        tx.addInstruction(
+                OpenbookProgram.consumeEvents(
+                        tradingAccount,
+                        solUsdc.getMarketId(),
+                        solUsdc.getEventHeap(),
+                        peopleToCrank,
+                        8
+                )
+        );
+
+
+        String consumeEventsTx = new RpcClient(Cluster.MAINNET).getApi().sendTransaction(
+                tx,
+                List.of(tradingAccount),
+                null
+        );
+        log.info("Consumed events in TX: {}", consumeEventsTx);
     }
 }
