@@ -50,12 +50,13 @@ eventHeap.get().getOutEvents().forEach(openBookOutEvent -> {
 
 ### Crank A Market
 ```java
+PublicKey marketId = PublicKey.valueOf("5hYMkB5nAz9aJA33GizyPVH3VkqfkG7V4S2B5ykHxsiM");
 Account tradingAccount = Account.fromJson(
         Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
 );
 Optional<String> transactionId = openBookManager.consumeEvents(
         tradingAccount,
-        PublicKey.valueOf("5hYMkB5nAz9aJA33GizyPVH3VkqfkG7V4S2B5ykHxsiM"),
+        marketId,
         8
 );
 
