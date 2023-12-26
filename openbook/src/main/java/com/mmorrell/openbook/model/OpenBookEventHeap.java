@@ -83,4 +83,24 @@ public class OpenBookEventHeap {
                         "11111111111111111111111111111111")))
                 .toList();
     }
+
+    public List<PublicKey> getEventOwnersToConsume() {
+        return eventNodes.stream()
+                .map(openBookEventNode -> {
+                    if (openBookEventNode.getEvent().getEventType() == (byte) 0) {
+                        byte[] eventType = {0x00};
+                        byte[] combined = new byte[eventType.length + openBookEventNode.getEvent().getPadding().length];
+                        System.arraycopy(eventType, 0, combined, 0, eventType.length);
+                        System.arraycopy(openBookEventNode.getEvent().getPadding(), 0, combined, eventType.length, openBookEventNode.getEvent().getPadding().length);
+                        return OpenBookFillEvent.readOpenBookFillEvent(combined).getMaker();
+                    } else {
+                        byte[] eventType = {0x01};
+                        byte[] combined = new byte[eventType.length + openBookEventNode.getEvent().getPadding().length];
+                        System.arraycopy(eventType, 0, combined, 0, eventType.length);
+                        System.arraycopy(openBookEventNode.getEvent().getPadding(), 0, combined, eventType.length, openBookEventNode.getEvent().getPadding().length);
+                        return OpenBookOutEvent.readOpenBookOutEvent(combined).getOwner();
+                    }
+                })
+                .toList();
+    }
 }

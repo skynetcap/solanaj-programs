@@ -198,10 +198,7 @@ public class OpenBookManager {
             return Optional.empty();
         }
 
-        List<PublicKey> peopleToCrank = eventHeap.getFillEvents().stream()
-                .map(OpenBookFillEvent::getMaker)
-                .toList();
-
+        List<PublicKey> peopleToCrank = eventHeap.getEventOwnersToConsume();
         log.info("Cranking {}: {}", market.getName(), peopleToCrank);
         Transaction tx = new Transaction();
         tx.addInstruction(
