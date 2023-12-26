@@ -243,4 +243,24 @@ public class OpenBookTest {
             Thread.sleep(2000);
         }
     }
+
+    @Test
+    public void consumeEventsOpenBookManagerTest() throws IOException {
+        Account tradingAccount = Account.fromJson(
+                Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
+        );
+        log.info("Account: {}", tradingAccount.getPublicKey().toBase58());
+
+        Optional<String> transactionId = openBookManager.consumeEvents(
+                tradingAccount,
+                PublicKey.valueOf("5hYMkB5nAz9aJA33GizyPVH3VkqfkG7V4S2B5ykHxsiM"),
+                8
+        );
+
+        if (transactionId.isPresent()) {
+            log.info("Cranked events: {}", transactionId.get());
+        } else {
+            log.info("No events found to consume.");
+        }
+    }
 }
