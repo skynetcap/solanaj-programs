@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class represents a node in an OpenBookEventHeap.
+ * It contains information about the next node, previous node, and the event itself.
+ */
 @Data
 @Builder
 public class OpenBookEventNode {
@@ -26,6 +30,12 @@ public class OpenBookEventNode {
     private short prev;
     private OpenBookAnyEvent event;
 
+    /**
+     * Reads a byte array and returns a list of OpenBookEventNode objects.
+     *
+     * @param bytes the byte array to read
+     * @return a list of OpenBookEventNode objects
+     */
     public static List<OpenBookEventNode> readEventNodes(byte[] bytes) {
         List<OpenBookEventNode> results = new ArrayList<>();
         int numNodes = bytes.length / SIZE;

@@ -3,7 +3,6 @@ package com.mmorrell.openbook.manager;
 import com.mmorrell.openbook.OpenBookUtil;
 import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.OpenBookEventHeap;
-import com.mmorrell.openbook.model.OpenBookFillEvent;
 import com.mmorrell.openbook.model.OpenBookMarket;
 import com.mmorrell.openbook.model.OpenBookOpenOrdersAccount;
 import com.mmorrell.openbook.program.OpenbookProgram;
@@ -12,13 +11,11 @@ import org.bitcoinj.core.Base58;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
-import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +132,7 @@ public class OpenBookManager {
      *
      * @param eventHeap The Public Key of the event heap to retrieve.
      * @return An Optional containing the OpenBookEventHeap if retrieval is successful,
-     *         otherwise an empty Optional.
+     * otherwise an empty Optional.
      */
     public Optional<OpenBookEventHeap> getEventHeap(PublicKey eventHeap) {
         try {
@@ -176,11 +173,11 @@ public class OpenBookManager {
     /**
      * Consume events in an OpenBook market.
      *
-     * @param caller     The account making the request.
-     * @param marketId   The public key of the market to consume events from.
-     * @param limit      The maximum number of events to consume.
+     * @param caller   The account making the request.
+     * @param marketId The public key of the market to consume events from.
+     * @param limit    The maximum number of events to consume.
      * @return An Optional containing the transaction hash if events are consumed successfully,
-     *                   otherwise an empty Optional.
+     * otherwise an empty Optional.
      */
     public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit) {
         Optional<OpenBookMarket> marketOptional = getMarket(marketId, true, false);
@@ -198,7 +195,8 @@ public class OpenBookManager {
             return Optional.empty();
         }
 
-        List<PublicKey> peopleToCrank = eventHeap.getEventOwnersToConsume();
+        List<PublicKey> peopleToCrank = eventHeap.getEventOwnersToConsume()
+                .subList(0, Math.min((int) limit, eventHeap.getEventOwnersToConsume().size()));
         log.info("Cranking {}: {}", market.getName(), peopleToCrank);
         Transaction tx = new Transaction();
         tx.addInstruction(

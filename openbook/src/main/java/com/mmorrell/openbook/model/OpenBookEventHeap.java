@@ -9,6 +9,14 @@ import org.p2p.solanaj.utils.ByteUtils;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The OpenBookEventHeap class represents the heap of open book events.
+ * It contains information about the free and used heads, the count of events,
+ * the padding, and the sequence number.
+ * It also includes a list of event nodes and fill events.
+ * The class provides methods to read the OpenBookEventHeap from data and retrieve the fill events,
+ * out events, and event owners to consume.
+ */
 @Data
 @Builder
 public class OpenBookEventHeap {
@@ -34,6 +42,12 @@ public class OpenBookEventHeap {
 
     // + 64 bytes reserved
 
+    /**
+     * Reads an OpenBookEventHeap from the given byte array.
+     *
+     * @param data the byte array containing the OpenBookEventHeap data
+     * @return the deserialized OpenBookEventHeap object
+     */
     public static OpenBookEventHeap readOpenBookEventHeap(byte[] data) {
         return OpenBookEventHeap.builder()
                 .freeHead((short) Utils.readUint16(data, FREE_HEAD_OFFSET))
@@ -53,6 +67,11 @@ public class OpenBookEventHeap {
                 .build();
     }
 
+    /**
+     * Returns a list of OpenBookFillEvent objects.
+     *
+     * @return The list of OpenBookFillEvent objects.
+     */
     public List<OpenBookFillEvent> getFillEvents() {
         byte[] eventType = {0x00};
         return eventNodes.stream()
@@ -69,6 +88,11 @@ public class OpenBookEventHeap {
 
     }
 
+    /**
+     * Returns a list of OpenBookOutEvent objects.
+     *
+     * @return The list of OpenBookOutEvent objects.
+     */
     public List<OpenBookOutEvent> getOutEvents() {
         byte[] eventType = {0x01};
         return eventNodes.stream()
@@ -84,6 +108,11 @@ public class OpenBookEventHeap {
                 .toList();
     }
 
+    /**
+     * Retrieves a list of public keys representing the owners of the events to be consumed.
+     *
+     * @return A list of public keys representing the owners of the events to be consumed.
+     */
     public List<PublicKey> getEventOwnersToConsume() {
         return eventNodes.stream()
                 .map(openBookEventNode -> {
