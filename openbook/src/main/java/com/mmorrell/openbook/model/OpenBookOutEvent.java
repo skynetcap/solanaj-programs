@@ -7,6 +7,9 @@ import org.p2p.solanaj.core.PublicKey;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * OpenBookOutEvent represents an event of a Maker action (i.e. Cxl) for a particular token and side.
+ */
 @Data
 @Builder
 public class OpenBookOutEvent {
@@ -19,6 +22,12 @@ public class OpenBookOutEvent {
     private PublicKey owner;
     private long quantity;
 
+    /**
+     * Reads an OpenBookOutEvent from the given byte array.
+     *
+     * @param data the byte array containing the OpenBookOutEvent data
+     * @return the deserialized OpenBookOutEvent object
+     */
     public static OpenBookOutEvent readOpenBookOutEvent(byte[] data) {
         ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.LITTLE_ENDIAN);

@@ -1,11 +1,13 @@
 package com.mmorrell.openbook.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.Arrays;
 
+/**
+ * The OpenBookAnyEvent class represents an event in the OpenBook system.
+ * It stores the type of the event and additional padding data.
+ */
 @Data
 public class OpenBookAnyEvent {
 
@@ -15,6 +17,12 @@ public class OpenBookAnyEvent {
     private byte eventType;
     private byte[] padding;
 
+    /**
+     * Reads a byte array and returns an OpenBookAnyEvent object.
+     *
+     * @param data the byte array to read
+     * @return an OpenBookAnyEvent object
+     */
     public static OpenBookAnyEvent readOpenBookAnyEvent(byte[] data) {
         OpenBookAnyEvent openBookAnyEvent = new OpenBookAnyEvent();
         openBookAnyEvent.setEventType(data[0]);

@@ -11,6 +11,9 @@ import java.util.Arrays;
 import static org.bitcoinj.core.Utils.reverseBytes;
 import static org.p2p.solanaj.utils.ByteUtils.readBytes;
 
+/**
+ * The OpenBookUtil class provides utility methods for working with OpenBook data.
+ */
 public class OpenBookUtil {
 
     public final static byte[] MARKET_DISCRIMINATOR = {
@@ -83,6 +86,16 @@ public class OpenBookUtil {
         return bb.getInt(0);
     }
 
+    /**
+     * Calculates the numerical representation of the price in an open book market.
+     *
+     * @param price         The price of the order
+     * @param baseDecimals  The number of decimal places in the base currency
+     * @param quoteDecimals The number of decimal places in the quote currency
+     * @param baseLotSize   The size of a base lot
+     * @param quoteLotSize  The size of a quote lot
+     * @return The numerical representation of the price
+     */
     public static double priceLotsToNumber(long price, byte baseDecimals, byte quoteDecimals, long baseLotSize,
                                            long quoteLotSize) {
         double top = (price * quoteLotSize * getBaseSplTokenMultiplier(baseDecimals));

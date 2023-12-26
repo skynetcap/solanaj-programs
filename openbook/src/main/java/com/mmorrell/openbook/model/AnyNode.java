@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * AnyNode class represents a node in a data structure.
+ */
 @Data
 @Builder
 public class AnyNode {
@@ -15,6 +18,12 @@ public class AnyNode {
     private byte[] data; // 87 bytes
     private NodeTag nodeTag;
 
+    /**
+     * Reads the AnyNode objects from the given byte array data.
+     *
+     * @param data the byte array from which to read the AnyNode objects
+     * @return a list of AnyNode objects read from the data
+     */
     public static List<AnyNode> readAnyNodes(byte[] data) {
         List<AnyNode> nodes = new ArrayList<>(1024);
 

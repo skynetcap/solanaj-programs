@@ -7,6 +7,9 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The OrderTreeRoot class represents a root node in an order tree.
+ */
 @Data
 @Builder
 public class OrderTreeRoot {
@@ -16,6 +19,13 @@ public class OrderTreeRoot {
     private int maybeNode;
     private int leafCount;
 
+    /**
+     * Reads the order tree roots from a byte array.
+     *
+     * @param data     The byte array containing the order tree roots data
+     * @param numRoots The number of order tree roots to read
+     * @return The list of order tree roots
+     */
     public static List<OrderTreeRoot> readOrderTreeRoots(byte[] data, int numRoots) {
         List<OrderTreeRoot> results = new ArrayList<>();
 

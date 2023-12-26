@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 import static com.mmorrell.openbook.OpenBookUtil.CONSUME_EVENTS_DISCRIMINATOR;
 
 /**
- * Class for creating Serum v3 {@link TransactionInstruction}s
+ * The OpenbookProgram class extends the Program class and provides methods to interact with
+ * the Openbook v2 program.
  */
 public class OpenbookProgram extends Program {
 
@@ -73,6 +74,16 @@ public class OpenbookProgram extends Program {
         );
     }
 
+    /**
+     * Creates a transaction instruction for consuming events in OpenbookProgram.
+     *
+     * @param caller            The account initiating the transaction.
+     * @param market            The public key of the market.
+     * @param eventHeap         The public key of the event heap.
+     * @param openOrdersAccounts A list of public keys representing open orders accounts.
+     * @param limit             The maximum number of events to consume.
+     * @return A TransactionInstruction object representing the consume events instruction.
+     */
     public static TransactionInstruction consumeEvents(Account caller, PublicKey market, PublicKey eventHeap,
                                                        List<PublicKey> openOrdersAccounts, long limit) {
         final List<AccountMeta> keys = new ArrayList<>();

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Represents an OpenBook v2 order book, stored in the `bid` and `asks` accounts separately.
+ * The `BookSide` class represents a side of a book in a market. It contains information about the order tree structure and metadata for the book side.
  */
 @Data
 @Builder
@@ -33,6 +33,12 @@ public class BookSide {
     private long baseLotSize;
     private long quoteLotSize;
 
+    /**
+     * Reads the BookSide data from a byte array.
+     *
+     * @param data The byte array containing the BookSide data
+     * @return The BookSide object
+     */
     public static BookSide readBookSide(byte[] data) {
         return BookSide.builder()
                 .roots(
@@ -63,6 +69,12 @@ public class BookSide {
                 .build();
     }
 
+
+    /**
+     * Retrieves the list of leaf nodes from the order tree.
+     *
+     * @return The list of leaf nodes
+     */
     public List<LeafNode> getLeafNodes() {
         return orderTreeNodes.getNodes().stream()
                 .filter(anyNode -> anyNode.getNodeTag() == NodeTag.LeafNode)
@@ -70,6 +82,11 @@ public class BookSide {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the list of OpenBookOrders representing the orders.
+     *
+     * @return The list of OpenBookOrders
+     */
     public List<OpenBookOrder> getOrders() {
         return getLeafNodes().stream()
                 .map(leafNode -> OpenBookOrder.builder()

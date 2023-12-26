@@ -8,6 +8,9 @@ import org.p2p.solanaj.core.PublicKey;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+/**
+ * LeafNode class represents a leaf node in a data structure.
+ */
 @Data
 @Builder
 public class LeafNode {
@@ -25,6 +28,12 @@ public class LeafNode {
 
     private long price;
 
+    /**
+     * Reads a LeafNode from an AnyNode object.
+     *
+     * @param anyNode The AnyNode object to read from
+     * @return The LeafNode object
+     */
     public static LeafNode readLeafNode(AnyNode anyNode) {
         byte[] data = anyNode.getData(); // starts at offset 1 of 88
         byte tag = anyNode.getTag(); // ignore offset 0

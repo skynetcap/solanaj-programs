@@ -12,6 +12,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The OpenBookMarket class represents a market in the OpenBook platform.
+ * It contains various properties and methods to manipulate and query the market data.
+ */
 @Data
 @Builder
 public class OpenBookMarket {
@@ -56,6 +60,13 @@ public class OpenBookMarket {
     private List<OpenBookOrder> bidOrders;
     private List<OpenBookOrder> askOrders;
 
+    /**
+     * Reads an OpenBookMarket object from the given data and marketId.
+     *
+     * @param data    the byte array containing the market data
+     * @param marketId the marketId for the market
+     * @return the OpenBookMarket object built from the data
+     */
     public static OpenBookMarket readOpenBookMarket(byte[] data, PublicKey marketId) {
         ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
