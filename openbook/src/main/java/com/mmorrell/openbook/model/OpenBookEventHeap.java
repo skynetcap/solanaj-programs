@@ -130,6 +130,7 @@ public class OpenBookEventHeap {
                         return OpenBookOutEvent.readOpenBookOutEvent(combined).getOwner();
                     }
                 })
+                .filter(publicKey -> !publicKey.equals(new PublicKey("11111111111111111111111111111111")))
                 .toList();
     }
 }

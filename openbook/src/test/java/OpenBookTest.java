@@ -253,7 +253,7 @@ public class OpenBookTest {
 
         Optional<String> transactionId = openBookManager.consumeEvents(
                 tradingAccount,
-                PublicKey.valueOf("5hYMkB5nAz9aJA33GizyPVH3VkqfkG7V4S2B5ykHxsiM"),
+                PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q"),
                 8
         );
 
