@@ -18,7 +18,7 @@ Or just one dependency:
 <dependency>
     <groupId>com.mmorrell</groupId>
     <artifactId>phoenix</artifactId>
-    <version>1.19.19</version>
+    <version>1.21.1</version>
 </dependency>
 ```
 
