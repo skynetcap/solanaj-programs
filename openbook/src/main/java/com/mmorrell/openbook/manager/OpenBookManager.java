@@ -11,6 +11,7 @@ import org.bitcoinj.core.Base58;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
+import org.p2p.solanaj.programs.ComputeBudgetProgram;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
@@ -97,7 +98,7 @@ public class OpenBookManager {
                 );
 
                 if (retrieveOrderBooks) {
-                    Map<PublicKey, Optional<AccountInfo.Value>> books =client.getApi().getMultipleAccountsMap(
+                    Map<PublicKey, Optional<AccountInfo.Value>> books = client.getApi().getMultipleAccountsMap(
                             List.of(openBookMarket.getBids(), openBookMarket.getAsks())
                     );
 
@@ -205,6 +206,8 @@ public class OpenBookManager {
                 .subList(0, Math.min((int) limit, eventHeap.getEventOwnersToConsume().size()));
         log.info("Cranking {}: {}", market.getName(), peopleToCrank);
         Transaction tx = new Transaction();
+        tx.addInstruction(ComputeBudgetProgram.setComputeUnitLimit(50_000));
+        tx.addInstruction(ComputeBudgetProgram.setComputeUnitPrice(11));
         tx.addInstruction(
                 OpenbookProgram.consumeEvents(
                         caller,
