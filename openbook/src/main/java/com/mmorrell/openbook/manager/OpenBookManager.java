@@ -13,9 +13,11 @@ import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
+import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,28 +97,32 @@ public class OpenBookManager {
                 );
 
                 if (retrieveOrderBooks) {
-                    BookSide bids = BookSide.readBookSide(
-                            client.getApi()
-                                    .getAccountInfo(openBookMarket.getBids(), Map.of("commitment", Commitment.PROCESSED))
-                                    .getDecodedData()
+                    Map<PublicKey, Optional<AccountInfo.Value>> books =client.getApi().getMultipleAccountsMap(
+                            List.of(openBookMarket.getBids(), openBookMarket.getAsks())
                     );
-                    bids.setBaseDecimals(openBookMarket.getBaseDecimals());
-                    bids.setQuoteDecimals(openBookMarket.getQuoteDecimals());
-                    bids.setBaseLotSize(openBookMarket.getBaseLotSize());
-                    bids.setQuoteLotSize(openBookMarket.getQuoteLotSize());
 
-                    BookSide asks = BookSide.readBookSide(
-                            client.getApi()
-                                    .getAccountInfo(openBookMarket.getAsks(), Map.of("commitment", Commitment.PROCESSED))
-                                    .getDecodedData()
-                    );
-                    asks.setBaseDecimals(openBookMarket.getBaseDecimals());
-                    asks.setQuoteDecimals(openBookMarket.getQuoteDecimals());
-                    asks.setBaseLotSize(openBookMarket.getBaseLotSize());
-                    asks.setQuoteLotSize(openBookMarket.getQuoteLotSize());
+                    Optional<AccountInfo.Value> bidOrderBookValue = books.get(openBookMarket.getBids());
+                    Optional<AccountInfo.Value> askOrderBookValue = books.get(openBookMarket.getAsks());
 
-                    openBookMarket.setBidOrders(bids.getOrders());
-                    openBookMarket.setAskOrders(asks.getOrders());
+                    if (bidOrderBookValue.isPresent() && askOrderBookValue.isPresent()) {
+                        byte[] bidData =
+                                Base64.getDecoder().decode(bidOrderBookValue.get().getData().get(0).getBytes());
+                        BookSide bids = BookSide.readBookSide(bidData);
+                        bids.setBaseDecimals(openBookMarket.getBaseDecimals());
+                        bids.setQuoteDecimals(openBookMarket.getQuoteDecimals());
+                        bids.setBaseLotSize(openBookMarket.getBaseLotSize());
+                        bids.setQuoteLotSize(openBookMarket.getQuoteLotSize());
+                        openBookMarket.setBidOrders(bids.getOrders());
+
+                        byte[] askData =
+                                Base64.getDecoder().decode(askOrderBookValue.get().getData().get(0).getBytes());
+                        BookSide asks = BookSide.readBookSide(askData);
+                        asks.setBaseDecimals(openBookMarket.getBaseDecimals());
+                        asks.setQuoteDecimals(openBookMarket.getQuoteDecimals());
+                        asks.setBaseLotSize(openBookMarket.getBaseLotSize());
+                        asks.setQuoteLotSize(openBookMarket.getQuoteLotSize());
+                        openBookMarket.setAskOrders(asks.getOrders());
+                    }
                 }
 
                 return Optional.of(openBookMarket);
