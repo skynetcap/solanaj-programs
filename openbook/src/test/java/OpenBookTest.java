@@ -120,6 +120,7 @@ public class OpenBookTest {
         //eventHeap.ifPresent(heap -> log.info("Event Heap: {}", heap));
         eventHeap.get().getFillEvents().forEach(openBookFillEvent -> {
             log.info("Fill: {}", openBookFillEvent.toString());
+            log.info("Hash: {}", openBookFillEvent.generateTradeHash());
         });
     }
 
