@@ -1,5 +1,8 @@
 package com.mmorrell.openbook.model;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import lombok.Builder;
 import lombok.Data;
 import org.p2p.solanaj.core.PublicKey;
@@ -63,6 +66,27 @@ public class OpenBookFillEvent {
                 .quantity(ByteUtils.readUint64(data, 120).longValue())
                 .makerClientOrderId(ByteUtils.readUint64(data, 128).longValue())
                 .build();
+    }
+
+    public String generateTradeHash() {
+        final HashFunction sha256 = Hashing.sha256();
+        final HashCode tradeHash = sha256.newHasher()
+                .putByte(eventType)
+                .putByte(takerSide)
+                .putByte(makerOut)
+                .putByte(makerSlot)
+                .putLong(timeStamp)
+                .putBytes(maker.toByteArray())
+                .putLong(makerTimeStamp)
+                .putBytes(taker.toByteArray())
+                .putLong(takerClientOrderId)
+                .putLong(price)
+                .putLong(pegLimit)
+                .putLong(quantity)
+                .putLong(makerClientOrderId)
+                .hash();
+
+        return tradeHash.toString();
     }
 
 }
