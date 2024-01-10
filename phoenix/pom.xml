@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.21.3</version>
+        <version>1.21.4</version>
     </parent>
 
     <artifactId>phoenix</artifactId>
@@ -20,13 +20,13 @@
         <dependency>
             <groupId>com.mmorrell</groupId>
             <artifactId>serum</artifactId>
-            <version>1.21.3</version>
+            <version>1.21.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.mmorrell</groupId>
             <artifactId>metaplex</artifactId>
-            <version>1.21.3</version>
+            <version>1.21.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
