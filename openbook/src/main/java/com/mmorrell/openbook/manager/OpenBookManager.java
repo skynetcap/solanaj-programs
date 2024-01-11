@@ -1,5 +1,6 @@
 package com.mmorrell.openbook.manager;
 
+import com.google.common.io.Files;
 import com.mmorrell.openbook.OpenBookUtil;
 import com.mmorrell.openbook.model.BookSide;
 import com.mmorrell.openbook.model.OpenBookEventHeap;
@@ -18,6 +19,7 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
 
+import java.io.File;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -90,12 +92,11 @@ public class OpenBookManager {
             }
         } else {
             try {
-                OpenBookMarket openBookMarket = OpenBookMarket.readOpenBookMarket(
-                        client.getApi()
-                                .getAccountInfo(marketId, Map.of("commitment", Commitment.PROCESSED))
-                                .getDecodedData(),
-                        marketId
-                );
+                byte[] marketData = client.getApi()
+                        .getAccountInfo(marketId, Map.of("commitment", Commitment.PROCESSED))
+                        .getDecodedData();
+
+                OpenBookMarket openBookMarket = OpenBookMarket.readOpenBookMarket(marketData, marketId);
 
                 if (retrieveOrderBooks) {
                     Map<PublicKey, Optional<AccountInfo.Value>> books = client.getApi().getMultipleAccountsMap(
