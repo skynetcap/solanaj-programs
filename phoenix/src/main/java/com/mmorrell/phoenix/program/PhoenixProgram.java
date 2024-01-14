@@ -40,7 +40,7 @@ public class PhoenixProgram extends Program {
                     PHOENIX_PROGRAM_ID
             ).getAddress();
         } catch (Exception e) {
-            log.error("Error claiming seat: {}", e.getMessage());
+            log.error("Error claiming seat: {}", e.getMessage(), e);
         }
 
         accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));
@@ -182,7 +182,7 @@ public class PhoenixProgram extends Program {
                     PHOENIX_PROGRAM_ID
             ).getAddress();
         } catch (Exception e) {
-            log.error("Error claiming seat: {}", e.getMessage());
+            log.error("Error claiming seat: {}", e.getMessage(), e);
         }
 
         accountMetas.add(new AccountMeta(PHOENIX_PROGRAM_ID, false, false));

@@ -39,7 +39,7 @@ public class PhoenixManager {
                     PhoenixUtil.getDiscriminator("phoenix::program::accounts::MarketHeader")
             );
         } catch (RpcException e) {
-            log.error("Error caching phoenix market headers: {}", e.getMessage());
+            log.error("Error caching phoenix market headers: {}", e.getMessage(), e);
         }
 
         markets.forEach(programAccount -> {
@@ -77,7 +77,7 @@ public class PhoenixManager {
 
                 return Optional.of(phoenixMarket);
             } catch (Exception e) {
-                log.error("Unable to retrieve phoenix market {}", marketId);
+                log.error("Unable to retrieve phoenix market {}", marketId, e);
                 return Optional.empty();
             }
         }

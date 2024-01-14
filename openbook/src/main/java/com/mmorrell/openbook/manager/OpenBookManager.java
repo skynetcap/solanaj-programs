@@ -53,7 +53,7 @@ public class OpenBookManager {
                     Base58.encode(OpenBookUtil.MARKET_DISCRIMINATOR)
             );
         } catch (RpcException e) {
-            log.error("Error caching OpenBook v2 markets: {}", e.getMessage());
+            log.error("Error caching OpenBook v2 markets: {}", e.getMessage(), e);
             return;
         }
 
@@ -129,7 +129,7 @@ public class OpenBookManager {
 
                 return Optional.of(openBookMarket);
             } catch (Exception e) {
-                log.error("Unable to retrieve OpenBook v2 market {}", marketId);
+                log.error("Unable to retrieve OpenBook v2 market {}", marketId, e);
                 return Optional.empty();
             }
         }
@@ -152,7 +152,7 @@ public class OpenBookManager {
 
             return Optional.of(openBookEventHeap);
         } catch (RpcException e) {
-            log.error(e.getMessage());
+            log.error("Error getting event heap: {}", e.getMessage(), e);
             return Optional.empty();
         }
     }
@@ -173,7 +173,7 @@ public class OpenBookManager {
 
             return Optional.of(openBookOoa);
         } catch (RpcException e) {
-            log.error("Error getting OOA: {}", e.getMessage());
+            log.error("Error getting OOA: {}", e.getMessage(), e);
             return Optional.empty();
         }
     }
@@ -227,7 +227,7 @@ public class OpenBookManager {
                     null
             );
         } catch (RpcException e) {
-            log.error("Error cranking: {}", e.getMessage());
+            log.error("Error cranking: {}", e.getMessage(), e);
             return Optional.empty();
         }
 
