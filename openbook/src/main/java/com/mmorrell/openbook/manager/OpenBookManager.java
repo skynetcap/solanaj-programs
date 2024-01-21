@@ -92,11 +92,12 @@ public class OpenBookManager {
             }
         } else {
             try {
-                byte[] marketData = client.getApi()
-                        .getAccountInfo(marketId, Map.of("commitment", Commitment.PROCESSED))
-                        .getDecodedData();
+                // Use cache here anyway. The GPA will pick up all markets
+                OpenBookMarket openBookMarket = marketCache.get(marketId);
 
-                OpenBookMarket openBookMarket = OpenBookMarket.readOpenBookMarket(marketData, marketId);
+                if (openBookMarket == null) {
+                    return Optional.empty();
+                }
 
                 if (retrieveOrderBooks) {
                     Map<PublicKey, Optional<AccountInfo.Value>> books = client.getApi().getMultipleAccountsMap(
