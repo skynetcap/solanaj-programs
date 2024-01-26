@@ -13,12 +13,14 @@ import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
 import org.p2p.solanaj.programs.ComputeBudgetProgram;
+import org.p2p.solanaj.programs.MemoProgram;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 import org.p2p.solanaj.rpc.types.config.Commitment;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Base64;
 import java.util.HashMap;
@@ -188,7 +190,7 @@ public class OpenBookManager {
      * @return An Optional containing the transaction hash if events are consumed successfully,
      * otherwise an empty Optional.
      */
-    public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit) {
+    public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit, @Nullable String memo) {
         Optional<OpenBookMarket> marketOptional = getMarket(marketId, true, false);
         if (marketOptional.isEmpty()) {
             return Optional.empty();
@@ -219,6 +221,10 @@ public class OpenBookManager {
                         limit
                 )
         );
+
+        if (memo != null) {
+            tx.addInstruction(MemoProgram.writeUtf8(caller.getPublicKey(), memo));
+        }
 
         String consumeEventsTx;
         try {
