@@ -5,7 +5,7 @@ A SolanaJ module for interfacing with the Ellipsis Phoenix DEX.
 <dependency>
     <groupId>com.mmorrell</groupId>
     <artifactId>openbook</artifactId>
-    <version>1.20.6</version>
+    <version>1.30.1</version>
 </dependency>
 ```
 
