@@ -6,7 +6,7 @@ A SolanaJ module for interfacing with Pyth.
 <dependency>
         <groupId>com.mmorrell</groupId>
         <artifactId>solanaj-programs</artifactId>
-        <version>1.30.1</version>
+        <version>1.30.2</version>
 </dependency>
 ```
 
