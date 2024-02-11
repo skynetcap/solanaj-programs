@@ -24,9 +24,12 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The OpenBookManager class is responsible for managing OpenBook markets and their related data.
@@ -206,8 +209,10 @@ public class OpenBookManager {
             return Optional.empty();
         }
 
-        List<PublicKey> peopleToCrank = eventHeap.getEventOwnersToConsume()
-                .subList(0, Math.min((int) limit, eventHeap.getEventOwnersToConsume().size()));
+        Set<PublicKey> peopleToCrank = new HashSet<>(eventHeap.getEventOwnersToConsume());
+        List<PublicKey> openOrdersAccounts = peopleToCrank.stream().toList()
+                .subList(0, Math.min((int) limit, peopleToCrank.size()));
+
         log.info("Cranking {}: {}", market.getName(), peopleToCrank);
         Transaction tx = new Transaction();
         tx.addInstruction(ComputeBudgetProgram.setComputeUnitLimit(50_000));
@@ -217,7 +222,7 @@ public class OpenBookManager {
                         caller,
                         market.getMarketId(),
                         market.getEventHeap(),
-                        peopleToCrank,
+                        openOrdersAccounts,
                         limit
                 )
         );
