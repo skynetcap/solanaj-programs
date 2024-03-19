@@ -40,6 +40,8 @@ public class OpenBookManager {
     private final RpcClient client;
     private final Map<PublicKey, OpenBookMarket> marketCache = new HashMap<>();
 
+    private final static int CONSUME_EVENTS_DEFAULT_FEE = 11;
+
     public OpenBookManager(RpcClient client) {
         this.client = client;
         cacheMarkets();
@@ -193,7 +195,8 @@ public class OpenBookManager {
      * @return An Optional containing the transaction hash if events are consumed successfully,
      * otherwise an empty Optional.
      */
-    public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit, @Nullable String memo) {
+    public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit, @Nullable String memo,
+                                          int priorityFee) {
         Optional<OpenBookMarket> marketOptional = getMarket(marketId, true, false);
         if (marketOptional.isEmpty()) {
             return Optional.empty();
@@ -216,7 +219,7 @@ public class OpenBookManager {
         log.info("Cranking {}: {}", market.getName(), peopleToCrank);
         Transaction tx = new Transaction();
         tx.addInstruction(ComputeBudgetProgram.setComputeUnitLimit(50_000));
-        tx.addInstruction(ComputeBudgetProgram.setComputeUnitPrice(11));
+        tx.addInstruction(ComputeBudgetProgram.setComputeUnitPrice(priorityFee));
         tx.addInstruction(
                 OpenbookProgram.consumeEvents(
                         caller,
@@ -245,5 +248,20 @@ public class OpenBookManager {
 
         log.info("Consumed events in TX: {}", consumeEventsTx);
         return Optional.of(consumeEventsTx);
+    }
+
+
+    /**
+     * Consumes events for a given account, market ID, limit, and optional memo.
+     * It uses the default fee.
+     *
+     * @param caller The account performing the consumption
+     * @param marketId The public key of the market
+     * @param limit The maximum number of events to consume
+     * @param memo The optional memo
+     * @return An Optional String representing the consumed events
+     */
+    public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit, @Nullable String memo) {
+        return consumeEvents(caller, marketId, limit, memo, CONSUME_EVENTS_DEFAULT_FEE);
     }
 }
