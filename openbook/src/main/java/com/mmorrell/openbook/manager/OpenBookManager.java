@@ -159,7 +159,7 @@ public class OpenBookManager {
             );
 
             return Optional.of(openBookEventHeap);
-        } catch (RpcException e) {
+        } catch (Exception e) {
             log.error("Error getting event heap: {}", e.getMessage(), e);
             return Optional.empty();
         }
@@ -180,7 +180,7 @@ public class OpenBookManager {
             );
 
             return Optional.of(openBookOoa);
-        } catch (RpcException e) {
+        } catch (Exception e) {
             log.error("Error getting OOA: {}", e.getMessage(), e);
             return Optional.empty();
         }
