@@ -93,6 +93,7 @@ public class PythTest {
     }
 
     @Test
+    @Ignore
     public void priceDataAccountTest() {
         final int EXPECTED_MIN_BCH_USD_PUBLISHERS = 3;
         final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);

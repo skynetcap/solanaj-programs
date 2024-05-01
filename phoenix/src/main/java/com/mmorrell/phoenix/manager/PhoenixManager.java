@@ -43,15 +43,19 @@ public class PhoenixManager {
         }
 
         markets.forEach(programAccount -> {
-            final PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(
-                    Arrays.copyOfRange(
-                            programAccount.getAccount().getDecodedData(),
-                            0,
-                            programAccount.getAccount().getDecodedData().length
-                    )
-            );
-            phoenixMarket.setMarketId(new PublicKey(programAccount.getPubkey()));
-            marketCache.put(phoenixMarket.getMarketId(), phoenixMarket);
+            try {
+                final PhoenixMarket phoenixMarket = PhoenixMarket.readPhoenixMarket(
+                        Arrays.copyOfRange(
+                                programAccount.getAccount().getDecodedData(),
+                                0,
+                                programAccount.getAccount().getDecodedData().length
+                        )
+                );
+                phoenixMarket.setMarketId(new PublicKey(programAccount.getPubkey()));
+                marketCache.put(phoenixMarket.getMarketId(), phoenixMarket);
+            } catch (Exception ex) {
+                log.error("Error reading PHX account: {}", ex.getMessage(), ex);
+            }
         });
     }
 
