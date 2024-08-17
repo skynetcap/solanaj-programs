@@ -144,7 +144,7 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
-                            <homedir>c:/Users/Michael/.gnupg/</homedir>
+                            <homedir>/Users/chintan_mbp/.gnupg/</homedir>
                             <keyname>0x27FAE7D2</keyname>
                         </configuration>
                     </execution>
