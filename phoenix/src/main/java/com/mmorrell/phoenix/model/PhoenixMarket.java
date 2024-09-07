@@ -121,47 +121,58 @@ public class PhoenixMarket {
     private static void normalizeOrders(PhoenixMarket market) {
         market.setBidListNormalized(new ArrayList<>());
         market.getBidListSanitized().forEach(order -> {
-            double price =
-                    ((double) order.getFirst().getPriceInTicks() *
-                            market.getTickSizeInQuoteLotsPerBaseUnit() *
-                            market.getPhoenixMarketHeader().getQuoteLotSize()) /
-                            (Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals()) *
-                                    market.getPhoenixMarketHeader().getRawBaseUnitsPerBaseUnit());
-            double size =
-                    ((double) order.getSecond().getNumBaseLots() * market.getPhoenixMarketHeader().getBaseLotSize())
-                            / Math.pow(10, market.getPhoenixMarketHeader().getBaseDecimals());
+            // Ensure the trader index is valid
+            int traderIndex = (int) (order.getSecond().getTraderIndex() - 1);
+            if (traderIndex >= 0 && traderIndex < market.getTraders().size()) {
+                double price = calculatePrice(order, market);
+                double size = calculateSize(order, market);
 
-            market.getBidListNormalized().add(
-                    PhoenixOrder.builder()
-                            .price(price)
-                            .size(size)
-                            .trader(market.getTraders().get((int) (order.getSecond().getTraderIndex() - 1)).getFirst())
-                            .build()
-            );
+                market.getBidListNormalized().add(
+                        PhoenixOrder.builder()
+                                .price(price)
+                                .size(size)
+                                .trader(market.getTraders().get(traderIndex).getFirst())
+                                .build()
+                );
+            } else {
+                log.error("Invalid trader index for bid order: " + traderIndex);
+            }
         });
         market.getBidListNormalized().sort(Comparator.comparingDouble(PhoenixOrder::getPrice));
 
         market.setAskListNormalized(new ArrayList<>());
         market.getAskListSanitized().forEach(order -> {
-            double price =
-                    ((double) order.getFirst().getPriceInTicks() *
-                            market.getTickSizeInQuoteLotsPerBaseUnit() *
-                            market.getPhoenixMarketHeader().getQuoteLotSize()) /
-                            (Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals()) *
-                                    market.getPhoenixMarketHeader().getRawBaseUnitsPerBaseUnit());
-            double size =
-                    ((double) order.getSecond().getNumBaseLots() * market.getPhoenixMarketHeader().getBaseLotSize())
-                            / Math.pow(10, market.getPhoenixMarketHeader().getBaseDecimals());
+            // Ensure the trader index is valid
+            int traderIndex = (int) (order.getSecond().getTraderIndex() - 1);
+            if (traderIndex >= 0 && traderIndex < market.getTraders().size()) {
+                double price = calculatePrice(order, market);
+                double size = calculateSize(order, market);
 
-            market.getAskListNormalized().add(
-                    PhoenixOrder.builder()
-                            .price(price)
-                            .size(size)
-                            .trader(market.getTraders().get((int) (order.getSecond().getTraderIndex() - 1)).getFirst())
-                            .build()
-            );
+                market.getAskListNormalized().add(
+                        PhoenixOrder.builder()
+                                .price(price)
+                                .size(size)
+                                .trader(market.getTraders().get(traderIndex).getFirst())
+                                .build()
+                );
+            } else {
+                log.error("Invalid trader index for ask order: " + traderIndex);
+            }
         });
         market.getAskListNormalized().sort(Comparator.comparingDouble(PhoenixOrder::getPrice));
+    }
+
+    private static double calculatePrice(Pair<FIFOOrderId, FIFORestingOrder> order, PhoenixMarket market) {
+        return ((double) order.getFirst().getPriceInTicks() *
+                market.getTickSizeInQuoteLotsPerBaseUnit() *
+                market.getPhoenixMarketHeader().getQuoteLotSize()) /
+                (Math.pow(10, market.getPhoenixMarketHeader().getQuoteDecimals()) *
+                        market.getPhoenixMarketHeader().getRawBaseUnitsPerBaseUnit());
+    }
+
+    private static double calculateSize(Pair<FIFOOrderId, FIFORestingOrder> order, PhoenixMarket market) {
+        return ((double) order.getSecond().getNumBaseLots() * market.getPhoenixMarketHeader().getBaseLotSize()) /
+                Math.pow(10, market.getPhoenixMarketHeader().getBaseDecimals());
     }
 
     private static void readTraderBuffer(byte[] traderBuffer, PhoenixMarket market) {
@@ -201,15 +212,21 @@ public class PhoenixMarket {
         int counter = 0;
 
         while (freeListHead != 0) {
-            Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
-            indexToRemove = next.component1();
-            freeListHead = next.component2();
+            // Ensure freeListHead is within bounds
+            if (freeListHead - 1 < freeListPointersList.size()) {
+                Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
+                indexToRemove = next.component1();
+                freeListHead = next.component2();
 
-            freeNodes.add(indexToRemove);
-            counter += 1;
+                freeNodes.add(indexToRemove);
+                counter += 1;
 
-            if (counter > bumpIndex) {
-                log.error("Infinite Loop Detected");
+                if (counter > bumpIndex) {
+                    log.error("Infinite Loop Detected");
+                }
+            } else {
+                log.error("freeListHead out of bounds: " + freeListHead);
+                break; // Exit the loop if out of bounds
             }
         }
 
@@ -262,15 +279,21 @@ public class PhoenixMarket {
         int counter = 0;
 
         while (freeListHead != 0) {
-            Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
-            indexToRemove = next.component1();
-            freeListHead = next.component2();
+            // Ensure freeListHead is within bounds
+            if (freeListHead - 1 < freeListPointersList.size()) {
+                Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
+                indexToRemove = next.component1();
+                freeListHead = next.component2();
 
-            freeNodes.add(indexToRemove);
-            counter += 1;
+                freeNodes.add(indexToRemove);
+                counter += 1;
 
-            if (counter > bumpIndex) {
-                log.error("Infinite Loop Detected");
+                if (counter > bumpIndex) {
+                    log.error("Infinite Loop Detected");
+                }
+            } else {
+                log.error("freeListHead out of bounds: " + freeListHead);
+                break; // Exit the loop if out of bounds
             }
         }
 
@@ -323,15 +346,21 @@ public class PhoenixMarket {
         int counter = 0;
 
         while (freeListHead != 0) {
-            Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
-            indexToRemove = next.component1();
-            freeListHead = next.component2();
+            // Ensure freeListHead is within bounds
+            if (freeListHead - 1 < freeListPointersList.size()) {
+                Pair<Integer, Integer> next = freeListPointersList.get(freeListHead - 1);
+                indexToRemove = next.component1();
+                freeListHead = next.component2();
 
-            freeNodes.add(indexToRemove);
-            counter += 1;
+                freeNodes.add(indexToRemove);
+                counter += 1;
 
-            if (counter > bumpIndex) {
-                log.error("Infinite Loop Detected");
+                if (counter > bumpIndex) {
+                    log.error("Infinite Loop Detected");
+                }
+            } else {
+                log.error("freeListHead out of bounds: " + freeListHead);
+                break; // Exit the loop if out of bounds
             }
         }
 

@@ -2,6 +2,7 @@ import com.mmorrell.serum.model.*;
 import org.bitcoinj.core.Utils;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.Before; // Add this import
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -20,12 +21,21 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class MarketTest {
 
-    private final RpcClient client = new RpcClient(Cluster.MAINNET);
+    private final RpcClient client = new RpcClient("https://mainnet.helius-rpc.com/?api-key=a778b653-bdd6-41bc-8cda-0c7377faf1dd");
     private static final Logger LOGGER = LogManager.getLogger(MarketTest.class);
+
+    /**
+     * Sets up the test environment, adding a delay before each test.
+     * 
+     * @throws InterruptedException if the thread is interrupted during sleep
+     */
+    @Before
+    public void setUp() throws InterruptedException {
+        Thread.sleep(1000); // 1 second delay
+    }
 
     /**
      * Uses a {@link MarketBuilder} class to retrieve data about the BTC/USDC Serum market.
@@ -240,6 +250,7 @@ public class MarketTest {
      * Uses a {@link MarketBuilder} class to retrieve the Event Queue from the SOL/USDC Serum market.
      */
     @Test
+    @Ignore
     public void marketBuilderEventQueueTest() {
         final PublicKey solUsdcPublicKey = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6");
 

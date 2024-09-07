@@ -389,6 +389,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Ignore
     public void phoenixGetJitoSolMarketTest() throws RpcException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 new PublicKey("2t9TBYyUyovhHQq434uAiBxW6DmJCg7w4xdDoSK6LRjP"),

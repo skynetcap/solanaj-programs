@@ -178,7 +178,7 @@ public class PythTest {
                             priceDataAccountKey.toBase58()
                     )
             );
-            Thread.sleep(300L);
+            Thread.sleep(2000L);
         }
 
         Thread.sleep(60000L);

@@ -10,6 +10,7 @@ import com.mmorrell.openbook.model.OpenBookOpenOrdersAccount;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.p2p.solanaj.core.Account;
@@ -42,6 +43,16 @@ public class OpenBookTest {
     };
     private final OpenBookManager openBookManager = new OpenBookManager(client);
     private static final String PRIVATE_KEY_FILE = "mikeDBaJgkicqhZcoYDBB4dRwZFFJCThtWCYD7A9FAH.json";
+
+    /**
+     * Sets up the test environment, adding a delay before each test.
+     * 
+     * @throws InterruptedException if the thread is interrupted during sleep
+     */
+    @Before
+    public void setUp() throws InterruptedException {
+        Thread.sleep(1500); // 1.5 seconds delay
+    }
 
     @Test
     public void openBookV2Test() throws RpcException {
@@ -134,6 +145,7 @@ public class OpenBookTest {
     }
 
     @Test
+    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
     public void openBookOpenOrdersAccountTest() throws RpcException, IOException {
         Optional<OpenBookOpenOrdersAccount> openBookOpenOrdersAccount = openBookManager.getOpenOrdersAccount(
                 new PublicKey("G1hKFxyM3qNCd1nnjnuvydw6VjCowVp5Jm6w1mwyWH4r")
@@ -148,6 +160,7 @@ public class OpenBookTest {
     }
 
     @Test
+    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
     public void consumeEventsTest() throws IOException, RpcException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
@@ -197,6 +210,7 @@ public class OpenBookTest {
     }
 
     @Test
+    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
     public void consumeEventsAllMarketsTest() throws IOException, RpcException, InterruptedException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
@@ -246,6 +260,7 @@ public class OpenBookTest {
     }
 
     @Test
+    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
     public void consumeEventsOpenBookManagerTest() throws IOException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
