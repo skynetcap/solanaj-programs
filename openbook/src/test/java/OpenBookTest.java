@@ -31,6 +31,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
@@ -279,5 +280,103 @@ public class OpenBookTest {
         } else {
             log.info("No events found to consume.");
         }
+    }
+
+    /**
+     * Tests the retrieval of a specific market by its public key.
+     */
+    @Test
+    public void testGetSpecificMarket() {
+        PublicKey marketId = PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q");
+        Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, false);
+        assertTrue("Market should be present", market.isPresent());
+        assertEquals("Market ID should match", marketId, market.get().getMarketId());
+        assertNotNull("Market name should not be null", market.get().getName());
+    }
+
+    /**
+     * Tests the retrieval of all markets and verifies that the list is not empty.
+     */
+    @Test
+    public void testGetAllMarkets() {
+        List<OpenBookMarket> markets = openBookManager.getOpenBookMarkets();
+        assertFalse("Markets list should not be empty", markets.isEmpty());
+        assertTrue("Markets list should contain more than one market", markets.size() > 1);
+    }
+
+    /**
+     * Tests the retrieval of the event heap for a specific market and verifies its contents.
+     */
+    @Test
+    public void testGetEventHeapForMarket() {
+        PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
+        Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, true, false);
+        assertTrue("Market should be present", market.isPresent());
+        Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(market.get().getEventHeap());
+        assertTrue("Event heap should be present", eventHeap.isPresent());
+        assertNotNull("Fill events should not be null", eventHeap.get().getFillEvents());
+    }
+
+    /**
+     * Tests the retrieval of open orders account for a specific public key.
+     */
+    @Test
+    public void testGetOpenOrdersAccount() {
+        PublicKey ooa = PublicKey.valueOf("KTmdiqkZvNXocarMothBs6PZZFN6Q9vzryLiSuxV2Ef");
+        Optional<OpenBookOpenOrdersAccount> account = openBookManager.getOpenOrdersAccount(ooa);
+        assertTrue("Open Orders Account should be present", account.isPresent());
+        
+    }
+
+    /**
+     * Tests the retrieval of the best bid and ask prices for a specific market.
+     */
+    @Test
+    public void testGetBestBidAskForMarket() {
+        PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
+        Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, true);
+        assertTrue("Market should be present", market.isPresent());
+        assertFalse("Bid orders should not be empty", market.get().getBidOrders().isEmpty());
+        assertFalse("Ask orders should not be empty", market.get().getAskOrders().isEmpty());
+    }
+
+    /**
+     * Tests the calculation of the spread for a specific market.
+     */
+    @Test
+    public void testCalculateSpreadForMarket() {
+        PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
+        Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, true);
+        assertTrue("Market should be present", market.isPresent());
+        assertFalse("Bid orders should not be empty", market.get().getBidOrders().isEmpty());
+        assertFalse("Ask orders should not be empty", market.get().getAskOrders().isEmpty());
+        double bestBidPrice = market.get().getBidOrders().get(0).getPrice();
+        double bestAskPrice = market.get().getAskOrders().get(0).getPrice();
+        double spread = bestAskPrice - bestBidPrice;
+        assertTrue("Spread should be greater than zero", spread > 0);
+    }
+
+    /**
+     * Tests the retrieval of market depth for a specific market.
+     */
+    @Test
+    public void testGetMarketDepth() {
+        PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
+        Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, true);
+        assertTrue("Market should be present", market.isPresent());
+        assertTrue("Bid orders should be greater than zero", market.get().getBidOrders().size() > 0);
+        assertTrue("Ask orders should be greater than zero", market.get().getAskOrders().size() > 0);
+    }
+
+    /**
+     * Tests the consumption of events for a specific market.
+     */
+    @Test
+    @Ignore // This test requires a valid Account object and may modify blockchain state
+    public void testConsumeEvents() throws IOException {
+        PublicKey marketId = PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q");
+        Account caller = Account.fromJson(Files.toString(new File("path/to/account.json"), Charset.defaultCharset()));
+        Optional<String> result = openBookManager.consumeEvents(caller, marketId, 10, null);
+        assertTrue("Consume events should return a transaction ID", result.isPresent());
     }
 }
