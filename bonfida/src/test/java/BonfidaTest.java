@@ -1,8 +1,7 @@
 import com.mmorrell.bonfida.manager.NamingManager;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.p2p.solanaj.core.PublicKey;
+import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 
@@ -11,29 +10,23 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Ignored since too many GPAs for free build server.
-@Ignore
 public class BonfidaTest {
 
     private static final Logger LOGGER = Logger.getLogger(BonfidaTest.class.getName());
-    private final RpcClient rpcClient = new RpcClient("https://rpc.ankr.com/solana");
+    private final RpcClient rpcClient = new RpcClient(Cluster.MAINNET);
     private final NamingManager namingManager = new NamingManager(rpcClient);
-    private static final String DOMAIN_NAME = ".sol";  // testdomainname.sol
     private final PublicKey skynetMainnetPubkey = new PublicKey("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq");
-    private final PublicKey bonfidaPubkey = new PublicKey("jCebN34bUfdeUYJT13J1yG16XWQpt5PDx6Mse9GUqhR");
-    private static final PublicKey NAME_PROGRAM_ID = new PublicKey("namesLPneVptA9Z5rqUDD9tMTWEJwofgaYwp8cawRkX");
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws InterruptedException {
         // Prevent RPCPool rate limit
         Thread.sleep(2000L);
     }
 
     @Test
-    @Ignore
     public void retrieveNameFromRegistry() {
         // getAccountInfo
         AccountInfo testAccountInfo = namingManager.getAccountInfo(new PublicKey("BVk1qg1y9AJ3LkfWCpr8FkDXZZcu7muAyVgbTBDbqDwZ"));
@@ -91,6 +84,7 @@ public class BonfidaTest {
     }
 
     @Test
+    @Disabled
     public void resolveTest() {
         LOGGER.info("Looking up domain for: " + skynetMainnetPubkey.toBase58());
         Optional<String> domainName = namingManager.getDomainNameByPubkey(skynetMainnetPubkey);
@@ -110,13 +104,5 @@ public class BonfidaTest {
         );
 
         assertTrue(sbfWallet.isPresent());
-
-//        // Confirm it matches sbf.sol
-//        assertEquals(
-//                sbfWallet.get(),
-//                "sbf"
-//        );
-//
-//        LOGGER.info("2NoEcR9cC7Rn6bP9rBpky6B1eP9syyPf8FXRaf1myChv = " + sbfWallet.get() + ".sol");
     }
 }

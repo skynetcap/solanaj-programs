@@ -1,9 +1,9 @@
 import com.mmorrell.serum.manager.SerumManager;
 import com.mmorrell.serum.model.*;
+import com.mmorrell.serum.model.Order;
 import com.mmorrell.serum.program.SerumProgram;
 import org.bitcoinj.core.Base58;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OrderTest {
 
@@ -43,7 +43,7 @@ public class OrderTest {
      *
      */
     @Test
-    @Ignore
+    @Disabled
     public void placeOrderTest() {
         // Replace with the public key of your USDC wallet
         final PublicKey usdcPayer = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
@@ -163,7 +163,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void cancelOrderV2Test() {
         // Build account from secretkey.dat
         byte[] data = new byte[0];
@@ -209,7 +209,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void cancelAllOrdersAndSettleTest() {
         // Build account from secretkey.dat
         byte[] data = new byte[0];
@@ -251,7 +251,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void openOrdersTest() {
         final Market lqidUsdcMarket = new MarketBuilder()
                 .setPublicKey(PublicKey.valueOf("4FPFh1iAiitKYMCPDBmEQrZVgA1DVMKHZBU2R7wjQWuu"))
@@ -283,7 +283,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void placeOrderOxyTest() {
         // Replace with the public key of your OXY and USDC wallet
         final PublicKey oxyWallet = PublicKey.valueOf("DoecacoZMpqHT8RGusoJYcjDFZjZauaLrDQh8BxQUVdU");
@@ -370,7 +370,7 @@ public class OrderTest {
 
 
     @Test
-    @Ignore
+    @Disabled
     public void iocPlaceOrderLqidTest() {
         // Replace with the public key of your LQID and USDC wallet
         final PublicKey lqidWallet = PublicKey.valueOf("AcnzwJRyEiqAGkZgpc5jr9R7uNorBQBH9Vd1mepzU29w");
@@ -417,7 +417,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void placeOrderSellMerTest() {
         // Replace with the public key of your OXY and USDC wallet
         final PublicKey merWallet = PublicKey.valueOf("FqZv3vNbLMcVXvV7yH8LmPKitn5nhLcpnd981JSFF7jf"); // needs 0.1 mer
@@ -504,7 +504,7 @@ public class OrderTest {
 
     // Requires 0.2 MER to offer
     @Test
-    @Ignore
+    @Disabled
     public void placeOrderSellMerTestPreCalculatedOpenOrdersAccount() {
         // Replace with the public key of your OXY and USDC wallet
         final PublicKey merWallet = PublicKey.valueOf("FqZv3vNbLMcVXvV7yH8LmPKitn5nhLcpnd981JSFF7jf"); // needs 0.1 mer
@@ -592,7 +592,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void placeOrderRandomClientIdTest() {
         final PublicKey xrpBearWallet = PublicKey.valueOf("3Hbga31dmqqLauAUtHXyemNYXB1jYnS4t1ExmSdfe4sD"); // XRPBEAR
         final PublicKey usdcWallet = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
@@ -656,7 +656,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void place20OrderSRandomClientIdTest() {
         final PublicKey xrpBearWallet = PublicKey.valueOf("3Hbga31dmqqLauAUtHXyemNYXB1jYnS4t1ExmSdfe4sD"); // XRPBEAR
         final PublicKey usdcWallet = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
@@ -797,7 +797,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void srmFeeDiscountTest() {
         final PublicKey xrpBearWallet = PublicKey.valueOf("3Hbga31dmqqLauAUtHXyemNYXB1jYnS4t1ExmSdfe4sD"); // XRPBEAR
         final PublicKey usdcWallet = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
@@ -843,7 +843,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void spoofyTest() {
         final PublicKey xrpBearWallet = PublicKey.valueOf("3Hbga31dmqqLauAUtHXyemNYXB1jYnS4t1ExmSdfe4sD"); // XRPBEAR
         final PublicKey usdcWallet = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
@@ -942,7 +942,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void cancelOrderByClientIdAndSettleLoopedTest() {
         final PublicKey lqidWallet = PublicKey.valueOf("5uRbRHoVD6EeBM3MLjx7GadMxbprvNvABZGfmS1hVVGG");
         final PublicKey usdcWallet = PublicKey.valueOf("A71WvME6ZhR4SFG3Ara7zQK5qdRSB97jwTVmB3sr7XiN");
@@ -1012,7 +1012,7 @@ public class OrderTest {
 
     // Requires 0.1 MER to offer
     @Test
-    @Ignore
+    @Disabled
     public void cancelOrderByClientIdAndSettleTest() {
         // Replace with the public key of your MER and USDC wallet
         final PublicKey merWallet = PublicKey.valueOf("FqZv3vNbLMcVXvV7yH8LmPKitn5nhLcpnd981JSFF7jf"); // needs 0.1 mer
@@ -1087,7 +1087,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testOpenOrdersAccounts() {
         final PublicKey skynetMainnetTestAccount = PublicKey.valueOf("F459S1MFG2whWbznzULPkYff6TFe2QjoKhgHXpRfDyCj");
 
@@ -1180,7 +1180,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void singleOpenOrdersAccount() {
         final OpenOrdersAccount openOrdersAccount = SerumUtils.findOpenOrdersAccountForOwner(
                 client,
@@ -1193,7 +1193,7 @@ public class OrderTest {
 
     // Doesn't work yet
     @Test
-    @Ignore
+    @Disabled
     public void consumeEventsTest() {
         LOGGER.info("Consuming events");
 
@@ -1248,7 +1248,7 @@ public class OrderTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void lqidUsdcTest() {
         byte[] data = new byte[0];
 

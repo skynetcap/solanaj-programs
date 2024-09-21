@@ -10,9 +10,7 @@ import com.mmorrell.openbook.model.OpenBookOpenOrdersAccount;
 import com.mmorrell.openbook.program.OpenbookProgram;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
@@ -29,10 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class OpenBookTest {
@@ -50,7 +45,7 @@ public class OpenBookTest {
      * 
      * @throws InterruptedException if the thread is interrupted during sleep
      */
-    @Before
+    @BeforeEach
     public void setUp() throws InterruptedException {
         Thread.sleep(1500); // 1.5 seconds delay
     }
@@ -118,7 +113,7 @@ public class OpenBookTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void eventHeapTest() throws RpcException, IOException {
         byte[] data = client.getApi().getAccountInfo(new PublicKey("GY5HKym4yKNUpdHpBBiqLB3DHbrNKhLHDFTSLPK8AbFX"))
                 .getDecodedData();
@@ -146,7 +141,7 @@ public class OpenBookTest {
     }
 
     @Test
-    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
+    @Disabled // Ignored due to usage of PRIVATE_KEY_FILE
     public void openBookOpenOrdersAccountTest() throws RpcException, IOException {
         Optional<OpenBookOpenOrdersAccount> openBookOpenOrdersAccount = openBookManager.getOpenOrdersAccount(
                 new PublicKey("G1hKFxyM3qNCd1nnjnuvydw6VjCowVp5Jm6w1mwyWH4r")
@@ -161,7 +156,7 @@ public class OpenBookTest {
     }
 
     @Test
-    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
+    @Disabled // Ignored due to usage of PRIVATE_KEY_FILE
     public void consumeEventsTest() throws IOException, RpcException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
@@ -211,7 +206,7 @@ public class OpenBookTest {
     }
 
     @Test
-    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
+    @Disabled // Ignored due to usage of PRIVATE_KEY_FILE
     public void consumeEventsAllMarketsTest() throws IOException, RpcException, InterruptedException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
@@ -261,7 +256,7 @@ public class OpenBookTest {
     }
 
     @Test
-    @Ignore // Ignored due to usage of PRIVATE_KEY_FILE
+    @Disabled // Ignored due to usage of PRIVATE_KEY_FILE
     public void consumeEventsOpenBookManagerTest() throws IOException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
@@ -289,9 +284,9 @@ public class OpenBookTest {
     public void testGetSpecificMarket() {
         PublicKey marketId = PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q");
         Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, false);
-        assertTrue("Market should be present", market.isPresent());
-        assertEquals("Market ID should match", marketId, market.get().getMarketId());
-        assertNotNull("Market name should not be null", market.get().getName());
+        assertTrue(market.isPresent(), "Market should be present");
+        assertEquals(marketId, market.get().getMarketId(), "Market ID should match");
+        assertNotNull(market.get().getName(), "Market name should not be null");
     }
 
     /**
@@ -300,8 +295,8 @@ public class OpenBookTest {
     @Test
     public void testGetAllMarkets() {
         List<OpenBookMarket> markets = openBookManager.getOpenBookMarkets();
-        assertFalse("Markets list should not be empty", markets.isEmpty());
-        assertTrue("Markets list should contain more than one market", markets.size() > 1);
+        assertFalse(markets.isEmpty(), "Markets list should not be empty");
+        assertTrue(markets.size() > 1, "Markets list should contain more than one market");
     }
 
     /**
@@ -311,10 +306,10 @@ public class OpenBookTest {
     public void testGetEventHeapForMarket() {
         PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
         Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, true, false);
-        assertTrue("Market should be present", market.isPresent());
+        assertTrue(market.isPresent(), "Market should be present");
         Optional<OpenBookEventHeap> eventHeap = openBookManager.getEventHeap(market.get().getEventHeap());
-        assertTrue("Event heap should be present", eventHeap.isPresent());
-        assertNotNull("Fill events should not be null", eventHeap.get().getFillEvents());
+        assertTrue(eventHeap.isPresent(), "Event heap should be present");
+        assertNotNull(eventHeap.get().getFillEvents(), "Fill events should not be null");
     }
 
     /**
@@ -324,7 +319,7 @@ public class OpenBookTest {
     public void testGetOpenOrdersAccount() {
         PublicKey ooa = PublicKey.valueOf("KTmdiqkZvNXocarMothBs6PZZFN6Q9vzryLiSuxV2Ef");
         Optional<OpenBookOpenOrdersAccount> account = openBookManager.getOpenOrdersAccount(ooa);
-        assertTrue("Open Orders Account should be present", account.isPresent());
+        assertTrue(account.isPresent(), "Open Orders Account should be present");
         
     }
 
@@ -335,9 +330,9 @@ public class OpenBookTest {
     public void testGetBestBidAskForMarket() {
         PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
         Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, true);
-        assertTrue("Market should be present", market.isPresent());
-        assertFalse("Bid orders should not be empty", market.get().getBidOrders().isEmpty());
-        assertFalse("Ask orders should not be empty", market.get().getAskOrders().isEmpty());
+        assertTrue(market.isPresent(), "Market should be present");
+        assertFalse(market.get().getBidOrders().isEmpty(), "Bid orders should not be empty");
+        assertFalse(market.get().getAskOrders().isEmpty(), "Ask orders should not be empty");
     }
 
     /**
@@ -347,13 +342,13 @@ public class OpenBookTest {
     public void testCalculateSpreadForMarket() {
         PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
         Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, true);
-        assertTrue("Market should be present", market.isPresent());
-        assertFalse("Bid orders should not be empty", market.get().getBidOrders().isEmpty());
-        assertFalse("Ask orders should not be empty", market.get().getAskOrders().isEmpty());
+        assertTrue(market.isPresent(), "Market should be present");
+        assertFalse(market.get().getBidOrders().isEmpty(), "Bid orders should not be empty");
+        assertFalse(market.get().getAskOrders().isEmpty(), "Ask orders should not be empty");
         double bestBidPrice = market.get().getBidOrders().get(0).getPrice();
         double bestAskPrice = market.get().getAskOrders().get(0).getPrice();
         double spread = bestAskPrice - bestBidPrice;
-        assertTrue("Spread should be greater than zero", spread > 0);
+        assertTrue(spread > 0, "Spread should be greater than zero");
     }
 
     /**
@@ -363,20 +358,20 @@ public class OpenBookTest {
     public void testGetMarketDepth() {
         PublicKey marketId = PublicKey.valueOf("3w9Z8FPRuSTbrGQLPhRDEQzSRYyhXzuiqmFVaku5Rjb2");
         Optional<OpenBookMarket> market = openBookManager.getMarket(marketId, false, true);
-        assertTrue("Market should be present", market.isPresent());
-        assertTrue("Bid orders should be greater than zero", market.get().getBidOrders().size() > 0);
-        assertTrue("Ask orders should be greater than zero", market.get().getAskOrders().size() > 0);
+        assertTrue(market.isPresent(), "Market should be present");
+        assertTrue(market.get().getBidOrders().size() > 0, "Bid orders should be greater than zero");
+        assertTrue(market.get().getAskOrders().size() > 0, "Ask orders should be greater than zero");
     }
 
     /**
      * Tests the consumption of events for a specific market.
      */
     @Test
-    @Ignore // This test requires a valid Account object and may modify blockchain state
+    @Disabled // This test requires a valid Account object and may modify blockchain state
     public void testConsumeEvents() throws IOException {
         PublicKey marketId = PublicKey.valueOf("C3YPL3kYCSYKsmHcHrPWx1632GUXGqi2yMXJbfeCc57q");
         Account caller = Account.fromJson(Files.toString(new File("path/to/account.json"), Charset.defaultCharset()));
         Optional<String> result = openBookManager.consumeEvents(caller, marketId, 10, null);
-        assertTrue("Consume events should return a transaction ID", result.isPresent());
+        assertTrue(result.isPresent(), "Consume events should return a transaction ID");
     }
 }

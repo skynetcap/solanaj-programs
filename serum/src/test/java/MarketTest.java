@@ -1,10 +1,8 @@
 import com.mmorrell.serum.model.*;
+import com.mmorrell.serum.model.Order;
 import org.bitcoinj.core.Utils;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.Before; // Add this import
+import org.junit.jupiter.api.*;
 import org.p2p.solanaj.core.PublicKey;
-import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
@@ -20,7 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MarketTest {
 
@@ -32,7 +30,7 @@ public class MarketTest {
      * 
      * @throws InterruptedException if the thread is interrupted during sleep
      */
-    @Before
+    @BeforeEach
     public void setUp() throws InterruptedException {
         Thread.sleep(1000); // 1 second delay
     }
@@ -82,7 +80,7 @@ public class MarketTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void orderBookCacheTest() throws InterruptedException {
         final PublicKey marketId = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6");
         final MarketBuilder solUsdcMarketBuilder = new MarketBuilder()
@@ -128,7 +126,7 @@ public class MarketTest {
      * Verifies that {@link OrderBook} headers are properly read by {@link OrderBook#readOrderBook(byte[])}
      */
     @Test
-    @Ignore
+    @Disabled
     public void orderBookTest() {
         byte[] data = new byte[0];
 
@@ -250,7 +248,7 @@ public class MarketTest {
      * Uses a {@link MarketBuilder} class to retrieve the Event Queue from the SOL/USDC Serum market.
      */
     @Test
-    @Ignore
+    @Disabled
     public void marketBuilderEventQueueTest() {
         final PublicKey solUsdcPublicKey = new PublicKey("8BnEgHoWFysVcuFFX7QztDmzuH8r5ZFvyP3sYwn1XTh6");
 
