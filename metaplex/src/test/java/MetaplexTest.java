@@ -1,7 +1,6 @@
 import com.mmorrell.metaplex.manager.MetaplexManager;
 import com.mmorrell.metaplex.model.Metadata;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -9,7 +8,7 @@ import org.p2p.solanaj.rpc.RpcClient;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MetaplexTest {
 
@@ -18,7 +17,7 @@ public class MetaplexTest {
     private final RpcClient rpcClient = new RpcClient(Cluster.MAINNET);
     private final MetaplexManager metaplexManager = new MetaplexManager(rpcClient);
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws InterruptedException {
         // Prevent RPCPool rate limit
         Thread.sleep(2000L);

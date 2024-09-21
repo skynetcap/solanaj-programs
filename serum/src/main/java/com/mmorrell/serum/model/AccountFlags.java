@@ -50,11 +50,32 @@ public class AccountFlags {
         return ((bitMask & ASKS) == ASKS);
     }
 
+    /**
+     * Reads account flags from a byte array starting from a fixed offset.
+     * 
+     * @param data the byte array containing account data
+     * @return an AccountFlags object
+     * @throws IllegalArgumentException if the data array is too short
+     */
     public static AccountFlags readAccountFlags(byte[] data) {
+        if (data.length < 12) {
+            throw new IllegalArgumentException("Data array is too short");
+        }
         return new AccountFlags(Arrays.copyOfRange(data, 5, 12)[0]);
     }
 
+    /**
+     * Reads account flags from a byte array starting from a specified offset.
+     * 
+     * @param data the byte array containing account data
+     * @param offset the starting index to read from
+     * @return an AccountFlags object
+     * @throws IllegalArgumentException if the data array is too short
+     */
     public static AccountFlags readAccountFlags(byte[] data, int offset) {
+        if (data.length < offset + 7) {
+            throw new IllegalArgumentException("Data array is too short");
+        }
         return new AccountFlags(Arrays.copyOfRange(data, offset, offset + 7)[0]);
     }
 

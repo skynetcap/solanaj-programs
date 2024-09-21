@@ -3,8 +3,7 @@ import com.mmorrell.pyth.manager.PythManager;
 import com.mmorrell.pyth.model.MappingAccount;
 import com.mmorrell.pyth.model.PriceDataAccount;
 import com.mmorrell.pyth.model.ProductAccount;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -15,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PythTest {
 
@@ -93,7 +92,7 @@ public class PythTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void priceDataAccountTest() {
         final int EXPECTED_MIN_BCH_USD_PUBLISHERS = 3;
         final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);
@@ -147,7 +146,7 @@ public class PythTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void mainnetTest() throws InterruptedException {
         final Map<String, Float> currentPriceMap = new ConcurrentHashMap<>();
 
@@ -178,14 +177,14 @@ public class PythTest {
                             priceDataAccountKey.toBase58()
                     )
             );
-            Thread.sleep(300L);
+            Thread.sleep(2000L);
         }
 
         Thread.sleep(60000L);
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void iterateProductsTest() throws InterruptedException {
         // Iterate all products and get their price once
         final MappingAccount mappingAccount = pythManager.getMappingAccount(MAPPING_ACCOUNT);

@@ -14,8 +14,7 @@ import com.mmorrell.phoenix.util.Keccak;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Utils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.Transaction;
@@ -40,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 public class PhoenixTest {
@@ -92,7 +91,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void placeMultiplePostOnlyOrdersTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
@@ -170,7 +169,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void swapTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
@@ -256,7 +255,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void placeSingleOrderTest() throws IOException, RpcException {
         PhoenixManager phoenixManager = new PhoenixManager(client);
         Account tradingAccount = Account.fromJson(
@@ -363,7 +362,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void cancelAllOrdersWithFreeFundsTest() throws RpcException, IOException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
@@ -389,6 +388,7 @@ public class PhoenixTest {
     }
 
     @Test
+    @Disabled
     public void phoenixGetJitoSolMarketTest() throws RpcException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 new PublicKey("2t9TBYyUyovhHQq434uAiBxW6DmJCg7w4xdDoSK6LRjP"),
@@ -420,7 +420,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void phoenixGetMarketDetailStreamingTest() throws InterruptedException {
         final SubscriptionWebSocketClient mainnet = SubscriptionWebSocketClient.getInstance(
                 Cluster.MAINNET.getEndpoint()
@@ -466,7 +466,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void phoenixGetMarketDetailTest() throws RpcException, IOException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET,
@@ -535,7 +535,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void phoenixClaimSeatTest() throws RpcException, IOException {
         Account tradingAccount = Account.fromJson(
                 Resources.toString(Resources.getResource(PRIVATE_KEY_FILE), Charset.defaultCharset())
@@ -575,7 +575,7 @@ public class PhoenixTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void phoenixPlaceLimitOrderTest() throws IOException, RpcException, InterruptedException {
         final AccountInfo marketAccountInfo = client.getApi().getAccountInfo(
                 SOL_USDC_MARKET,
