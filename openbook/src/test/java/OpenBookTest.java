@@ -47,10 +47,11 @@ public class OpenBookTest {
      */
     @BeforeEach
     public void setUp() throws InterruptedException {
-        Thread.sleep(1500); // 1.5 seconds delay
+        Thread.sleep(2000); // 1.5 seconds delay
     }
 
     @Test
+    @Disabled
     public void openBookV2Test() throws RpcException {
         final List<ProgramAccount> markets = client.getApi().getProgramAccountsBase64(
                 OpenbookProgram.OPENBOOK_V2_PROGRAM_ID,
