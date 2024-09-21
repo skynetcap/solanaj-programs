@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.mmorrell</groupId>
             <artifactId>solanaj</artifactId>
-            <version>1.18.0</version>
+            <version>1.18.2</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
