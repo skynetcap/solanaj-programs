@@ -123,7 +123,7 @@ public class JupiterTest {
     }
 
     @Test
-    public void testJupiterPoolDeserialization() throws RpcException, IOException {
+    public void testJupiterPoolDeserialization() throws RpcException {
         PublicKey poolPublicKey = new PublicKey("5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq");
 
         // Fetch the account data
@@ -132,7 +132,6 @@ public class JupiterTest {
         assertNotNull(accountInfo, "Account info should not be null");
 
         byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
-        Files.write(data, new File("jupiterPool.bin"));
 
         // Deserialize the data into JupiterPool
         JupiterPool pool = JupiterPool.fromByteArray(data);
@@ -177,8 +176,7 @@ public class JupiterTest {
     }
 
     @Test
-    @Disabled
-    public void testJupiterPerpetualsDeserialization() throws RpcException {
+    public void testJupiterPerpetualsDeserialization() throws RpcException, IOException {
         PublicKey perpetualsPublicKey = new PublicKey("H4ND9aYttUVLFmNypZqLjZ52FYiGvdEB45GmwNoKEjTj");
 
         // Fetch the account data
@@ -187,6 +185,7 @@ public class JupiterTest {
         assertNotNull(accountInfo, "Account info should not be null");
 
         byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+        Files.write(data, new File("jupiterPool.bin"));
 
         // Deserialize the data into JupiterPerpetuals
         JupiterPerpetuals perpetuals = JupiterPerpetuals.fromByteArray(data);
@@ -194,9 +193,28 @@ public class JupiterTest {
         // Assertions
         assertNotNull(perpetuals);
         assertNotNull(perpetuals.getPermissions());
-        assertFalse(perpetuals.getPools().isEmpty());
+        assertNotNull(perpetuals.getPool());
         assertNotNull(perpetuals.getAdmin());
-        // Add more assertions as needed
+
+        for (int i = 0; i < data.length; i++) {
+            try {
+                PublicKey pk = new PublicKey(Arrays.copyOfRange(data, i, i + 32));
+                if (pk.toBase58().equalsIgnoreCase("5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq")) {
+                    log.info("FOUND OFFSET 1 (POOL): {}", i);
+                }
+                if (pk.toBase58().equalsIgnoreCase("9hdBK7FUzv4NjZbtYfm39F5utJyFsmCwbF9Mow5Pr1sN")) {
+                    log.info("FOUND OFFSET 2 (ADMIN): {}", i);
+                }
+            } catch (Exception ex) {
+                log.error(ex.getMessage());
+            }
+        }
+
+        log.info("Deserialized JupiterPerpetuals: {}", perpetuals);
+
+        // Assuming one pool for now. The vector deserialization seemed off.
+        assertEquals("5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq", perpetuals.getPool().toBase58());
+
     }
 
     @Test

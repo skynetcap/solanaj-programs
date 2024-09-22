@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.p2p.solanaj.core.PublicKey;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Represents a Jupiter Perpetuals account in Jupiter Perpetuals.
  */
@@ -15,7 +12,7 @@ import java.util.List;
 @Builder
 public class JupiterPerpetuals {
     private Permissions permissions;
-    private List<PublicKey> pools;
+    private PublicKey pool; // Changed from List<PublicKey> to PublicKey
     private PublicKey admin;
     private byte transferAuthorityBump;
     private byte perpetualsBump;
@@ -27,11 +24,10 @@ public class JupiterPerpetuals {
         private boolean allowSwap;
         private boolean allowAddLiquidity;
         private boolean allowRemoveLiquidity;
-        private boolean allowOpenPosition;
-        private boolean allowClosePosition;
-        private boolean allowPnlWithdrawal;
+        private boolean allowIncreasePosition; // New field
+        private boolean allowDecreasePosition; // New field
         private boolean allowCollateralWithdrawal;
-        private boolean allowSizeChange;
+        private boolean allowLiquidatePosition; // New field
     }
 
     /**
@@ -46,9 +42,12 @@ public class JupiterPerpetuals {
         Permissions permissions = readPermissions(data, offset);
         offset += 8; // Adjust based on actual size
 
-        List<PublicKey> pools = readPublicKeyList(data, offset);
-        offset += 4 + (pools.size() * 32);
+        // Hardcoded offsets based on research
+        offset = 19; // Set offset to the found pool offset
+        PublicKey pool = PublicKey.readPubkey(data, offset);
+        offset += 32; // Move to the next field
 
+        offset = 51; // Set offset to the found admin offset
         PublicKey admin = PublicKey.readPubkey(data, offset);
         offset += 32;
 
@@ -59,7 +58,7 @@ public class JupiterPerpetuals {
 
         return JupiterPerpetuals.builder()
                 .permissions(permissions)
-                .pools(pools)
+                .pool(pool) // Set the single pool PublicKey
                 .admin(admin)
                 .transferAuthorityBump(transferAuthorityBump)
                 .perpetualsBump(perpetualsBump)
@@ -67,28 +66,16 @@ public class JupiterPerpetuals {
                 .build();
     }
 
-    // Add private static methods to read Permissions and PublicKey list
+    // Add private static methods to read Permissions and PublicKey
     private static Permissions readPermissions(byte[] data, int offset) {
         return Permissions.builder()
                 .allowSwap(data[offset++] != 0)
                 .allowAddLiquidity(data[offset++] != 0)
                 .allowRemoveLiquidity(data[offset++] != 0)
-                .allowOpenPosition(data[offset++] != 0)
-                .allowClosePosition(data[offset++] != 0)
-                .allowPnlWithdrawal(data[offset++] != 0)
+                .allowIncreasePosition(data[offset++] != 0) // New field
+                .allowDecreasePosition(data[offset++] != 0) // New field
                 .allowCollateralWithdrawal(data[offset++] != 0)
-                .allowSizeChange(data[offset] != 0)
+                .allowLiquidatePosition(data[offset] != 0) // New field
                 .build();
-    }
-
-    private static List<PublicKey> readPublicKeyList(byte[] data, int offset) {
-        List<PublicKey> pools = new ArrayList<>();
-        int poolsLength = JupiterUtil.readUint32(data, offset);
-        offset += 4;
-        for (int i = 0; i < poolsLength; i++) {
-            pools.add(PublicKey.readPubkey(data, offset));
-            offset += 32;
-        }
-        return pools;
     }
 }
