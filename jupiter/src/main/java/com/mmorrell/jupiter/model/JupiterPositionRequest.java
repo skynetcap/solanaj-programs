@@ -102,12 +102,9 @@ public class JupiterPositionRequest {
 
         RequestChange requestChange = RequestChange.values()[data[offset++]];
         RequestType requestType = RequestType.values()[data[offset++]];
-
-        log.info("Side offset: {}", offset);
         Side side = Side.values()[data[offset++]];
 
         // Read priceSlippage (Optional u64)
-        log.info("PriceSlippage offset: {}", offset);
         boolean hasPriceSlippage = data[offset] != 0;
         Long priceSlippage = null;
         if (hasPriceSlippage) {
@@ -118,7 +115,6 @@ public class JupiterPositionRequest {
         }
 
         // Read jupiterMinimumOut (Optional u64)
-        log.info("jupiterMinimumOut offset: {}", offset);
         boolean hasJupiterMinimumOut = data[offset] != 0;
         Long jupiterMinimumOut = null;
         if (hasJupiterMinimumOut) {
@@ -129,7 +125,6 @@ public class JupiterPositionRequest {
         }
 
         // Read preSwapAmount (Optional u64)
-        log.info("preSwapAmount offset: {}", offset);
         boolean hasPreSwapAmount = data[offset] != 0;
         Long preSwapAmount = null;
         if (hasPreSwapAmount) {
@@ -140,7 +135,6 @@ public class JupiterPositionRequest {
         }
 
         // Read triggerPrice (Optional u64)
-        log.info("triggerPrice offset: {}", offset);
         boolean hasTriggerPrice = data[offset] != 0;
         Long triggerPrice = null;
         if (hasTriggerPrice) {
@@ -151,7 +145,6 @@ public class JupiterPositionRequest {
         }
 
         // Read triggerAboveThreshold (Optional boolean)
-        log.info("triggerAboveThreshold offset: {}", offset);
         boolean hasTriggerAboveThreshold = data[offset] != 0;
         Boolean triggerAboveThreshold = null;
         if (hasTriggerAboveThreshold) {
@@ -162,7 +155,6 @@ public class JupiterPositionRequest {
         }
 
         // Read entirePosition (Optional boolean)
-        log.info("entirePosition offset: {}", offset);
         boolean hasEntirePosition = data[offset] != 0;
         Boolean entirePosition = null;
         if (hasEntirePosition) {
@@ -180,7 +172,6 @@ public class JupiterPositionRequest {
         byte bump = data[offset++];
 
         // Read referral (Optional PublicKey)
-        log.info("referral offset: {}", offset);
         boolean hasReferral = data[offset] != 0;
         PublicKey referral = null;
         if (hasReferral) {
