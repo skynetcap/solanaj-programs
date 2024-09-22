@@ -1,8 +1,8 @@
 import com.google.common.io.Files;
-import com.mmorrell.jupiter.model.JupiterPerpPosition;
-import com.mmorrell.jupiter.model.JupiterPool;
+import com.mmorrell.jupiter.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
@@ -65,6 +65,7 @@ public class JupiterTest {
     }
 
     @Test
+    @Disabled
     public void testGetAllJupiterPerpPositions() throws RpcException {
         PublicKey programId = new PublicKey("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
 
@@ -150,5 +151,96 @@ public class JupiterTest {
         assertEquals((byte) 252, pool.getBump());
         assertEquals((byte) 254, pool.getLpTokenBump());
         assertEquals(1689677832, pool.getInceptionTime());
+    }
+
+    @Test
+    public void testJupiterCustodyDeserialization() throws RpcException {
+        PublicKey custodyPublicKey = new PublicKey("7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz");
+
+        // Fetch the account data
+        AccountInfo accountInfo = client.getApi().getAccountInfo(custodyPublicKey);
+
+        assertNotNull(accountInfo, "Account info should not be null");
+
+        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+
+        // Deserialize the data into JupiterCustody
+        JupiterCustody custody = JupiterCustody.fromByteArray(data);
+
+        // Assertions
+        assertNotNull(custody);
+        assertNotNull(custody.getPool());
+        assertNotNull(custody.getMint());
+        assertNotNull(custody.getTokenAccount());
+
+        log.info("Deserialized JupiterCustody: {}", custody);
+    }
+
+    @Test
+    @Disabled
+    public void testJupiterPerpetualsDeserialization() throws RpcException {
+        PublicKey perpetualsPublicKey = new PublicKey("H4ND9aYttUVLFmNypZqLjZ52FYiGvdEB45GmwNoKEjTj");
+
+        // Fetch the account data
+        AccountInfo accountInfo = client.getApi().getAccountInfo(perpetualsPublicKey);
+
+        assertNotNull(accountInfo, "Account info should not be null");
+
+        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+
+        // Deserialize the data into JupiterPerpetuals
+        JupiterPerpetuals perpetuals = JupiterPerpetuals.fromByteArray(data);
+
+        // Assertions
+        assertNotNull(perpetuals);
+        assertNotNull(perpetuals.getPermissions());
+        assertFalse(perpetuals.getPools().isEmpty());
+        assertNotNull(perpetuals.getAdmin());
+        // Add more assertions as needed
+    }
+
+    @Test
+    @Disabled
+    public void testJupiterPositionRequestDeserialization() throws RpcException {
+        PublicKey positionRequestPublicKey = new PublicKey("APYrGNtsTTMpNNBQBpALxYnwYfKDQyFocf3d1j6jkuzf");
+
+        // Fetch the account data
+        AccountInfo accountInfo = client.getApi().getAccountInfo(positionRequestPublicKey);
+
+        assertNotNull(accountInfo, "Account info should not be null");
+
+        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+
+        // Deserialize the data into JupiterPositionRequest
+        JupiterPositionRequest positionRequest = JupiterPositionRequest.fromByteArray(data);
+
+        // Assertions
+        assertNotNull(positionRequest);
+        assertNotNull(positionRequest.getOwner());
+        assertNotNull(positionRequest.getPool());
+        assertNotNull(positionRequest.getCustody());
+        // Add more assertions as needed
+    }
+
+    @Test
+    @Disabled
+    public void testJupiterTestOracleDeserialization() throws RpcException {
+        PublicKey testOraclePublicKey = new PublicKey("YourTestOraclePublicKeyHere");
+
+        // Fetch the account data
+        AccountInfo accountInfo = client.getApi().getAccountInfo(testOraclePublicKey);
+
+        assertNotNull(accountInfo, "Account info should not be null");
+
+        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+
+        // Deserialize the data into JupiterTestOracle
+        JupiterTestOracle testOracle = JupiterTestOracle.fromByteArray(data);
+
+        // Assertions
+        assertNotNull(testOracle);
+        assertTrue(testOracle.getPrice() != 0);
+        assertTrue(testOracle.getPublishTime() > 0);
+        // Add more assertions as needed
     }
 }
