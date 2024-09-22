@@ -3,6 +3,7 @@ package com.mmorrell.jupiter.manager;
 import com.mmorrell.jupiter.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.p2p.solanaj.core.PublicKey;
+import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
@@ -15,6 +16,10 @@ public class JupiterManager {
 
     private final RpcClient client;
     private static final PublicKey JUPITER_PROGRAM_ID = new PublicKey("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
+
+    public JupiterManager() {
+        this.client = new RpcClient(Cluster.MAINNET);
+    }
 
     public JupiterManager(RpcClient client) {
         this.client = client;
