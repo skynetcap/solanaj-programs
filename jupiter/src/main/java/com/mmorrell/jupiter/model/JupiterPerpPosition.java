@@ -4,6 +4,23 @@ import lombok.Builder;
 import lombok.Data;
 import org.p2p.solanaj.core.PublicKey;
 
+/**
+ * 8 (padding) +
+ * 32 (owner) +
+ * 32 (pool) +
+ * 32 (custody) +
+ * 32 (collateralCustody) +
+ * 8 (openTime) +
+ * 8 (updateTime) +
+ * 4 (side) +
+ * 8 (price) +
+ * 8 (sizeUsd) +
+ * 8 (collateralUsd) +
+ * 8 (realisedPnlUsd) +
+ * 8 (cumulativeInterestSnapshot) +
+ * 8 (lockedAmount) +
+ * 4 (bump) =  8 + 128 + 64 + 4 + 4 =  216 bytes
+ */
 @Data
 @Builder
 public class JupiterPerpPosition {
