@@ -1,4 +1,6 @@
+import com.google.common.io.Files;
 import com.mmorrell.jupiter.model.JupiterPerpPosition;
+import com.mmorrell.jupiter.model.JupiterPool;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,8 @@ import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -115,5 +119,36 @@ public class JupiterTest {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 algorithm not found for discriminator calculation.");
         }
+    }
+
+    @Test
+    public void testJupiterPoolDeserialization() throws RpcException, IOException {
+        PublicKey poolPublicKey = new PublicKey("5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq");
+
+        // Fetch the account data
+        AccountInfo accountInfo = client.getApi().getAccountInfo(poolPublicKey);
+
+        assertNotNull(accountInfo, "Account info should not be null");
+
+        byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+        Files.write(data, new File("jupiterPool.bin"));
+
+        // Deserialize the data into JupiterPool
+        JupiterPool pool = JupiterPool.fromByteArray(data);
+
+        log.info("Deserialized JupiterPool: {}", pool);
+
+        // Assertions
+        assertNotNull(pool);
+        assertEquals("Pool", pool.getName());
+        assertEquals(5, pool.getCustodies().size());
+        assertTrue(pool.getAumUsd() > 0);
+        assertNotNull(pool.getLimit());
+        assertNotNull(pool.getFees());
+        assertNotNull(pool.getPoolApr());
+        assertEquals(45, pool.getMaxRequestExecutionSec());
+        assertEquals((byte) 252, pool.getBump());
+        assertEquals((byte) 254, pool.getLpTokenBump());
+        assertEquals(1689677832, pool.getInceptionTime());
     }
 }
