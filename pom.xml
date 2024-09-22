@@ -37,6 +37,7 @@
         <module>openbook</module>
         <module>phoenix</module>
         <module>metaplex</module>
+        <module>jupiter</module>
     </modules>
 
     <properties>
