@@ -53,7 +53,7 @@ public class JupiterPerpPosition {
                 .collateralCustody(PublicKey.readPubkey(data, offset += 32))
                 .openTime(readInt64(data, offset += 32))
                 .updateTime(readInt64(data, offset += 8))
-                .side(data[offset += 8] == 0 ? Side.LONG : Side.SHORT)
+                .side(data[offset += 8] == 1 ? Side.LONG : Side.SHORT)
                 .price(readUint64(data, offset += 1))
                 .sizeUsd(readUint64(data, offset += 8))
                 .collateralUsd(readUint64(data, offset += 8))
