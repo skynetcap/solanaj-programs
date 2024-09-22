@@ -19,17 +19,17 @@ public class JupiterUtil {
     }
 
     public static Long readOptionalUint64(byte[] data, int offset) {
-        boolean hasValue = data[offset++] != 0;
-        return hasValue ? readUint64(data, offset) : null;
+        boolean hasValue = data[offset] != 0;
+        return hasValue ? readUint64(data, offset + 1) : null;
     }
 
     public static Boolean readOptionalBoolean(byte[] data, int offset) {
-        boolean hasValue = data[offset++] != 0;
-        return hasValue ? data[offset] != 0 : null;
+        boolean hasValue = data[offset] != 0;
+        return hasValue ? data[offset + 1] != 0 : null;
     }
 
     public static PublicKey readOptionalPublicKey(byte[] data, int offset) {
-        boolean hasValue = data[offset++] != 0;
-        return hasValue ? PublicKey.readPubkey(data, offset) : null;
+        boolean hasValue = data[offset] != 0;
+        return hasValue ? PublicKey.readPubkey(data, offset + 1) : null;
     }
 }

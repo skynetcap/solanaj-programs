@@ -3,13 +3,17 @@ package com.mmorrell.jupiter.model;
 import com.mmorrell.jupiter.util.JupiterUtil;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.p2p.solanaj.core.PublicKey;
+
+import java.util.Arrays;
 
 /**
  * Represents a Jupiter PositionRequest account in Jupiter Perpetuals.
  */
 @Data
 @Builder
+@Slf4j
 public class JupiterPositionRequest {
     private PublicKey owner;
     private PublicKey pool;
@@ -34,22 +38,30 @@ public class JupiterPositionRequest {
     private byte bump;
     private PublicKey referral;
 
+    /**
+     * Enum representing the type of request change.
+     */
     public enum RequestChange {
-        NO_CHANGE,
-        INCREASE,
-        DECREASE,
-        CLOSE
+        None,
+        Increase,
+        Decrease
     }
 
+    /**
+     * Enum representing the type of request.
+     */
     public enum RequestType {
-        MARKET,
-        LIMIT,
-        STOP
+        Market,
+        Trigger
     }
 
+    /**
+     * Enum representing the side of the request.
+     */
     public enum Side {
-        LONG,
-        SHORT
+        None,
+        Long,
+        Short
     }
 
     /**
@@ -90,25 +102,75 @@ public class JupiterPositionRequest {
 
         RequestChange requestChange = RequestChange.values()[data[offset++]];
         RequestType requestType = RequestType.values()[data[offset++]];
+
+        log.info("Side offset: {}", offset);
         Side side = Side.values()[data[offset++]];
 
-        Long priceSlippage = JupiterUtil.readOptionalUint64(data, offset);
-        offset += 9;
+        // Read priceSlippage (Optional u64)
+        log.info("PriceSlippage offset: {}", offset);
+        boolean hasPriceSlippage = data[offset] != 0;
+        Long priceSlippage = null;
+        if (hasPriceSlippage) {
+            priceSlippage = JupiterUtil.readUint64(data, offset + 1);
+            offset += 9; // 1 byte for option + 8 bytes for uint64
+        } else {
+            offset += 1; // Only 1 byte for option
+        }
 
-        Long jupiterMinimumOut = JupiterUtil.readOptionalUint64(data, offset);
-        offset += 9;
+        // Read jupiterMinimumOut (Optional u64)
+        log.info("jupiterMinimumOut offset: {}", offset);
+        boolean hasJupiterMinimumOut = data[offset] != 0;
+        Long jupiterMinimumOut = null;
+        if (hasJupiterMinimumOut) {
+            jupiterMinimumOut = JupiterUtil.readUint64(data, offset + 1);
+            offset += 9;
+        } else {
+            offset += 1;
+        }
 
-        Long preSwapAmount = JupiterUtil.readOptionalUint64(data, offset);
-        offset += 9;
+        // Read preSwapAmount (Optional u64)
+        log.info("preSwapAmount offset: {}", offset);
+        boolean hasPreSwapAmount = data[offset] != 0;
+        Long preSwapAmount = null;
+        if (hasPreSwapAmount) {
+            preSwapAmount = JupiterUtil.readUint64(data, offset + 1);
+            offset += 9;
+        } else {
+            offset += 1;
+        }
 
-        Long triggerPrice = JupiterUtil.readOptionalUint64(data, offset);
-        offset += 9;
+        // Read triggerPrice (Optional u64)
+        log.info("triggerPrice offset: {}", offset);
+        boolean hasTriggerPrice = data[offset] != 0;
+        Long triggerPrice = null;
+        if (hasTriggerPrice) {
+            triggerPrice = JupiterUtil.readUint64(data, offset + 1);
+            offset += 9;
+        } else {
+            offset += 1;
+        }
 
-        Boolean triggerAboveThreshold = JupiterUtil.readOptionalBoolean(data, offset);
-        offset += 2;
+        // Read triggerAboveThreshold (Optional boolean)
+        log.info("triggerAboveThreshold offset: {}", offset);
+        boolean hasTriggerAboveThreshold = data[offset] != 0;
+        Boolean triggerAboveThreshold = null;
+        if (hasTriggerAboveThreshold) {
+            triggerAboveThreshold = data[offset + 1] != 0;
+            offset += 2; // 1 byte for option + 1 byte for boolean
+        } else {
+            offset += 1;
+        }
 
-        Boolean entirePosition = JupiterUtil.readOptionalBoolean(data, offset);
-        offset += 2;
+        // Read entirePosition (Optional boolean)
+        log.info("entirePosition offset: {}", offset);
+        boolean hasEntirePosition = data[offset] != 0;
+        Boolean entirePosition = null;
+        if (hasEntirePosition) {
+            entirePosition = data[offset + 1] != 0;
+            offset += 2;
+        } else {
+            offset += 1;
+        }
 
         boolean executed = data[offset++] != 0;
 
@@ -117,7 +179,16 @@ public class JupiterPositionRequest {
 
         byte bump = data[offset++];
 
-        PublicKey referral = JupiterUtil.readOptionalPublicKey(data, offset);
+        // Read referral (Optional PublicKey)
+        log.info("referral offset: {}", offset);
+        boolean hasReferral = data[offset] != 0;
+        PublicKey referral = null;
+        if (hasReferral) {
+            referral = PublicKey.readPubkey(data, offset + 1);
+            offset += 33; // 1 byte for option + 32 bytes for PublicKey
+        } else {
+            offset += 1;
+        }
 
         return JupiterPositionRequest.builder()
                 .owner(owner)
@@ -143,20 +214,5 @@ public class JupiterPositionRequest {
                 .bump(bump)
                 .referral(referral)
                 .build();
-    }
-
-    private static Long readOptionalUint64(byte[] data, int offset) {
-        boolean hasValue = data[offset++] != 0;
-        return hasValue ? JupiterUtil.readUint64(data, offset) : null;
-    }
-
-    private static Boolean readOptionalBoolean(byte[] data, int offset) {
-        boolean hasValue = data[offset++] != 0;
-        return hasValue ? data[offset] != 0 : null;
-    }
-
-    private static PublicKey readOptionalPublicKey(byte[] data, int offset) {
-        boolean hasValue = data[offset++] != 0;
-        return hasValue ? PublicKey.readPubkey(data, offset) : null;
     }
 }

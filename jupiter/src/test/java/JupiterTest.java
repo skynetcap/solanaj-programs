@@ -5,7 +5,6 @@ import org.bitcoinj.core.Base58;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.p2p.solanaj.core.PublicKey;
-import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
@@ -185,7 +184,6 @@ public class JupiterTest {
         assertNotNull(accountInfo, "Account info should not be null");
 
         byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
-        Files.write(data, new File("jupiterPool.bin"));
 
         // Deserialize the data into JupiterPerpetuals
         JupiterPerpetuals perpetuals = JupiterPerpetuals.fromByteArray(data);
@@ -218,8 +216,7 @@ public class JupiterTest {
     }
 
     @Test
-    @Disabled
-    public void testJupiterPositionRequestDeserialization() throws RpcException {
+    public void testJupiterPositionRequestDeserialization() throws RpcException, IOException {
         PublicKey positionRequestPublicKey = new PublicKey("APYrGNtsTTMpNNBQBpALxYnwYfKDQyFocf3d1j6jkuzf");
 
         // Fetch the account data
@@ -228,6 +225,7 @@ public class JupiterTest {
         assertNotNull(accountInfo, "Account info should not be null");
 
         byte[] data = Base64.getDecoder().decode(accountInfo.getValue().getData().get(0));
+        Files.write(data, new File("jupiterPositionRequest.bin"));
 
         // Deserialize the data into JupiterPositionRequest
         JupiterPositionRequest positionRequest = JupiterPositionRequest.fromByteArray(data);
@@ -237,7 +235,10 @@ public class JupiterTest {
         assertNotNull(positionRequest.getOwner());
         assertNotNull(positionRequest.getPool());
         assertNotNull(positionRequest.getCustody());
-        // Add more assertions as needed
+        assertTrue(positionRequest.getOpenTime() > 0);
+        assertTrue(positionRequest.getUpdateTime() > 0);
+
+        log.info("Deserialized JupiterPositionRequest: {}", positionRequest);
     }
 
     @Test
@@ -261,4 +262,5 @@ public class JupiterTest {
         assertTrue(testOracle.getPublishTime() > 0);
         // Add more assertions as needed
     }
+    
 }
