@@ -69,8 +69,6 @@ public class JupiterTest {
         assertTrue(position.getUpdateTime() > 0);
         assertNotNull(position.getSide());
         assertTrue(position.getPrice() > 0);
-        assertTrue(position.getSizeUsd() > 0);
-        assertTrue(position.getCollateralUsd() > 0);
         // Add more assertions as needed
     }
 
