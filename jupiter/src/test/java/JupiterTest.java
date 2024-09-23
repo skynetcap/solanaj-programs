@@ -73,7 +73,6 @@ public class JupiterTest {
     }
 
     @Test
-    @Disabled
     public void testGetAllJupiterPerpPositions() throws RpcException {
         PublicKey programId = new PublicKey("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
 
@@ -104,12 +103,28 @@ public class JupiterTest {
             }
         }
 
-        positions.sort(Comparator.comparingLong(JupiterPerpPosition::getSizeUsd));
+        positions.sort(Comparator.comparingDouble(JupiterPerpPosition::getSizeUsd).reversed());
 
         // Log the positions
         for (JupiterPerpPosition position : positions) {
             double leverage = (double) position.getSizeUsd() / position.getCollateralUsd();
-            log.info("Owner: {}, Size USD: {}, Leverage: {}", position.getOwner().toBase58(), position.getSizeUsd(), leverage);
+            // log.info("Owner: {}, Size USD: {}, Leverage: {}", position.getOwner().toBase58(), position.getSizeUsd(), leverage);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            JupiterPerpPosition position = positions.get(i);
+            double leverage = position.getSizeUsd() / position.getCollateralUsd();
+
+            log.info(
+                    String.format(
+                            "Position #%d: Owner[%s], Size[$%.2f], Entry[$%.2f] Leverage: %.2fx",
+                            i + 1,
+                            position.getOwner().toBase58().substring(0, 5).concat("..."),
+                            position.getSizeUsd(),
+                            position.getPrice(),
+                            leverage
+                    )
+            );
         }
     }
 
