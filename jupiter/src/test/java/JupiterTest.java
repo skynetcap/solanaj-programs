@@ -1,4 +1,5 @@
 import com.google.common.io.Files;
+import com.mmorrell.jupiter.manager.JupiterManager;
 import com.mmorrell.jupiter.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
@@ -263,4 +264,51 @@ public class JupiterTest {
         // Add more assertions as needed
     }
     
+    @Test
+    public void testJupiterManager() {
+        JupiterManager manager = new JupiterManager(client);
+
+        // Test getPosition
+        PublicKey positionPublicKey = new PublicKey("FdqbJAvADUJzZsBFK1ArhV79vXLmpKUMB4oXSrW8rSE");
+        Optional<JupiterPerpPosition> position = manager.getPosition(positionPublicKey);
+        assertTrue(position.isPresent());
+        assertEquals(new PublicKey("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq"), position.get().getOwner());
+
+        // Test getPool
+        PublicKey poolPublicKey = new PublicKey("5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq");
+        Optional<JupiterPool> pool = manager.getPool(poolPublicKey);
+        assertTrue(pool.isPresent());
+        assertEquals("Pool", pool.get().getName());
+
+        // Test getCustody
+        PublicKey custodyPublicKey = new PublicKey("7xS2gz2bTp3fwCC7knJvUWTEU9Tycczu6VhJYKgi1wdz");
+        Optional<JupiterCustody> custody = manager.getCustody(custodyPublicKey);
+        assertTrue(custody.isPresent());
+        assertNotNull(custody.get().getPool());
+
+        // Test getPositionRequest
+        PublicKey positionRequestPublicKey = new PublicKey("APYrGNtsTTMpNNBQBpALxYnwYfKDQyFocf3d1j6jkuzf");
+        Optional<JupiterPositionRequest> positionRequest = manager.getPositionRequest(positionRequestPublicKey);
+        assertTrue(positionRequest.isPresent());
+        assertNotNull(positionRequest.get().getOwner());
+
+        // Test getPerpetuals
+        PublicKey perpetualsPublicKey = new PublicKey("H4ND9aYttUVLFmNypZqLjZ52FYiGvdEB45GmwNoKEjTj");
+        Optional<JupiterPerpetuals> perpetuals = manager.getPerpetuals(perpetualsPublicKey);
+        assertTrue(perpetuals.isPresent());
+        assertNotNull(perpetuals.get().getPool());
+    }
+
+    @Test
+    public void testJupiterManagerWithInvalidPublicKeys() {
+        JupiterManager manager = new JupiterManager(client);
+        PublicKey invalidPublicKey = new PublicKey("1111111111111111111111111111111111111111111");
+
+        // Test all methods with invalid public key
+        assertFalse(manager.getPosition(invalidPublicKey).isPresent());
+        assertFalse(manager.getPool(invalidPublicKey).isPresent());
+        assertFalse(manager.getCustody(invalidPublicKey).isPresent());
+        assertFalse(manager.getPositionRequest(invalidPublicKey).isPresent());
+        assertFalse(manager.getPerpetuals(invalidPublicKey).isPresent());
+    }
 }
