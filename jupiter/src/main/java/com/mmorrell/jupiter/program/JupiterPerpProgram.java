@@ -128,7 +128,7 @@ public class JupiterPerpProgram extends Program {
      * @param name The name of the pool.
      * @return A TransactionInstruction object for adding a pool.
      */
-    public static TransactionInstruction addPoolInstruction(
+    public static TransactionInstruction addPool(
             PublicKey admin,
             PublicKey perpetuals,
             PublicKey pool,
@@ -166,7 +166,7 @@ public class JupiterPerpProgram extends Program {
      * @param oracleType The type of oracle being used.
      * @return A TransactionInstruction object for adding a custody.
      */
-    public static TransactionInstruction addCustodyInstruction(
+    public static TransactionInstruction addCustody(
             PublicKey admin,
             PublicKey perpetuals,
             PublicKey pool,
@@ -206,7 +206,7 @@ public class JupiterPerpProgram extends Program {
      * @param config The custody configuration data.
      * @return A TransactionInstruction object for setting the custody configuration.
      */
-    public static TransactionInstruction setCustodyConfigInstruction(
+    public static TransactionInstruction setCustodyConfig(
             PublicKey admin,
             PublicKey perpetuals,
             PublicKey pool,
@@ -240,7 +240,7 @@ public class JupiterPerpProgram extends Program {
      * @param limit The global custody limit.
      * @return A TransactionInstruction object for setting the global custody limit.
      */
-    public static TransactionInstruction setCustodyGlobalLimitInstruction(
+    public static TransactionInstruction setCustodyGlobalLimit(
             PublicKey admin,
             PublicKey perpetuals,
             PublicKey pool,
@@ -273,7 +273,7 @@ public class JupiterPerpProgram extends Program {
      * @param config The pool configuration data.
      * @return A TransactionInstruction object for setting the pool configuration.
      */
-    public static TransactionInstruction setPoolConfigInstruction(
+    public static TransactionInstruction setPoolConfig(
             PublicKey admin,
             PublicKey perpetuals,
             PublicKey pool,
@@ -303,7 +303,7 @@ public class JupiterPerpProgram extends Program {
      * @param config The perpetuals configuration data.
      * @return A TransactionInstruction object for setting the perpetuals configuration.
      */
-    public static TransactionInstruction setPerpetualsConfigInstruction(
+    public static TransactionInstruction setPerpetualsConfig(
             PublicKey admin,
             PublicKey perpetuals,
             byte[] config
@@ -330,7 +330,7 @@ public class JupiterPerpProgram extends Program {
      * @param newAdmin The public key of the new admin account.
      * @return A TransactionInstruction object for transferring the admin authority.
      */
-    public static TransactionInstruction transferAdminInstruction(
+    public static TransactionInstruction transferAdmin(
             PublicKey admin,
             PublicKey newAdmin
     ) {
@@ -358,7 +358,7 @@ public class JupiterPerpProgram extends Program {
      * @param amount The amount of fees to withdraw.
      * @return A TransactionInstruction object for withdrawing fees.
      */
-    public static TransactionInstruction withdrawFeesInstruction(
+    public static TransactionInstruction withdrawFees(
             PublicKey admin,
             PublicKey perpetuals,
             PublicKey pool,
