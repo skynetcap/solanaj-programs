@@ -1,5 +1,8 @@
 package com.mmorrell.jupiter.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import org.p2p.solanaj.core.PublicKey;
 
 public class JupiterUtil {
@@ -31,5 +34,18 @@ public class JupiterUtil {
     public static PublicKey readOptionalPublicKey(byte[] data, int offset) {
         boolean hasValue = data[offset] != 0;
         return hasValue ? PublicKey.readPubkey(data, offset + 1) : null;
+    }
+
+    public static byte[] getInstructionDiscriminator(String instructionName) {
+        try {
+            String discriminatorString = "global:" + instructionName;
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(discriminatorString.getBytes());
+            byte[] discriminator = new byte[8];
+            System.arraycopy(hash, 0, discriminator, 0, 8);
+            return discriminator;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
