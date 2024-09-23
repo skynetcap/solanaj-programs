@@ -3,6 +3,7 @@ import com.mmorrell.jupiter.manager.JupiterManager;
 import com.mmorrell.jupiter.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.p2p.solanaj.core.PublicKey;
@@ -28,6 +29,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JupiterTest {
 
     private final RpcClient client = new RpcClient("https://mainnet.helius-rpc.com/?api-key=a778b653-bdd6-41bc-8cda-0c7377faf1dd");
+
+    @BeforeEach
+    public void setup() {
+        try {
+            Thread.sleep(1001L);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     public void testJupiterPerpPositionDeserialization() throws RpcException {
