@@ -106,7 +106,7 @@ public class JupiterManager {
      * @return a list of JupiterDca objects.
      * @throws RpcException if the RPC call fails.
      */
-    public List<JupiterDca> getAllDcaAccounts() {
+    public List<JupiterDca> getDcaAccounts() {
         byte[] dcaDiscriminator = JupiterUtil.getAccountDiscriminator("Dca");
 
         // Create a memcmp filter for the discriminator at offset 0
@@ -133,7 +133,7 @@ public class JupiterManager {
         }
     }
 
-    public List<JupiterDca> getAllDcaAccounts(PublicKey user) {
+    public List<JupiterDca> getDcaAccounts(PublicKey user) {
         byte[] dcaDiscriminator = JupiterUtil.getAccountDiscriminator("Dca");
 
         // Create a memcmp filter for the discriminator at offset 0

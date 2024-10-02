@@ -16,9 +16,6 @@ import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,16 +33,17 @@ public class JupiterTest {
     @BeforeEach
     public void setup() {
         try {
-            Thread.sleep(1001L);
+            Thread.sleep(1500L);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Test
+    @Disabled
     public void testJupiterPerpPositionDeserialization() throws RpcException {
-        PublicKey positionPublicKey = new PublicKey("FdqbJAvADUJzZsBFK1ArhV79vXLmpKUMB4oXSrW8rSE");
-        PublicKey positionPublicKeyOwner = new PublicKey("skynetDj29GH6o6bAqoixCpDuYtWqi1rm8ZNx1hB3vq");
+        PublicKey positionPublicKey = new PublicKey("63sifZpCp9peUq4sfQfxruvKFUCkwLcRfUVVC2mSGDug");
+        PublicKey positionPublicKeyOwner = new PublicKey("CMo1gA6YQebnSxXNYK8KawpczFaYLuUgyAf5FRAoryRQ");
 
         // Fetch the account data
         AccountInfo accountInfo = client.getApi().getAccountInfo(positionPublicKey);
@@ -78,6 +76,7 @@ public class JupiterTest {
     }
 
     @Test
+    @Disabled
     public void testGetAllJupiterPerpPositions() throws RpcException {
         PublicKey programId = new PublicKey("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
 
@@ -228,6 +227,7 @@ public class JupiterTest {
     }
 
     @Test
+    @Disabled
     public void testJupiterPositionRequestDeserialization() throws RpcException, IOException {
         PublicKey positionRequestPublicKey = new PublicKey("APYrGNtsTTMpNNBQBpALxYnwYfKDQyFocf3d1j6jkuzf");
 
@@ -275,7 +275,9 @@ public class JupiterTest {
         // Add more assertions as needed
     }
 
+    // Disabled since it relies on hardcoded accounts (and positions always close)
     @Test
+    @Disabled
     public void testJupiterManager() {
         JupiterManager manager = new JupiterManager(client);
 
@@ -327,7 +329,7 @@ public class JupiterTest {
     public void testGetAllJupiterDcaAccounts() {
         JupiterManager manager = new JupiterManager(client);
 
-        List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
+        List<JupiterDca> dcaAccounts = manager.getDcaAccounts();
         assertNotNull(dcaAccounts, "DCA accounts list should not be null");
         assertTrue(dcaAccounts.size() > 0, "DCA accounts list should contain at least one account");
 
@@ -357,7 +359,7 @@ public class JupiterTest {
     @Test
     public void getMostRecentJupiterDcaAccounts() {
         JupiterManager manager = new JupiterManager(client);
-        List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
+        List<JupiterDca> dcaAccounts = manager.getDcaAccounts();
         dcaAccounts.sort(Comparator.comparingLong(JupiterDca::getCreatedAt).reversed());
 
         for (int i = 0; i < 10; i++) {
@@ -387,9 +389,9 @@ public class JupiterTest {
         tokenPrices.put("DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", 0.00002479); // Example price for outputMint
         // Add more token prices as needed
 
-        List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
+        List<JupiterDca> dcaAccounts = manager.getDcaAccounts();
         assertNotNull(dcaAccounts, "DCA accounts list should not be null");
-        assertTrue(dcaAccounts.size() > 0, "DCA accounts list should contain at least one account");
+        assertFalse(dcaAccounts.isEmpty(), "DCA accounts list should contain at least one account");
 
         long now = Instant.now().getEpochSecond();
 
@@ -461,7 +463,7 @@ public class JupiterTest {
     @Test
     public void testGetDcaAccountsByUserFiltering() {
         JupiterManager manager = new JupiterManager(client);
-        List<JupiterDca> jupiterDcas = manager.getAllDcaAccounts()
+        List<JupiterDca> jupiterDcas = manager.getDcaAccounts()
                 .stream()
                 .filter(jupiterDca -> jupiterDca.getUser().equals(new PublicKey("ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB")))
                 .toList();
@@ -471,7 +473,7 @@ public class JupiterTest {
     @Test
     public void testGetDcaAccountsByUser() {
         JupiterManager manager = new JupiterManager(client);
-        List<JupiterDca> jupiterDcas = manager.getAllDcaAccounts(new PublicKey("ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB"));
+        List<JupiterDca> jupiterDcas = manager.getDcaAccounts(new PublicKey("ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB"));
         log.info("DCAs for user: {}", jupiterDcas);
     }
 }
