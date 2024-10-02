@@ -31,18 +31,20 @@ public class JupiterPerpPosition {
     private long openTime;
     private long updateTime;
     private Side side;
-    private long price;
-    private long sizeUsd;
-    private long collateralUsd;
-    private long realisedPnlUsd;
-    private long cumulativeInterestSnapshot;
-    private long lockedAmount;
+    private double price;
+    private double sizeUsd;
+    private double collateralUsd;
+    private double realisedPnlUsd;
+    private double cumulativeInterestSnapshot;
+    private double lockedAmount;
     private byte bump;
 
     public enum Side {
         LONG,
         SHORT
     }
+
+    private static final double POSITION_DIVISOR = 1_000_000.00;
 
     public static JupiterPerpPosition fromByteArray(byte[] data) {
         int offset = 8; // Start at offset 8 to skip the padding
@@ -54,12 +56,12 @@ public class JupiterPerpPosition {
                 .openTime(readInt64(data, offset += 32))
                 .updateTime(readInt64(data, offset += 8))
                 .side(data[offset += 8] == 1 ? Side.LONG : Side.SHORT)
-                .price(readUint64(data, offset += 1))
-                .sizeUsd(readUint64(data, offset += 8))
-                .collateralUsd(readUint64(data, offset += 8))
-                .realisedPnlUsd(readInt64(data, offset += 8))
-                .cumulativeInterestSnapshot(readUint128(data, offset += 8))
-                .lockedAmount(readUint64(data, offset += 16))
+                .price(readUint64(data, offset += 1) / POSITION_DIVISOR)
+                .sizeUsd(readUint64(data, offset += 8) / POSITION_DIVISOR)
+                .collateralUsd(readUint64(data, offset += 8) / POSITION_DIVISOR)
+                .realisedPnlUsd(readInt64(data, offset += 8) / POSITION_DIVISOR)
+                .cumulativeInterestSnapshot(readUint128(data, offset += 8) / POSITION_DIVISOR)
+                .lockedAmount(readUint64(data, offset += 16) / POSITION_DIVISOR)
                 .bump(data[offset += 8])
                 .build();
     }

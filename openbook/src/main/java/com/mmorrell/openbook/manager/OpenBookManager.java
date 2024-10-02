@@ -41,6 +41,7 @@ public class OpenBookManager {
     private final Map<PublicKey, OpenBookMarket> marketCache = new HashMap<>();
 
     private final static int CONSUME_EVENTS_DEFAULT_FEE = 11;
+    private final static int DEFAULT_PRIORITY_LIMIT = 50_000;
 
     public OpenBookManager(RpcClient client) {
         this.client = client;
@@ -196,7 +197,7 @@ public class OpenBookManager {
      * otherwise an empty Optional.
      */
     public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit, @Nullable String memo,
-                                          int priorityFee) {
+                                          int priorityFee, int priorityLimit) {
         Optional<OpenBookMarket> marketOptional = getMarket(marketId, true, false);
         if (marketOptional.isEmpty()) {
             return Optional.empty();
@@ -218,7 +219,7 @@ public class OpenBookManager {
 
         log.info("Cranking {}: {}", market.getName(), peopleToCrank);
         Transaction tx = new Transaction();
-        tx.addInstruction(ComputeBudgetProgram.setComputeUnitLimit(50_000));
+        tx.addInstruction(ComputeBudgetProgram.setComputeUnitLimit(priorityLimit));
         tx.addInstruction(ComputeBudgetProgram.setComputeUnitPrice(priorityFee));
         tx.addInstruction(
                 OpenbookProgram.consumeEvents(
@@ -262,6 +263,11 @@ public class OpenBookManager {
      * @return An Optional String representing the consumed events
      */
     public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit, @Nullable String memo) {
-        return consumeEvents(caller, marketId, limit, memo, CONSUME_EVENTS_DEFAULT_FEE);
+        return consumeEvents(caller, marketId, limit, memo, CONSUME_EVENTS_DEFAULT_FEE, DEFAULT_PRIORITY_LIMIT);
+    }
+
+    public Optional<String> consumeEvents(Account caller, PublicKey marketId, long limit, @Nullable String memo,
+                                          int priorityFee) {
+        return consumeEvents(caller, marketId, limit, memo, CONSUME_EVENTS_DEFAULT_FEE, DEFAULT_PRIORITY_LIMIT);
     }
 }
