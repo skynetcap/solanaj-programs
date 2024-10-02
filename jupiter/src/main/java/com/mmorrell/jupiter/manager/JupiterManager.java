@@ -1,21 +1,26 @@
 package com.mmorrell.jupiter.manager;
 
 import com.mmorrell.jupiter.model.*;
+import com.mmorrell.jupiter.util.JupiterUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.bitcoinj.core.Base58;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
+import org.p2p.solanaj.rpc.types.Memcmp;
+import org.p2p.solanaj.rpc.types.ProgramAccount;
 
-import java.util.Base64;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 public class JupiterManager {
 
     private final RpcClient client;
     private static final PublicKey JUPITER_PROGRAM_ID = new PublicKey("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
+    private static final String DCA_PROGRAM_ID = "DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M"; // Replace with actual DCA Program ID
+    private static final int DCA_ACCOUNT_SIZE = 289; // Updated based on JupiterDca structure
 
     public JupiterManager() {
         this.client = new RpcClient(Cluster.MAINNET);
@@ -93,5 +98,35 @@ public class JupiterManager {
             log.warn("Error fetching perpetuals: {}", e.getMessage());
             return Optional.empty();
         }
+    }
+
+    /**
+     * Retrieves all Jupiter DCA accounts.
+     *
+     * @return a list of JupiterDca objects.
+     * @throws RpcException if the RPC call fails.
+     */
+    public List<JupiterDca> getAllDcaAccounts() throws RpcException {
+        PublicKey programId = new PublicKey(DCA_PROGRAM_ID);
+
+        byte[] dcaDiscriminator = JupiterUtil.getAccountDiscriminator("Dca");
+
+        // Create a memcmp filter for the discriminator at offset 0
+        Memcmp memCmpFilter = new Memcmp(0, Base58.encode(dcaDiscriminator));
+
+        List<ProgramAccount> accounts = client.getApi().getProgramAccounts(
+                programId,
+                List.of(memCmpFilter),
+                DCA_ACCOUNT_SIZE
+        );
+
+        List<JupiterDca> dcaAccounts = new ArrayList<>();
+        for (ProgramAccount account : accounts) {
+            byte[] data = account.getAccount().getDecodedData();
+            JupiterDca dca = JupiterDca.fromByteArray(data);
+            dcaAccounts.add(dca);
+        }
+
+        return dcaAccounts;
     }
 }

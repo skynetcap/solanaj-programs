@@ -1,6 +1,7 @@
 import com.google.common.io.Files;
 import com.mmorrell.jupiter.manager.JupiterManager;
 import com.mmorrell.jupiter.model.*;
+import com.mmorrell.jupiter.util.JupiterUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test class for Jupiter Perpetuals positions.
+ * Test class for Jupiter Perpetuals positions and DCA accounts.
  */
 @Slf4j
 public class JupiterTest {
@@ -79,7 +80,7 @@ public class JupiterTest {
         PublicKey programId = new PublicKey("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
 
         // Get the discriminator for the Position account
-        byte[] positionDiscriminator = getAccountDiscriminator("Position");
+        byte[] positionDiscriminator = JupiterUtil.getAccountDiscriminator("Position");
 
         // Create a memcmp filter for the discriminator at offset 0
         Memcmp memcmpFilter = new Memcmp(0, Base58.encode(positionDiscriminator));
@@ -127,23 +128,6 @@ public class JupiterTest {
                             leverage
                     )
             );
-        }
-    }
-
-    /**
-     * Calculates the account discriminator for a given account name.
-     *
-     * @param accountName the name of the account.
-     * @return the first 8 bytes of the SHA-256 hash of "account:<accountName>".
-     */
-    private byte[] getAccountDiscriminator(String accountName) {
-        String preimage = "account:" + accountName;
-        try {
-            MessageDigest hasher = MessageDigest.getInstance("SHA-256");
-            hasher.update(preimage.getBytes(StandardCharsets.UTF_8));
-            return Arrays.copyOfRange(hasher.digest(), 0, 8);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not found for discriminator calculation.");
         }
     }
 
@@ -335,5 +319,39 @@ public class JupiterTest {
         assertFalse(manager.getCustody(invalidPublicKey).isPresent());
         assertFalse(manager.getPositionRequest(invalidPublicKey).isPresent());
         assertFalse(manager.getPerpetuals(invalidPublicKey).isPresent());
+    }
+
+    @Test
+    public void testGetAllJupiterDcaAccounts() {
+        JupiterManager manager = new JupiterManager(client);
+        try {
+            List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
+            assertNotNull(dcaAccounts, "DCA accounts list should not be null");
+            assertTrue(dcaAccounts.size() > 0, "DCA accounts list should contain at least one account");
+
+            for (JupiterDca dca : dcaAccounts) {
+                assertNotNull(dca.getUser(), "DCA user should not be null");
+                assertNotNull(dca.getInputMint(), "DCA inputMint should not be null");
+                assertNotNull(dca.getOutputMint(), "DCA outputMint should not be null");
+                assertTrue(dca.getNextCycleAt() > 0, "DCA nextCycleAt should be greater than 0");
+                assertTrue(dca.getOutWithdrawn() >= 0, "DCA outWithdrawn should be non-negative");
+                assertTrue(dca.getInUsed() >= 0, "DCA inUsed should be non-negative");
+                assertTrue(dca.getOutReceived() >= 0, "DCA outReceived should be non-negative");
+                assertTrue(dca.getInAmountPerCycle() > 0, "DCA inAmountPerCycle should be greater than 0");
+                assertTrue(dca.getCycleFrequency() > 0, "DCA cycleFrequency should be greater than 0");
+                assertTrue(dca.getNextCycleAmountLeft() >= 0, "DCA nextCycleAmountLeft should be non-negative");
+                assertNotNull(dca.getInAccount(), "DCA inAccount should not be null");
+                assertNotNull(dca.getOutAccount(), "DCA outAccount should not be null");
+                assertTrue(dca.getCreatedAt() > 0, "DCA createdAt should be greater than 0");
+            }
+
+            // Log the retrieved DCA accounts
+            for (JupiterDca dca : dcaAccounts) {
+                log.info("JupiterDca: {}", dca);
+            }
+
+        } catch (RpcException e) {
+            fail("RPC Exception occurred: " + e.getMessage());
+        }
     }
 }
