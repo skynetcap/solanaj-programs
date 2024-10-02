@@ -106,7 +106,7 @@ public class JupiterManager {
      * @return a list of JupiterDca objects.
      * @throws RpcException if the RPC call fails.
      */
-    public List<JupiterDca> getAllDcaAccounts() throws RpcException {
+    public List<JupiterDca> getAllDcaAccounts() {
         PublicKey programId = new PublicKey(DCA_PROGRAM_ID);
 
         byte[] dcaDiscriminator = JupiterUtil.getAccountDiscriminator("Dca");
@@ -114,19 +114,24 @@ public class JupiterManager {
         // Create a memcmp filter for the discriminator at offset 0
         Memcmp memCmpFilter = new Memcmp(0, Base58.encode(dcaDiscriminator));
 
-        List<ProgramAccount> accounts = client.getApi().getProgramAccounts(
-                programId,
-                List.of(memCmpFilter),
-                DCA_ACCOUNT_SIZE
-        );
+        try {
+            List<ProgramAccount> accounts = client.getApi().getProgramAccounts(
+                    programId,
+                    List.of(memCmpFilter),
+                    DCA_ACCOUNT_SIZE
+            );
 
-        List<JupiterDca> dcaAccounts = new ArrayList<>();
-        for (ProgramAccount account : accounts) {
-            byte[] data = account.getAccount().getDecodedData();
-            JupiterDca dca = JupiterDca.fromByteArray(data);
-            dcaAccounts.add(dca);
+            List<JupiterDca> dcaAccounts = new ArrayList<>();
+            for (ProgramAccount account : accounts) {
+                byte[] data = account.getAccount().getDecodedData();
+                JupiterDca dca = JupiterDca.fromByteArray(data);
+                dcaAccounts.add(dca);
+            }
+
+            return dcaAccounts;
+        } catch (RpcException ex) {
+            log.warn("Error fetching DCA accounts: {}", ex.getMessage());
+            return Collections.emptyList();
         }
-
-        return dcaAccounts;
     }
 }

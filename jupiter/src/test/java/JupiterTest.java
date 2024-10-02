@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -324,34 +325,42 @@ public class JupiterTest {
     @Test
     public void testGetAllJupiterDcaAccounts() {
         JupiterManager manager = new JupiterManager(client);
-        try {
-            List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
-            assertNotNull(dcaAccounts, "DCA accounts list should not be null");
-            assertTrue(dcaAccounts.size() > 0, "DCA accounts list should contain at least one account");
 
-            for (JupiterDca dca : dcaAccounts) {
-                assertNotNull(dca.getUser(), "DCA user should not be null");
-                assertNotNull(dca.getInputMint(), "DCA inputMint should not be null");
-                assertNotNull(dca.getOutputMint(), "DCA outputMint should not be null");
-                assertTrue(dca.getNextCycleAt() > 0, "DCA nextCycleAt should be greater than 0");
-                assertTrue(dca.getOutWithdrawn() >= 0, "DCA outWithdrawn should be non-negative");
-                assertTrue(dca.getInUsed() >= 0, "DCA inUsed should be non-negative");
-                assertTrue(dca.getOutReceived() >= 0, "DCA outReceived should be non-negative");
-                assertTrue(dca.getInAmountPerCycle() > 0, "DCA inAmountPerCycle should be greater than 0");
-                assertTrue(dca.getCycleFrequency() > 0, "DCA cycleFrequency should be greater than 0");
-                assertTrue(dca.getNextCycleAmountLeft() >= 0, "DCA nextCycleAmountLeft should be non-negative");
-                assertNotNull(dca.getInAccount(), "DCA inAccount should not be null");
-                assertNotNull(dca.getOutAccount(), "DCA outAccount should not be null");
-                assertTrue(dca.getCreatedAt() > 0, "DCA createdAt should be greater than 0");
-            }
+        List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
+        assertNotNull(dcaAccounts, "DCA accounts list should not be null");
+        assertTrue(dcaAccounts.size() > 0, "DCA accounts list should contain at least one account");
 
-            // Log the retrieved DCA accounts
-            for (JupiterDca dca : dcaAccounts) {
-                log.info("JupiterDca: {}", dca);
-            }
+        for (JupiterDca dca : dcaAccounts) {
+            assertNotNull(dca.getUser(), "DCA user should not be null");
+            assertNotNull(dca.getInputMint(), "DCA inputMint should not be null");
+            assertNotNull(dca.getOutputMint(), "DCA outputMint should not be null");
+            assertTrue(dca.getNextCycleAt() > 0, "DCA nextCycleAt should be greater than 0");
+            assertTrue(dca.getOutWithdrawn() >= 0, "DCA outWithdrawn should be non-negative");
+            assertTrue(dca.getInUsed() >= 0, "DCA inUsed should be non-negative");
+            assertTrue(dca.getOutReceived() >= 0, "DCA outReceived should be non-negative");
+            assertTrue(dca.getInAmountPerCycle() > 0, "DCA inAmountPerCycle should be greater than 0");
+            assertTrue(dca.getCycleFrequency() > 0, "DCA cycleFrequency should be greater than 0");
+            assertTrue(dca.getNextCycleAmountLeft() >= 0, "DCA nextCycleAmountLeft should be non-negative");
+            assertNotNull(dca.getInAccount(), "DCA inAccount should not be null");
+            assertNotNull(dca.getOutAccount(), "DCA outAccount should not be null");
+            assertTrue(dca.getCreatedAt() > 0, "DCA createdAt should be greater than 0");
+        }
 
-        } catch (RpcException e) {
-            fail("RPC Exception occurred: " + e.getMessage());
+        // Log the retrieved DCA accounts
+        for (JupiterDca dca : dcaAccounts) {
+            log.info("JupiterDca: {}", dca);
+        }
+
+    }
+
+    @Test
+    public void getMostRecentJupiterDcaAccounts() {
+        JupiterManager manager = new JupiterManager(client);
+        List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
+        dcaAccounts.sort(Comparator.comparingLong(JupiterDca::getIdx).reversed());
+        for (int i = 0; i < 10; i++) {
+            JupiterDca dca = dcaAccounts.get(i);
+            log.info("DCA #{}: {}", i + 1, dca);
         }
     }
 }
