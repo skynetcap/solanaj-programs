@@ -21,6 +21,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -372,5 +373,88 @@ public class JupiterTest {
 
         activeDcas.forEach(dca -> log.info("DCA {} #{}: {}", Instant.ofEpochSecond(dca.getCreatedAt()), dcaAccounts.indexOf(dca) + 1, dca));
         log.info("Size: {}", activeDcas.size());
+    }
+
+    @Test
+    public void testGetOpenDcaOrders() {
+        JupiterManager manager = new JupiterManager(client);
+        
+        // Mocking price data for tokens (Replace with actual price retrieval in production)
+        Map<String, Double> tokenPrices = new HashMap<>();
+        tokenPrices.put("Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", 1.0); // Example price for inputMint
+        tokenPrices.put("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", 1.0); // Example price for another inputMint
+        tokenPrices.put("So11111111111111111111111111111111111111112", 147.0); // Example price for inputMint
+        tokenPrices.put("DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", 0.00002479); // Example price for outputMint
+        // Add more token prices as needed
+
+        List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
+        assertNotNull(dcaAccounts, "DCA accounts list should not be null");
+        assertTrue(dcaAccounts.size() > 0, "DCA accounts list should contain at least one account");
+
+        long now = Instant.now().getEpochSecond();
+
+        List<JupiterDca> openDcaOrders = dcaAccounts.stream()
+            // Filter where nextCycleAt > createdAt and nextCycleAt > now and inUsed < inDeposited
+            .filter(dca -> dca.getNextCycleAt() > dca.getCreatedAt()
+                        && dca.getNextCycleAt() > now
+                        && dca.getInUsed() < dca.getInDeposited())
+            // Filter where percent_remaining > 0
+            .filter(dca -> {
+                double remainingInputAmount = (double) (dca.getInDeposited() - dca.getInUsed());
+                double inputAmount = (double) dca.getInDeposited() / Math.pow(10, 6); // Assuming 6 decimals
+                double percentRemaining = 100 * remainingInputAmount / inputAmount;
+                return percentRemaining > 0;
+            })
+            // Filter based on is_in_range constraints
+            .filter(dca -> {
+                double inputOrderSize = (double) dca.getInAmountPerCycle() / Math.pow(10, 6); // Assuming 6 decimals
+
+                // Retrieve prices; default to 1.0 if not found
+                double inputPriceUsd = tokenPrices.getOrDefault(dca.getInputMint().toBase58(), 1.0);
+                double outputPriceUsd = tokenPrices.getOrDefault(dca.getOutputMint().toBase58(), 1.0);
+
+                double outputOrderSize = inputOrderSize * inputPriceUsd / outputPriceUsd;
+
+                boolean minInRange = (dca.getMinOutAmount() == 0) 
+                                     || (outputOrderSize >= ((double) dca.getMinOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+                boolean maxInRange = (dca.getMaxOutAmount() == 0) 
+                                     || (outputOrderSize <= ((double) dca.getMaxOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+
+                return minInRange && maxInRange;
+            })
+            .collect(Collectors.toList());
+
+        assertNotNull(openDcaOrders, "Open DCA orders list should not be null");
+
+        // Assertions to ensure all open DCA orders meet the criteria
+        openDcaOrders.forEach(dca -> {
+            // Verify nextCycleAt constraints
+            assertTrue(dca.getNextCycleAt() > dca.getCreatedAt(), "nextCycleAt should be greater than createdAt");
+            assertTrue(dca.getNextCycleAt() > now, "nextCycleAt should be in the future");
+            assertTrue(dca.getInUsed() < dca.getInDeposited(), "inUsed should be less than inDeposited");
+
+            // Verify percent_remaining > 0
+            double remainingInputAmount = (double) (dca.getInDeposited() - dca.getInUsed());
+            double inputAmount = (double) dca.getInDeposited() / Math.pow(10, 6); // Assuming 6 decimals
+            double percentRemaining = 100 * remainingInputAmount / inputAmount;
+            assertTrue(percentRemaining > 0, "Percent remaining should be greater than 0");
+
+            // Verify is_in_range constraints
+            double inputOrderSize = (double) dca.getInAmountPerCycle() / Math.pow(10, 6); // Assuming 6 decimals
+            double inputPriceUsd = tokenPrices.getOrDefault(dca.getInputMint().toBase58(), 1.0);
+            double outputPriceUsd = tokenPrices.getOrDefault(dca.getOutputMint().toBase58(), 1.0);
+            double outputOrderSize = inputOrderSize * inputPriceUsd / outputPriceUsd;
+
+            boolean minInRange = (dca.getMinOutAmount() == 0) 
+                                 || (outputOrderSize >= ((double) dca.getMinOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+            boolean maxInRange = (dca.getMaxOutAmount() == 0) 
+                                 || (outputOrderSize <= ((double) dca.getMaxOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+
+            assertTrue(minInRange, "Output order size should be within the minimum range");
+            assertTrue(maxInRange, "Output order size should be within the maximum range");
+        });
+
+        log.info("Open DCA Orders [{}]: {}", openDcaOrders.size(), openDcaOrders);
+        log.info("Size: {}", openDcaOrders.size());
     }
 }
