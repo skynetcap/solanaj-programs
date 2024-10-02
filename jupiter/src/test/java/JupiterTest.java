@@ -273,7 +273,7 @@ public class JupiterTest {
         assertTrue(testOracle.getPublishTime() > 0);
         // Add more assertions as needed
     }
-    
+
     @Test
     public void testJupiterManager() {
         JupiterManager manager = new JupiterManager(client);
@@ -357,10 +357,20 @@ public class JupiterTest {
     public void getMostRecentJupiterDcaAccounts() {
         JupiterManager manager = new JupiterManager(client);
         List<JupiterDca> dcaAccounts = manager.getAllDcaAccounts();
-        dcaAccounts.sort(Comparator.comparingLong(JupiterDca::getIdx).reversed());
+        dcaAccounts.sort(Comparator.comparingLong(JupiterDca::getCreatedAt).reversed());
+
         for (int i = 0; i < 10; i++) {
             JupiterDca dca = dcaAccounts.get(i);
-            log.info("DCA #{}: {}", i + 1, dca);
+            log.info("DCA {} #{}: {}", Instant.ofEpochSecond(dca.getCreatedAt()),i + 1, dca);
         }
+
+        log.info("Only showing ones where nextCycleAt > createdAt && nextCycleAt > now && inUsed < inDeposited");
+        List<JupiterDca> activeDcas = dcaAccounts.stream()
+                .filter(dca -> dca.getNextCycleAt() > dca.getCreatedAt() && dca.getNextCycleAt() > Instant.now().getEpochSecond())
+                .filter(dca -> dca.getInUsed() < dca.getInDeposited())
+                .toList();
+
+        activeDcas.forEach(dca -> log.info("DCA {} #{}: {}", Instant.ofEpochSecond(dca.getCreatedAt()), dcaAccounts.indexOf(dca) + 1, dca));
+        log.info("Size: {}", activeDcas.size());
     }
 }
