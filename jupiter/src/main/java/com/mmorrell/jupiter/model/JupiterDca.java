@@ -5,12 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import org.p2p.solanaj.core.PublicKey;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Represents a Jupiter DCA (Dollar-Cost Averaging) account.
  */
 @Data
 @Builder
 public class JupiterDca {
+    private static final PublicKey USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    private static final PublicKey USDT_MINT = new PublicKey("Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB");
+    private static final int DECIMALS = 6;
+
     private PublicKey user;
     private PublicKey inputMint;
     private PublicKey outputMint;
@@ -32,6 +39,127 @@ public class JupiterDca {
     private long dcaOutBalanceBeforeSwap;
     private long createdAt;
     private byte bump;
+
+    /**
+     * Checks if the input mint is a stablecoin (USDC or USDT).
+     *
+     * @return true if the input mint is USDC or USDT, false otherwise.
+     */
+    public boolean isInputStablecoin() {
+        return inputMint.equals(USDC_MINT) || inputMint.equals(USDT_MINT);
+    }
+
+    /**
+     * Checks if the output mint is a stablecoin (USDC or USDT).
+     *
+     * @return true if the output mint is USDC or USDT, false otherwise.
+     */
+    public boolean isOutputStablecoin() {
+        return outputMint.equals(USDC_MINT) || outputMint.equals(USDT_MINT);
+    }
+
+    /**
+     * Calculates the USD value of the deposited amount.
+     *
+     * @return the USD value of the deposited amount, or null if neither input nor output is a stablecoin.
+     */
+    public BigDecimal getInDepositedUsd() {
+        return isInputStablecoin() ? convertToUsd(inDeposited) : 
+               (isOutputStablecoin() ? convertToUsd(outReceived) : null);
+    }
+
+    /**
+     * Calculates the USD value of the withdrawn amount.
+     *
+     * @return the USD value of the withdrawn amount, or null if neither input nor output is a stablecoin.
+     */
+    public BigDecimal getInWithdrawnUsd() {
+        return isInputStablecoin() ? convertToUsd(inWithdrawn) : 
+               (isOutputStablecoin() ? convertToUsd(outWithdrawn) : null);
+    }
+
+    /**
+     * Calculates the USD value of the used amount.
+     *
+     * @return the USD value of the used amount, or null if neither input nor output is a stablecoin.
+     */
+    public BigDecimal getInUsedUsd() {
+        return isInputStablecoin() ? convertToUsd(inUsed) : 
+               (isOutputStablecoin() ? convertToUsd(outReceived) : null);
+    }
+
+    /**
+     * Calculates the USD value of the amount per cycle.
+     *
+     * @return the USD value of the amount per cycle, or null if neither input nor output is a stablecoin.
+     */
+    public BigDecimal getInAmountPerCycleUsd() {
+        return isInputStablecoin() ? convertToUsd(inAmountPerCycle) : null;
+    }
+
+    /**
+     * Calculates the total notional value in the original token.
+     *
+     * @return the total notional value in the original token.
+     */
+    public BigDecimal getTotalNotional() {
+        return convertToDecimal(inDeposited);
+    }
+
+    /**
+     * Calculates the total notional value in USD.
+     *
+     * @return the total notional value in USD, or null if neither input nor output is a stablecoin.
+     */
+    public BigDecimal getTotalNotionalUsd() {
+        return isInputStablecoin() ? convertToUsd(inDeposited) : 
+               (isOutputStablecoin() ? convertToUsd(outReceived) : null);
+    }
+
+    /**
+     * Calculates the remaining notional value in the original token.
+     *
+     * @return the remaining notional value in the original token.
+     */
+    public BigDecimal getRemainingNotional() {
+        return convertToDecimal(inDeposited - inUsed);
+    }
+
+    /**
+     * Calculates the remaining notional value in USD.
+     *
+     * @return the remaining notional value in USD, or null if neither input nor output is a stablecoin.
+     */
+    public BigDecimal getRemainingNotionalUsd() {
+        if (isInputStablecoin()) {
+            return convertToUsd(inDeposited - inUsed);
+        } else if (isOutputStablecoin()) {
+            return convertToUsd(outReceived - outWithdrawn);
+        }
+        return null;
+    }
+
+    /**
+     * Converts a token amount to its USD value.
+     *
+     * @param amount the token amount to convert.
+     * @return the USD value of the token amount.
+     */
+    private BigDecimal convertToUsd(long amount) {
+        return BigDecimal.valueOf(amount)
+                .divide(BigDecimal.valueOf(Math.pow(10, DECIMALS)), 2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Converts a token amount to its decimal representation.
+     *
+     * @param amount the token amount to convert.
+     * @return the decimal representation of the token amount.
+     */
+    private BigDecimal convertToDecimal(long amount) {
+        return BigDecimal.valueOf(amount)
+                .divide(BigDecimal.valueOf(Math.pow(10, DECIMALS)), DECIMALS, RoundingMode.HALF_UP);
+    }
 
     /**
      * Deserializes a byte array into a JupiterDca object.

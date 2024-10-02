@@ -2,6 +2,8 @@ package com.mmorrell.jupiter.manager;
 
 import com.mmorrell.jupiter.model.*;
 import com.mmorrell.jupiter.util.JupiterUtil;
+import java.util.Collections;
+
 import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.Base58;
 import org.p2p.solanaj.core.PublicKey;
@@ -13,6 +15,8 @@ import org.p2p.solanaj.rpc.types.Memcmp;
 import org.p2p.solanaj.rpc.types.ProgramAccount;
 
 import java.util.*;
+import java.time.Instant;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class JupiterManager {
@@ -25,6 +29,7 @@ public class JupiterManager {
     public JupiterManager() {
         this.client = new RpcClient(Cluster.MAINNET);
     }
+
 
     public JupiterManager(RpcClient client) {
         this.client = client;
@@ -160,4 +165,116 @@ public class JupiterManager {
             return Collections.emptyList();
         }
     }
+
+    public List<JupiterDca> getActiveDcaOrders() {
+        long now = Instant.now().getEpochSecond();
+        return getDcaAccounts().stream()
+            .filter(dca -> dca.getNextCycleAt() > now && dca.getInUsed() < dca.getInDeposited())
+            .collect(Collectors.toList());
+    }
+
+    public List<JupiterDca> getDcaOrdersByTokenPair(PublicKey inputMint, PublicKey outputMint) {
+        return getDcaAccounts().stream()
+            .filter(dca -> dca.getInputMint().equals(inputMint) && dca.getOutputMint().equals(outputMint))
+            .collect(Collectors.toList());
+    }
+
+    public double getAggregatedDcaVolume(PublicKey inputMint, PublicKey outputMint, long startTime, long endTime) {
+        return getDcaAccounts().stream()
+            .filter(dca -> dca.getInputMint().equals(inputMint) 
+                        && dca.getOutputMint().equals(outputMint)
+                        && dca.getCreatedAt() >= startTime
+                        && dca.getCreatedAt() <= endTime)
+            .mapToDouble(dca -> (double) dca.getInDeposited() / Math.pow(10, 6))
+            .sum();
+    }
+
+    public List<Map.Entry<Map.Entry<PublicKey, PublicKey>, Long>> getMostPopularDcaPairs(int limit) {
+        Map<Map.Entry<PublicKey, PublicKey>, Long> pairCounts = getDcaAccounts().stream()
+            .collect(Collectors.groupingBy(
+                dca -> new AbstractMap.SimpleEntry<>(dca.getInputMint(), dca.getOutputMint()),
+                Collectors.counting()
+            ));
+        
+        return pairCounts.entrySet().stream()
+            .sorted(Map.Entry.<Map.Entry<PublicKey, PublicKey>, Long>comparingByValue().reversed())
+            .limit(limit)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves completed Jupiter DCA orders.
+     * A DCA order is considered completed if it has fully utilized its deposited amount or has expired.
+     *
+     * @return a list of completed JupiterDca objects.
+     */
+    public List<JupiterDca> getCompletedDcaOrders() {
+        long now = Instant.now().getEpochSecond();
+        return getDcaAccounts().stream()
+                .filter(dca -> dca.getInUsed() >= dca.getInDeposited() || dca.getNextCycleAt() <= now)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves Jupiter DCA orders created within a specific time range.
+     *
+     * @param startTime the start epoch time.
+     * @param endTime   the end epoch time.
+     * @return a list of JupiterDca objects within the specified time range.
+     */
+    public List<JupiterDca> getDcaOrdersByTimeRange(long startTime, long endTime) {
+        return getDcaAccounts().stream()
+                .filter(dca -> dca.getCreatedAt() >= startTime && dca.getCreatedAt() <= endTime)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves Jupiter DCA orders sorted by the total deposited amount in descending order.
+     *
+     * @return a list of JupiterDca objects sorted by volume.
+     */
+    public List<JupiterDca> getDcaOrdersSortedByVolume() {
+        return getDcaAccounts().stream()
+                .sorted(Comparator.comparingLong(JupiterDca::getInDeposited).reversed())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves aggregated statistics for a specific user's DCA activities.
+     *
+     * @param user the PublicKey of the user.
+     * @return a UserDcaStats object containing aggregated statistics.
+     */
+    public JupiterUserDcaStats getUserDcaStatistics(PublicKey user) {
+        List<JupiterDca> userDcas = getDcaAccounts(user);
+
+        long totalOrders = userDcas.size();
+        double totalVolume = userDcas.stream()
+                .mapToDouble(dca -> (double) dca.getInDeposited() / Math.pow(10, 6))
+                .sum();
+        Set<PublicKey> uniqueInputTokens = userDcas.stream()
+                .map(JupiterDca::getInputMint)
+                .collect(Collectors.toSet());
+        Set<PublicKey> uniqueOutputTokens = userDcas.stream()
+                .map(JupiterDca::getOutputMint)
+                .collect(Collectors.toSet());
+
+        return new JupiterUserDcaStats(totalOrders, totalVolume, uniqueInputTokens, uniqueOutputTokens);
+    }
+
+
+    /**
+     * Retrieves the most recent Jupiter DCA orders up to the specified limit.
+     *
+     * @param limit the maximum number of recent orders to retrieve.
+     * @return a list of recent JupiterDca objects.
+     */
+    public List<JupiterDca> getRecentDcaOrders(int limit) {
+        return getDcaAccounts().stream()
+                .sorted(Comparator.comparingLong(JupiterDca::getCreatedAt).reversed())
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    // Additional methods can be added here as needed for other use cases.
 }

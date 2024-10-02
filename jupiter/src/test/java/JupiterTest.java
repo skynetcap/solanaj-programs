@@ -342,7 +342,7 @@ public class JupiterTest {
             assertTrue(dca.getInUsed() >= 0, "DCA inUsed should be non-negative");
             assertTrue(dca.getOutReceived() >= 0, "DCA outReceived should be non-negative");
             assertTrue(dca.getInAmountPerCycle() > 0, "DCA inAmountPerCycle should be greater than 0");
-            assertTrue(dca.getCycleFrequency() > 0, "DCA cycleFrequency should be greater than 0");
+            assertTrue(dca.getCycleFrequency() > 0, "DCA cykleFrequency should be greater than 0");
             assertTrue(dca.getNextCycleAmountLeft() >= 0, "DCA nextCycleAmountLeft should be non-negative");
             assertNotNull(dca.getInAccount(), "DCA inAccount should not be null");
             assertNotNull(dca.getOutAccount(), "DCA outAccount should not be null");
@@ -418,9 +418,9 @@ public class JupiterTest {
                 double outputOrderSize = inputOrderSize * inputPriceUsd / outputPriceUsd;
 
                 boolean minInRange = (dca.getMinOutAmount() == 0) 
-                                     || (outputOrderSize >= ((double) dca.getMinOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+                                   || (outputOrderSize >= ((double) dca.getMinOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
                 boolean maxInRange = (dca.getMaxOutAmount() == 0) 
-                                     || (outputOrderSize <= ((double) dca.getMaxOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+                                   || (outputOrderSize <= ((double) dca.getMaxOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
 
                 return minInRange && maxInRange;
             })
@@ -448,13 +448,14 @@ public class JupiterTest {
             double outputOrderSize = inputOrderSize * inputPriceUsd / outputPriceUsd;
 
             boolean minInRange = (dca.getMinOutAmount() == 0) 
-                                 || (outputOrderSize >= ((double) dca.getMinOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+                               || (outputOrderSize >= ((double) dca.getMinOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
             boolean maxInRange = (dca.getMaxOutAmount() == 0) 
-                                 || (outputOrderSize <= ((double) dca.getMaxOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
+                               || (outputOrderSize <= ((double) dca.getMaxOutAmount() / Math.pow(10, 6))); // Assuming 6 decimals
 
             assertTrue(minInRange, "Output order size should be within the minimum range");
             assertTrue(maxInRange, "Output order size should be within the maximum range");
         });
+
 
         log.info("Open DCA Orders [{}]: {}", openDcaOrders.size(), openDcaOrders);
         log.info("Size: {}", openDcaOrders.size());
@@ -475,5 +476,179 @@ public class JupiterTest {
         JupiterManager manager = new JupiterManager(client);
         List<JupiterDca> jupiterDcas = manager.getDcaAccounts(new PublicKey("ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB"));
         log.info("DCAs for user: {}", jupiterDcas);
+    }
+
+    /**
+     * Tests retrieving completed DCA orders.
+     */
+    @Test
+    public void testGetCompletedDcaOrders() {
+        JupiterManager manager = new JupiterManager(client);
+        List<JupiterDca> completedDcaOrders = manager.getCompletedDcaOrders();
+
+        assertNotNull(completedDcaOrders, "Completed DCA orders list should not be null");
+        // This assertion depends on expected data; adjust as necessary
+        // assertFalse(completedDcaOrders.isEmpty(), "Completed DCA orders list should contain at least one account");
+
+        // Verify each completed DCA order meets the completion criteria
+        completedDcaOrders.forEach(dca -> {
+            boolean isUsedFully = dca.getInUsed() >= dca.getInDeposited();
+            boolean isExpired = dca.getNextCycleAt() <= Instant.now().getEpochSecond();
+            assertTrue(isUsedFully || isExpired, "DCA order should be either fully used or expired");
+        });
+
+        log.info("Completed DCA Orders [{}]: {}", completedDcaOrders.size(), completedDcaOrders);
+    }
+
+    /**
+     * Tests retrieving DCA orders within a specific time range.
+     */
+    @Test
+    public void testGetDcaOrdersByTimeRange() {
+        JupiterManager manager = new JupiterManager(client);
+        long startTime = Instant.now().minusSeconds(86400).getEpochSecond(); // 24 hours ago
+        long endTime = Instant.now().getEpochSecond();
+
+        List<JupiterDca> dcaOrders = manager.getDcaOrdersByTimeRange(startTime, endTime);
+
+        assertNotNull(dcaOrders, "DCA orders list should not be null");
+        // Adjust the following assertion based on expected data
+        // assertFalse(dcaOrders.isEmpty(), "DCA orders list should contain at least one account within the time range");
+
+        // Verify each DCA order falls within the specified time range
+        dcaOrders.forEach(dca -> {
+            assertTrue(dca.getCreatedAt() >= startTime && dca.getCreatedAt() <= endTime,
+                    "DCA order should be within the specified time range");
+        });
+
+        log.info("DCA Orders within Time Range [{} - {}]: {}", startTime, endTime, dcaOrders.size());
+    }
+
+    /**
+     * Tests retrieving DCA orders sorted by volume.
+     */
+    @Test
+    public void testGetDcaOrdersSortedByVolume() {
+        JupiterManager manager = new JupiterManager(client);
+        List<JupiterDca> sortedDcaOrders = manager.getDcaOrdersSortedByVolume();
+
+        assertNotNull(sortedDcaOrders, "Sorted DCA orders list should not be null");
+        assertFalse(sortedDcaOrders.isEmpty(), "Sorted DCA orders list should contain at least one account");
+
+        // Verify the list is sorted in descending order of inDeposited
+        for (int i = 0; i < sortedDcaOrders.size() - 1; i++) {
+            assertTrue(sortedDcaOrders.get(i).getInDeposited() >= sortedDcaOrders.get(i + 1).getInDeposited(),
+                    "DCA orders should be sorted by deposited amount in descending order");
+        }
+
+        log.info("Sorted DCA Orders by Volume [{}]: {}", sortedDcaOrders.size(), sortedDcaOrders);
+    }
+
+    /**
+     * Tests retrieving user-specific DCA statistics.
+     */
+    @Test
+    public void testGetUserDcaStatistics() {
+        JupiterManager manager = new JupiterManager(client);
+        PublicKey userPublicKey = new PublicKey("ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB");
+        JupiterUserDcaStats stats = manager.getUserDcaStatistics(userPublicKey);
+
+        assertNotNull(stats, "User DCA statistics should not be null");
+        assertTrue(stats.getTotalOrders() >= 0, "Total orders should be non-negative");
+        assertTrue(stats.getTotalVolumeUsd() >= 0, "Total volume should be non-negative");
+        assertNotNull(stats.getUniqueInputTokens(), "Unique input tokens should not be null");
+        assertNotNull(stats.getUniqueOutputTokens(), "Unique output tokens should not be null");
+
+        log.info("User DCA Statistics: {}", stats);
+    }
+
+    /**
+     * Tests retrieving recent DCA orders.
+     */
+    @Test
+    public void testGetRecentDcaOrders() {
+        JupiterManager manager = new JupiterManager(client);
+        int limit = 10;
+        List<JupiterDca> recentDcaOrders = manager.getRecentDcaOrders(limit);
+
+        assertNotNull(recentDcaOrders, "Recent DCA orders list should not be null");
+        assertTrue(recentDcaOrders.size() <= limit, "Recent DCA orders list should not exceed the specified limit");
+
+        // Verify the list is sorted in descending order of createdAt
+        for (int i = 0; i < recentDcaOrders.size() - 1; i++) {
+            assertTrue(recentDcaOrders.get(i).getCreatedAt() >= recentDcaOrders.get(i + 1).getCreatedAt(),
+                    "DCA orders should be sorted by createdAt in descending order");
+        }
+
+        log.info("Recent DCA Orders [{}]: {}", recentDcaOrders.size(), recentDcaOrders);
+    }
+
+    @Test
+    public void testGetActiveDcaOrders() {
+        JupiterManager manager = new JupiterManager(client);
+        List<JupiterDca> activeDcaOrders = manager.getActiveDcaOrders();
+
+        assertNotNull(activeDcaOrders, "Active DCA orders list should not be null");
+
+        activeDcaOrders.forEach(dca -> {
+            assertTrue(dca.getInUsed() < dca.getInDeposited(), "Used amount should be less than deposited amount");
+            assertTrue(dca.getInDeposited() > 0, "Deposited amount should be greater than 0");
+            assertTrue(dca.getInAmountPerCycle() > 0, "Amount per cycle should be greater than 0");
+            assertTrue(dca.getCycleFrequency() > 0, "Cycle frequency should be greater than 0");
+            assertNotNull(dca.getUser(), "User should not be null");
+            assertNotNull(dca.getInputMint(), "Input mint should not be null");
+            assertNotNull(dca.getOutputMint(), "Output mint should not be null");
+        });
+
+        log.info("Active DCA Orders [{}]: {}", activeDcaOrders.size(), activeDcaOrders);
+    }
+
+    @Test
+    public void testGetDcaOrdersByTokenPair() {
+        JupiterManager manager = new JupiterManager(client);
+        PublicKey inputMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // USDC
+        PublicKey outputMint = new PublicKey("So11111111111111111111111111111111111111112"); // SOL
+
+        List<JupiterDca> dcaOrdersByPair = manager.getDcaOrdersByTokenPair(inputMint, outputMint);
+
+        assertNotNull(dcaOrdersByPair, "DCA orders by token pair list should not be null");
+        dcaOrdersByPair.forEach(dca -> {
+            assertEquals(inputMint, dca.getInputMint(), "Input mint should match");
+            assertEquals(outputMint, dca.getOutputMint(), "Output mint should match");
+        });
+
+        log.info("DCA Orders for USDC-SOL pair [{}]: {}", dcaOrdersByPair.size(), dcaOrdersByPair);
+    }
+
+    @Test
+    public void testGetAggregatedDcaVolume() {
+        JupiterManager manager = new JupiterManager(client);
+        PublicKey inputMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // USDC
+        PublicKey outputMint = new PublicKey("So11111111111111111111111111111111111111112"); // SOL
+        long startTime = Instant.now().minusSeconds(86400 * 7).getEpochSecond(); // 7 days ago
+        long endTime = Instant.now().getEpochSecond();
+
+        double aggregatedVolume = manager.getAggregatedDcaVolume(inputMint, outputMint, startTime, endTime);
+
+        assertTrue(aggregatedVolume >= 0, "Aggregated volume should be non-negative");
+        log.info("Aggregated DCA Volume for USDC-SOL pair in the last 7 days: {}", aggregatedVolume);
+    }
+
+    @Test
+    public void testGetMostPopularDcaPairs() {
+        JupiterManager manager = new JupiterManager(client);
+        int limit = 5;
+
+        var popularPairs = manager.getMostPopularDcaPairs(limit);
+
+        assertNotNull(popularPairs, "Popular DCA pairs list should not be null");
+        assertTrue(popularPairs.size() <= limit, "Number of popular pairs should not exceed the limit");
+
+        for (int i = 0; i < popularPairs.size() - 1; i++) {
+            assertTrue(popularPairs.get(i).getValue() >= popularPairs.get(i + 1).getValue(),
+                    "Pairs should be sorted by count in descending order");
+        }
+
+        log.info("Most Popular DCA Pairs [{}]: {}", popularPairs.size(), popularPairs);
     }
 }
