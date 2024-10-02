@@ -457,4 +457,21 @@ public class JupiterTest {
         log.info("Open DCA Orders [{}]: {}", openDcaOrders.size(), openDcaOrders);
         log.info("Size: {}", openDcaOrders.size());
     }
+
+    @Test
+    public void testGetDcaAccountsByUserFiltering() {
+        JupiterManager manager = new JupiterManager(client);
+        List<JupiterDca> jupiterDcas = manager.getAllDcaAccounts()
+                .stream()
+                .filter(jupiterDca -> jupiterDca.getUser().equals(new PublicKey("ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB")))
+                .toList();
+        log.info("DCAs for ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB: {}", jupiterDcas);
+    }
+
+    @Test
+    public void testGetDcaAccountsByUser() {
+        JupiterManager manager = new JupiterManager(client);
+        List<JupiterDca> jupiterDcas = manager.getAllDcaAccounts(new PublicKey("ESmavfhN3JKy3q3iJfP2FJYWNDRWVEkcKmzzVfetU5eB"));
+        log.info("DCAs for user: {}", jupiterDcas);
+    }
 }

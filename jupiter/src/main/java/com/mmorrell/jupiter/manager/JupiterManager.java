@@ -19,7 +19,7 @@ public class JupiterManager {
 
     private final RpcClient client;
     private static final PublicKey JUPITER_PROGRAM_ID = new PublicKey("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
-    private static final String DCA_PROGRAM_ID = "DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M"; // Replace with actual DCA Program ID
+    private static final PublicKey DCA_PROGRAM_ID = new PublicKey("DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M");
     private static final int DCA_ACCOUNT_SIZE = 289; // Updated based on JupiterDca structure
 
     public JupiterManager() {
@@ -107,8 +107,6 @@ public class JupiterManager {
      * @throws RpcException if the RPC call fails.
      */
     public List<JupiterDca> getAllDcaAccounts() {
-        PublicKey programId = new PublicKey(DCA_PROGRAM_ID);
-
         byte[] dcaDiscriminator = JupiterUtil.getAccountDiscriminator("Dca");
 
         // Create a memcmp filter for the discriminator at offset 0
@@ -116,8 +114,36 @@ public class JupiterManager {
 
         try {
             List<ProgramAccount> accounts = client.getApi().getProgramAccounts(
-                    programId,
+                    DCA_PROGRAM_ID,
                     List.of(memCmpFilter),
+                    DCA_ACCOUNT_SIZE
+            );
+
+            List<JupiterDca> dcaAccounts = new ArrayList<>();
+            for (ProgramAccount account : accounts) {
+                byte[] data = account.getAccount().getDecodedData();
+                JupiterDca dca = JupiterDca.fromByteArray(data);
+                dcaAccounts.add(dca);
+            }
+
+            return dcaAccounts;
+        } catch (RpcException ex) {
+            log.warn("Error fetching DCA accounts: {}", ex.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<JupiterDca> getAllDcaAccounts(PublicKey user) {
+        byte[] dcaDiscriminator = JupiterUtil.getAccountDiscriminator("Dca");
+
+        // Create a memcmp filter for the discriminator at offset 0
+        Memcmp memCmpFilter = new Memcmp(0, Base58.encode(dcaDiscriminator));
+        Memcmp memCmpFilterUser = new Memcmp(8, Base58.encode(user.toByteArray()));
+
+        try {
+            List<ProgramAccount> accounts = client.getApi().getProgramAccounts(
+                    DCA_PROGRAM_ID,
+                    List.of(memCmpFilter, memCmpFilterUser),
                     DCA_ACCOUNT_SIZE
             );
 
