@@ -584,6 +584,14 @@ public class JupiterTest {
     }
 
     @Test
+    public void testSpecificUserAdhoc() {
+        JupiterManager manager = new JupiterManager(client);
+        var stats = manager.getUserDcaStatistics(new PublicKey("F4KpkufKgrPD5j1JaDTpvTb36cGHBYUnXtmGgnsVHRkB"));
+
+        log.info("Stats F4KpkufKgrPD5j1JaDTpvTb36cGHBYUnXtmGgnsVHRkB: {}", stats.toString());
+    }
+
+    @Test
     public void testGetActiveDcaOrders() {
         JupiterManager manager = new JupiterManager(client);
         List<JupiterDca> activeDcaOrders = manager.getActiveDcaOrders();
