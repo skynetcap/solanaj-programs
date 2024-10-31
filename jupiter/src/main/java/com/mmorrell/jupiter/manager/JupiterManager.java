@@ -167,9 +167,8 @@ public class JupiterManager {
     }
 
     public List<JupiterDca> getActiveDcaOrders() {
-        long now = Instant.now().getEpochSecond();
         return getDcaAccounts().stream()
-            .filter(dca -> dca.getNextCycleAt() > now && dca.getInUsed() < dca.getInDeposited())
+            .filter(dca -> dca.getInUsed() <= dca.getInDeposited())
             .collect(Collectors.toList());
     }
 
