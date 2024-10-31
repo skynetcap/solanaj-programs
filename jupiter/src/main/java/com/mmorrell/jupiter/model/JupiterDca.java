@@ -40,6 +40,9 @@ public class JupiterDca {
     private long createdAt;
     private byte bump;
 
+    // Not deserialized, but passed in from GPA
+    private PublicKey publicKey;
+
     /**
      * Checks if the input mint is a stablecoin (USDC or USDT).
      *
