@@ -128,7 +128,7 @@ public class JupiterManager {
             for (ProgramAccount account : accounts) {
                 byte[] data = account.getAccount().getDecodedData();
                 JupiterDca dca = JupiterDca.fromByteArray(data);
-                dca.setUser(new PublicKey(account.getPubkey()));
+                dca.setPublicKey(account.getPublicKey());
                 dcaAccounts.add(dca);
             }
 
@@ -157,7 +157,7 @@ public class JupiterManager {
             for (ProgramAccount account : accounts) {
                 byte[] data = account.getAccount().getDecodedData();
                 JupiterDca dca = JupiterDca.fromByteArray(data);
-                dca.setUser(new PublicKey(account.getPubkey()));
+                dca.setPublicKey(account.getPublicKey());
                 dcaAccounts.add(dca);
             }
 
