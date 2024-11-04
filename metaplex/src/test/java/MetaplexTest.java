@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MetaplexTest {
 
     private static final Logger LOGGER = Logger.getLogger(MetaplexTest.class.getName());
-    private static final PublicKey CRIPCO_TOKEN_MINT = new PublicKey("3uejHm24sWmniGA5m4j4S1DVuGqzYBR5DJpevND4mivq");
+    private static final PublicKey ORE_MINT = new PublicKey("oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp");
     private final RpcClient rpcClient = new RpcClient(Cluster.MAINNET);
     private final MetaplexManager metaplexManager = new MetaplexManager(rpcClient);
 
@@ -25,7 +25,7 @@ public class MetaplexTest {
 
     @Test
     public void metadataTest() {
-        final Optional<Metadata> optionalMetadata = metaplexManager.getTokenMetadata(CRIPCO_TOKEN_MINT);
+        final Optional<Metadata> optionalMetadata = metaplexManager.getTokenMetadata(ORE_MINT);
         assertTrue(optionalMetadata.isPresent());
 
         final Metadata metadata = optionalMetadata.get();

@@ -24,7 +24,7 @@ public class MetaplexManager {
     private static final int MINT_OFFSET = 33;
     private static final int NAME_OFFSET = 65;
     private static final int SYMBOL_OFFSET = 101;
-    private static final int URI_OFFSET = 115;
+    private static final int URI_OFFSET = 119;
 
     // Sizes (in bytes)
     private static final int NAME_SIZE = 36;
