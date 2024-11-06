@@ -39,6 +39,22 @@ public class MetaplexTest {
     }
 
     @Test
+    public void metadataEmojiSymbolTest() {
+        final Optional<Metadata> optionalMetadata = metaplexManager.getTokenMetadata(
+                new PublicKey("Fc9Lf5TeCQr3xUHL2zpgVSjHkq2GD25bUxVa6oDSpump")
+        );
+        assertTrue(optionalMetadata.isPresent());
+
+        final Metadata metadata = optionalMetadata.get();
+        log.info(
+                String.format(
+                        "Metadata: %s",
+                        metadata
+                )
+        );
+    }
+
+    @Test
     public void metadataMultipleTest() {
         var metadata = metaplexManager.getTokenMetadata(
                 List.of(

@@ -1,13 +1,19 @@
 package com.mmorrell.metaplex.manager;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mmorrell.metaplex.model.Metadata;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.AccountInfo;
 import org.p2p.solanaj.utils.ByteUtils;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,17 +107,20 @@ public class MetaplexManager {
             try {
                 accountInfos = client.getApi().getMultipleAccountsMap(metadataPdas);
             } catch (RpcException e) {
-                log.info("Error getting multiple accounts map for batch starting at index {}: {}", 
-                         tokenMints.indexOf(batch.get(0)), e.getMessage());
+                log.info("Error getting multiple accounts map for batch starting at index {}: {}",
+                        tokenMints.indexOf(batch.get(0)), e.getMessage());
                 continue; // Skip this batch and proceed with the next
             }
+
+            // Map to track lookups we have to do
+            Map<PublicKey, String> tokenMintJsonMap = new HashMap<>();
 
             for (Map.Entry<PublicKey, Optional<AccountInfo.Value>> entry : accountInfos.entrySet()) {
                 PublicKey metadataPda = entry.getKey();
                 Optional<AccountInfo.Value> accountInfoOpt = entry.getValue();
 
-                if (metadataCache.containsKey(metadataPda)) {
-                    metadataMap.put(metadataToTokenMintMap.get(metadataPda), metadataCache.get(metadataPda));
+                if (metadataCache.containsKey(metadataToTokenMintMap.get(metadataPda))) {
+                    metadataMap.put(metadataToTokenMintMap.get(metadataPda), metadataCache.get(metadataToTokenMintMap.get(metadataPda)));
                 } else if (accountInfoOpt.isEmpty()) {
                     // No data available for this PDA
                 } else {
@@ -125,6 +134,7 @@ public class MetaplexManager {
                                 .uri(new String(ByteUtils.readBytes(data, URI_OFFSET, URI_SIZE)).trim())
                                 .build();
 
+                        tokenMintJsonMap.put(metadataToTokenMintMap.get(metadataPda), metadata.getUri());
                         metadataCache.put(metadataToTokenMintMap.get(metadataPda), metadata);
                         metadataMap.put(metadataToTokenMintMap.get(metadataPda), metadata);
                     } catch (Exception e) {
@@ -132,9 +142,9 @@ public class MetaplexManager {
                     }
                 }
             }
+            // iterate tokenMintJsonMap todo
         }
 
         return metadataMap;
     }
-
 }
