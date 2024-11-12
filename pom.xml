@@ -162,8 +162,8 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
-                            <homedir>/Users/chintan_mbp/.gnupg/</homedir>
-                            <keyname></keyname>
+                            <homedir>c:/Users/Michael/.gnupg/</homedir>
+                            <keyname>0x27FAE7D2</keyname>
                         </configuration>
                     </execution>
                 </executions>
